@@ -16,7 +16,7 @@ Frontend: React.js / HTML5 / CSS3 / JavaScript
 Backend: Node.js / Express
 Base de Datos: PostgreSQL (Supabase)
 Autenticación: Supabase Auth
-Deployment: GitHub Pages / Netlify
+Deployment: GitHub Pages
 
 🚀 Configuración Inicial para Desarrolladores
 Prerrequisitos
@@ -28,12 +28,10 @@ Editor de código (recomendado: VS Code)
 
 📦 Instalación
 
-Clonar el repositorio:
-bashgit clone https://github.com/tu-usuario/radio-oriente.git
-cd radio-oriente
-
 Instalar dependencias:
-bashnpm install
+bash 
+
+npm install
 
 Configurar variables de entorno:
 bash# Crear archivo de configuración local
@@ -46,14 +44,16 @@ REACT_APP_SUPABASE_ANON_KEY=tu-anon-key-aqui
 
 # Configuración de la radio
 REACT_APP_RADIO_STREAM_URL=url-del-stream-aqui
-REACT_APP_API_BASE_URL=https://api.radiooriente.com
+
 
 # Servicios externos
 REACT_APP_GOOGLE_MAPS_API_KEY=tu-google-maps-key
 REACT_APP_YOUTUBE_API_KEY=tu-youtube-api-key
 
 Iniciar el servidor de desarrollo:
-bashnpm start
+bash
+
+npm start
 
 Abrir en el navegador: http://localhost:3000
 
