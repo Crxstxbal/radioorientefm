@@ -20,7 +20,7 @@ const LoginModal = ({ isOpen, onClose, setUsuario }) => {
     setError(null);
     try {
       const res = await axios.post("http://localhost:3001/api/login", {
-        usuario: usuarioInput,
+        identificador: usuarioInput,
         password: passwordInput,
       });
       setUsuario(res.data);
