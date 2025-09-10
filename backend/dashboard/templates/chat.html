@@ -1,0 +1,324 @@
+{% extends 'dashboard/base.html' %} {% block page_title %}Moderación del Chat{%
+endblock %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>
+    <i class="fas fa-comments text-primary me-2"></i>
+    Moderación del Chat
+  </h2>
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-outline-primary active">Todos</button>
+    <button type="button" class="btn btn-outline-warning">Reportados</button>
+    <button type="button" class="btn btn-outline-danger">Bloqueados</button>
+  </div>
+</div>
+
+<!-- Estadísticas del chat -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <i class="fas fa-comments fa-2x text-primary mb-2"></i>
+        <h5>{{ messages|length }}</h5>
+        <small class="text-muted">Mensajes Hoy</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <i class="fas fa-users fa-2x text-success mb-2"></i>
+        <h5>42</h5>
+        <small class="text-muted">Usuarios Activos</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <i class="fas fa-flag fa-2x text-warning mb-2"></i>
+        <h5>3</h5>
+        <small class="text-muted">Reportes</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <i class="fas fa-ban fa-2x text-danger mb-2"></i>
+        <h5>1</h5>
+        <small class="text-muted">Bloqueados</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Mensajes del chat -->
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header bg-white">
+        <div class="row align-items-center">
+          <div class="col">
+            <h5 class="mb-0">Mensajes Recientes</h5>
+          </div>
+          <div class="col-auto">
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Buscar mensajes..."
+                id="searchMessages"
+              />
+              <button class="btn btn-outline-secondary" type="button">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body" style="max-height: 600px; overflow-y: auto">
+        {% for message in messages %}
+        <div class="d-flex mb-3 pb-3 border-bottom message-item">
+          <div class="flex-shrink-0">
+            <div
+              class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
+              style="width: 40px; height: 40px"
+            >
+              <i class="fas fa-user text-white"></i>
+            </div>
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="mb-1">
+                  {{ message.usuario_nombre|default:"Usuario anónimo" }}
+                </h6>
+                <small class="text-muted"
+                  >{{ message.sala|default:"General" }} • {{
+                  message.fecha_creacion|timesince }} ago</small
+                >
+              </div>
+              <div class="dropdown">
+                <button
+                  class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                >
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="#"
+                      ><i class="fas fa-flag me-2"></i>Reportar</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#"
+                      ><i class="fas fa-ban me-2"></i>Bloquear Usuario</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item text-danger" href="#"
+                      ><i class="fas fa-trash me-2"></i>Eliminar</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <p class="mb-0 mt-2">{{ message.mensaje }}</p>
+          </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-4">
+          <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+          <p class="text-muted">No hay mensajes en el chat</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel de moderación -->
+  <div class="col-lg-4">
+    <div class="card mb-4">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">
+          <i class="fas fa-shield-alt text-success me-2"></i>
+          Herramientas de Moderación
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <button class="btn btn-outline-primary">
+            <i class="fas fa-volume-mute me-2"></i>
+            Silenciar Chat
+          </button>
+          <button class="btn btn-outline-warning">
+            <i class="fas fa-broom me-2"></i>
+            Limpiar Chat
+          </button>
+          <button class="btn btn-outline-info">
+            <i class="fas fa-robot me-2"></i>
+            Filtros Automáticos
+          </button>
+          <button class="btn btn-outline-success">
+            <i class="fas fa-download me-2"></i>
+            Exportar Logs
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Usuarios más activos -->
+    <div class="card mb-4">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">
+          <i class="fas fa-star text-warning me-2"></i>
+          Usuarios Más Activos
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex align-items-center">
+            <div
+              class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3"
+              style="width: 32px; height: 32px"
+            >
+              <i class="fas fa-user text-white small"></i>
+            </div>
+            <div>
+              <strong>juan_radio</strong>
+              <br /><small class="text-muted">47 mensajes</small>
+            </div>
+          </div>
+          <span class="badge bg-success">Activo</span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex align-items-center">
+            <div
+              class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3"
+              style="width: 32px; height: 32px"
+            >
+              <i class="fas fa-user text-white small"></i>
+            </div>
+            <div>
+              <strong>maria_music</strong>
+              <br /><small class="text-muted">32 mensajes</small>
+            </div>
+          </div>
+          <span class="badge bg-primary">Online</span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex align-items-center">
+            <div
+              class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3"
+              style="width: 32px; height: 32px"
+            >
+              <i class="fas fa-user text-white small"></i>
+            </div>
+            <div>
+              <strong>carlos_fm</strong>
+              <br /><small class="text-muted">28 mensajes</small>
+            </div>
+          </div>
+          <span class="badge bg-secondary">Offline</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Palabras filtradas -->
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">
+          <i class="fas fa-filter text-danger me-2"></i>
+          Filtros de Contenido
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label">Palabras Prohibidas</label>
+          <textarea
+            class="form-control"
+            rows="3"
+            placeholder="Ingresa palabras separadas por comas"
+          ></textarea>
+        </div>
+        <div class="form-check mb-3">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="autoFilter"
+            checked
+          />
+          <label class="form-check-label" for="autoFilter">
+            Filtro automático activado
+          </label>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="linkFilter" />
+          <label class="form-check-label" for="linkFilter">
+            Bloquear enlaces
+          </label>
+        </div>
+        <button class="btn btn-primary btn-sm w-100">Actualizar Filtros</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  // Búsqueda de mensajes
+  document
+    .getElementById("searchMessages")
+    .addEventListener("input", function (e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const messages = document.querySelectorAll(".message-item");
+
+      messages.forEach((message) => {
+        const text = message.textContent.toLowerCase();
+        message.style.display = text.includes(searchTerm) ? "" : "none";
+      });
+    });
+
+  // Auto-refresh cada 10 segundos
+  setInterval(function () {
+    // Aquí se podría hacer una llamada AJAX para actualizar los mensajes
+    console.log("Actualizando mensajes del chat...");
+  }, 10000);
+
+  // Simular notificaciones de nuevos mensajes
+  function showNotification(message) {
+    // Crear notificación toast
+    const toast = document.createElement("div");
+    toast.className =
+      "toast align-items-center text-white bg-primary border-0 position-fixed top-0 end-0 m-3";
+    toast.style.zIndex = "9999";
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-comment me-2"></i>
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    document.body.appendChild(toast);
+
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+
+    // Eliminar el toast después de que se oculte
+    toast.addEventListener("hidden.bs.toast", function () {
+      toast.remove();
+    });
+  }
+
+  // Simular nuevos mensajes cada 30 segundos
+  setInterval(function () {
+    if (Math.random() > 0.7) {
+      showNotification("Nuevo mensaje en el chat");
+    }
+  }, 30000);
+</script>
+{% endblock %}

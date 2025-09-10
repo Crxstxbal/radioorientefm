@@ -1,0 +1,619 @@
+{% extends 'dashboard/base.html' %} {% block page_title %}Gestión de Radio{%
+endblock %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>
+    <i class="fas fa-broadcast-tower text-primary me-2"></i>
+    Gestión de Radio
+  </h2>
+  <div>
+    <button
+      class="btn btn-success me-2"
+      data-bs-toggle="modal"
+      data-bs-target="#addProgramModal"
+    >
+      <i class="fas fa-plus me-2"></i>
+      Nuevo Programa
+    </button>
+    <button
+      class="btn btn-info"
+      data-bs-toggle="modal"
+      data-bs-target="#stationConfigModal"
+    >
+      <i class="fas fa-cog me-2"></i>
+      Configurar Estación
+    </button>
+  </div>
+</div>
+
+<!-- Estado de la estación -->
+<div class="row mb-4">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">
+          <i class="fas fa-radio text-danger me-2"></i>
+          Estado de la Estación
+        </h5>
+      </div>
+      <div class="card-body">
+        {% if station %}
+        <div class="row">
+          <div class="col-md-6">
+            <h6>{{ station.nombre }}</h6>
+            <p class="text-muted mb-1">
+              {{ station.descripcion|default:"Sin descripción" }}
+            </p>
+            <p class="mb-0">
+              <strong>Stream URL:</strong>
+              <code>{{ station.stream_url|default:"No configurado" }}</code>
+            </p>
+          </div>
+          <div class="col-md-6">
+            <div class="d-flex align-items-center justify-content-end">
+              {% if station.activo %}
+              <span class="badge bg-success fs-6 me-3">
+                <i class="fas fa-broadcast-tower me-1"></i>
+                EN VIVO
+              </span>
+              {% else %}
+              <span class="badge bg-danger fs-6 me-3">
+                <i class="fas fa-stop-circle me-1"></i>
+                FUERA DEL AIRE
+              </span>
+              {% endif %}
+            </div>
+            <div class="text-end mt-2">
+              <small class="text-muted">
+                Canción actual: {{ station.cancion_actual|default:"Sin
+                información" }}
+              </small>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="fas fa-radio fa-3x text-muted mb-3"></i>
+          <p class="text-muted">No hay configuración de estación</p>
+          <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#stationConfigModal"
+          >
+            Configurar Estación
+          </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Estadísticas</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-3">
+          <span>Programas Activos</span>
+          <strong>{{ programs|length }}</strong>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+          <span>Noticias</span>
+          <strong>{{ news|length }}</strong>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span>Estado</span>
+          {% if station.activo %}
+          <span class="text-success"><strong>Online</strong></span>
+          {% else %}
+          <span class="text-danger"><strong>Offline</strong></span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Programación -->
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">
+          <i class="fas fa-calendar-alt text-info me-2"></i>
+          Programación
+        </h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Programa</th>
+                <th>Horario</th>
+                <th>Días</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for program in programs %}
+              <tr>
+                <td>
+                  <div>
+                    <strong>{{ program.nombre }}</strong>
+                    <br /><small class="text-muted"
+                      >{{ program.descripcion|truncatechars:50 }}</small
+                    >
+                  </div>
+                </td>
+                <td>
+                  {{ program.hora_inicio|time:"H:i" }} - {{
+                  program.hora_fin|time:"H:i" }}
+                </td>
+                <td>
+                  <span class="badge bg-secondary"
+                    >{{ program.dias_semana|default:"Todos los días" }}</span
+                  >
+                </td>
+                <td>
+                  {% if program.activo %}
+                  <span class="badge bg-success">Activo</span>
+                  {% else %}
+                  <span class="badge bg-danger">Inactivo</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-primary"
+                      data-bs-toggle="modal"
+                      data-bs-target="#editProgramModal"
+                      data-program-id="{{ program.id }}"
+                      data-program-nombre="{{ program.nombre }}"
+                      data-program-descripcion="{{ program.descripcion }}"
+                      data-program-hora-inicio="{{ program.hora_inicio|time:'H:i' }}"
+                      data-program-hora-fin="{{ program.hora_fin|time:'H:i' }}"
+                      data-program-dias="{{ program.dias_semana }}"
+                      data-program-activo="{{ program.activo }}"
+                      title="Editar"
+                    >
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger"
+                      onclick="deleteItem('{% url 'delete_program' program.id %}', '{{ program.nombre|escapejs }}')"
+                      title="Eliminar"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  <i class="fas fa-calendar fa-3x text-muted mb-3"></i>
+                  <p class="text-muted">No hay programas configurados</p>
+                  <button
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addProgramModal"
+                  >
+                    Crear Primer Programa
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">
+          <i class="fas fa-newspaper text-warning me-2"></i>
+          Noticias Recientes
+        </h5>
+      </div>
+      <div class="card-body">
+        {% for item in news %}
+        <div class="d-flex mb-3 pb-3 border-bottom">
+          <div class="flex-grow-1">
+            <h6 class="mb-1">{{ item.titulo|truncatechars:40 }}</h6>
+            <p class="mb-1 small text-muted">
+              {{ item.contenido|truncatechars:80 }}
+            </p>
+            <small class="text-muted"
+              >{{ item.fecha_creacion|timesince }} ago</small
+            >
+          </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-4">
+          <i class="fas fa-newspaper fa-2x text-muted mb-3"></i>
+          <p class="text-muted">No hay noticias</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para agregar programa -->
+<div class="modal fade" id="addProgramModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nuevo Programa</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Nombre del Programa</label>
+            <input type="text" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control" rows="3"></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Hora Inicio</label>
+                <input type="time" class="form-control" required />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Hora Fin</label>
+                <input type="time" class="form-control" required />
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Días de la Semana</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Ej: Lunes a Viernes"
+            />
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="programActive"
+              checked
+            />
+            <label class="form-check-label" for="programActive">
+              Programa activo
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-primary">Crear Programa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para configurar estación -->
+<div class="modal fade" id="stationConfigModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Configuración de Estación</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Nombre de la Estación</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ station.nombre|default:'Radio Oriente FM' }}"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control" rows="3">
+{{ station.descripcion|default:'' }}</textarea
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label">URL del Stream</label>
+            <input
+              type="url"
+              class="form-control"
+              value="{{ station.stream_url|default:'' }}"
+              placeholder="https://stream.example.com/radio"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Canción Actual</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ station.cancion_actual|default:'' }}"
+              placeholder="Artista - Canción"
+            />
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="stationActive"
+              {%
+              if
+              station.activo
+              %}checked{%
+              endif
+              %}
+            />
+            <label class="form-check-label" for="stationActive">
+              Estación en vivo
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-primary">
+          Guardar Configuración
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para agregar programa -->
+<div class="modal fade" id="addProgramModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nuevo Programa</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <form method="post" action="{% url 'create_program' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre del Programa</label>
+            <input type="text" class="form-control" name="nombre" required />
+          </div>
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea
+              class="form-control"
+              name="descripcion"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="hora_inicio" class="form-label"
+                  >Hora de Inicio</label
+                >
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_inicio"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="hora_fin" class="form-label">Hora de Fin</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_fin"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="dias_semana" class="form-label"
+              >Días de la Semana</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              name="dias_semana"
+              placeholder="Ej: Lunes a Viernes"
+            />
+          </div>
+          <div class="form-check mb-3">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="activo"
+              id="activo"
+              checked
+            />
+            <label class="form-check-label" for="activo">
+              Programa activo
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">Crear Programa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar programa -->
+<div class="modal fade" id="editProgramModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Programa</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <form method="post" id="editProgramForm">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="edit-nombre" class="form-label"
+              >Nombre del Programa</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              name="nombre"
+              id="edit-nombre"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="edit-descripcion" class="form-label">Descripción</label>
+            <textarea
+              class="form-control"
+              name="descripcion"
+              id="edit-descripcion"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="edit-hora-inicio" class="form-label"
+                  >Hora de Inicio</label
+                >
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_inicio"
+                  id="edit-hora-inicio"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="edit-hora-fin" class="form-label"
+                  >Hora de Fin</label
+                >
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_fin"
+                  id="edit-hora-fin"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="edit-dias" class="form-label">Días de la Semana</label>
+            <input
+              type="text"
+              class="form-control"
+              name="dias_semana"
+              id="edit-dias"
+            />
+          </div>
+          <div class="form-check mb-3">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="activo"
+              id="edit-activo"
+            />
+            <label class="form-check-label" for="edit-activo">
+              Programa activo
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Actualizar Programa
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Manejar click en botones de editar programa
+    document
+      .querySelectorAll('[data-bs-target="#editProgramModal"]')
+      .forEach((button) => {
+        button.addEventListener("click", function () {
+          const programId = this.getAttribute("data-program-id");
+          const nombre = this.getAttribute("data-program-nombre");
+          const descripcion = this.getAttribute("data-program-descripcion");
+          const horaInicio = this.getAttribute("data-program-hora-inicio");
+          const horaFin = this.getAttribute("data-program-hora-fin");
+          const dias = this.getAttribute("data-program-dias");
+          const activo = this.getAttribute("data-program-activo") === "True";
+
+          // Llenar el formulario
+          document.getElementById("edit-nombre").value = nombre || "";
+          document.getElementById("edit-descripcion").value = descripcion || "";
+          document.getElementById("edit-hora-inicio").value = horaInicio || "";
+          document.getElementById("edit-hora-fin").value = horaFin || "";
+          document.getElementById("edit-dias").value = dias || "";
+          document.getElementById("edit-activo").checked = activo;
+
+          // Actualizar la acción del formulario
+          document.getElementById(
+            "editProgramForm"
+          ).action = `/dashboard/radio/edit/${programId}/`;
+        });
+      });
+  });
+</script>
+{% endblock %}
