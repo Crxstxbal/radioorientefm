@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Radio, Users, Music, Newspaper } from "lucide-react";
 import axios from "axios";
 import "./Home.css";
@@ -44,7 +45,11 @@ const Home = () => {
                 de santiago. Conectando comunidades a través de las ondas
                 radiales.
               </p>
-              
+              <div className="hero-buttons">
+                <Link to="/programacion" className="btn btn-primary">
+                  Ver Programación
+                </Link>
+              </div>
             </div>
             <div className="hero-image">
               <div className="radio-graphic">
