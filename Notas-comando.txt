@@ -1,0 +1,17 @@
+#Comandos Django
+pip install -r requirements.txt
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+
+#Para crear una nueva rama de archivo o modelos y tenerlo más ordenado
+python manage.py startapp NOMBRE-MODULO
+
+#Dependencias Django
+pip install channels
+
+#Frontend
+npm install
+npm start
+npm install axios lucide-react react-hot-toast react-router-dom
