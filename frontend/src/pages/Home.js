@@ -135,9 +135,9 @@ const Home = () => {
             </div>
           )}
           <div className="text-center mt-8">
-            
-              Ver Todas las Noticias
-            
+
+            Ver Todas las Noticias
+
           </div>
         </div>
       </section>
@@ -151,7 +151,7 @@ const Home = () => {
               Suscríbete a nuestro boletín y recibe las últimas noticias y
               actualizaciones
             </p>
-            
+
           </div>
         </div>
       </section>

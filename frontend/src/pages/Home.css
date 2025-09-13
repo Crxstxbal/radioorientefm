@@ -33,6 +33,11 @@
   line-height: 1.6;
 }
 
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
 .hero-image {
   display: flex;
   justify-content: center;
@@ -79,12 +84,14 @@
   width: 200px;
   height: 200px;
   animation-delay: 1s;
+  opacity: 0;
 }
 
 .wave-3 {
   width: 250px;
   height: 250px;
   animation-delay: 2s;
+  opacity: 0;
 }
 
 @keyframes wave-animation {
