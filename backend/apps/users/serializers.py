@@ -5,6 +5,8 @@ from .models import User
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
     password_confirm = serializers.CharField(write_only=True)
+    email = serializers.EmailField(write_only=True)     # alias de correo
+    username = serializers.CharField(write_only=True)   # alias de usuario
 
     class Meta:
         model = User
@@ -17,19 +19,33 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('password_confirm')
-        user = User.objects.create_user(**validated_data)
+        password = validated_data.pop('password')
+
+        correo = validated_data.pop('email')
+        usuario = validated_data.pop('username')
+        nombre = f"{validated_data.get('first_name', '')} {validated_data.get('last_name', '')}".strip()
+
+        user = User.objects.create_user(
+            correo=correo,
+            usuario=usuario,
+            password=password,
+            nombre=nombre,
+            **validated_data
+        )
         return user
+
 
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
 
     def validate(self, attrs):
-        email = attrs.get('email')
+        correo = attrs.get('email')
         password = attrs.get('password')
 
-        if email and password:
-            user = authenticate(username=email, password=password)
+        if correo and password:
+            # Django usa USERNAME_FIELD = 'correo'
+            user = authenticate(username=correo, password=password)
             if not user:
                 raise serializers.ValidationError('Credenciales inválidas.')
             if not user.is_active:
@@ -42,5 +58,8 @@ class UserLoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'avatar', 'is_premium', 'full_name')
-        read_only_fields = ('id', 'is_premium')
+        fields = ('id', 'email', 'username', 'nombre', 'first_name', 'last_name', 'is_active', 'is_staff', 'fecha_creacion')
+        read_only_fields = ('id', 'is_active', 'is_staff', 'fecha_creacion')
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }

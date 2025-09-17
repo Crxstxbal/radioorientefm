@@ -4,7 +4,6 @@ import { Radio, Users, Music, Newspaper } from "lucide-react";
 import axios from "axios";
 import "./Home.css";
 
-
 const Home = () => {
   const [featuredNews, setFeaturedNews] = useState([]);
   const [radioStation, setRadioStation] = useState(null);
@@ -48,6 +47,9 @@ const Home = () => {
               <div className="hero-buttons">
                 <Link to="/programacion" className="btn btn-primary">
                   Ver Programación
+                </Link>
+                <Link to="/contacto" className="btn btn-outline">
+                  Contáctanos
                 </Link>
               </div>
             </div>
@@ -135,9 +137,9 @@ const Home = () => {
             </div>
           )}
           <div className="text-center mt-8">
-
-            Ver Todas las Noticias
-
+            <Link to="/noticias" className="btn btn-secondary">
+              Ver Todas las Noticias
+            </Link>
           </div>
         </div>
       </section>
@@ -151,7 +153,9 @@ const Home = () => {
               Suscríbete a nuestro boletín y recibe las últimas noticias y
               actualizaciones
             </p>
-
+            <Link to="/suscripcion" className="btn btn-primary">
+              Suscribirse Ahora
+            </Link>
           </div>
         </div>
       </section>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Radio } from "lucide-react";
 import "./Navbar.css";
 
 const Navbar = () => {
@@ -12,6 +12,10 @@ const Navbar = () => {
   const navItems = [
     { name: "Inicio", path: "/" },
     { name: "Programación", path: "/programacion" },
+    { name: "Noticias", path: "/noticias" },
+    { name: "Contacto", path: "/contacto" },
+    { name: "Suscripción", path: "/suscripcion" },
+    { name: "Blog", path: "/blog" },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -52,7 +56,7 @@ const Navbar = () => {
           <div className="nav-auth desktop">
             {isAuthenticated ? (
               <div className="user-menu">
-                <span className="user-name">Hola, {user?.first_name}</span>
+                <span className="user-name">Hola {user.usuario || user.first_name || 'Usuario'}</span>
                 <button onClick={handleLogout} className="btn btn-outline">
                   Cerrar Sesión
                 </button>
@@ -91,7 +95,7 @@ const Navbar = () => {
             <div className="mobile-auth">
               {isAuthenticated ? (
                 <>
-                  <span className="user-name">Hola, {user?.first_name}</span>
+                  <span className="user-name">Hola {user.usuario || user.first_name || 'Usuario'}</span>
                   <button onClick={handleLogout} className="btn btn-outline">
                     Cerrar Sesión
                   </button>

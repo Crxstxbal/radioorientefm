@@ -1,4 +1,6 @@
+/backend/.env
 .env
 .env.example
 db.sqlite3
 database_setup.sql
+node_modules
