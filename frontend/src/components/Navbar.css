@@ -162,3 +162,13 @@
     display: flex;
   }
 }
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* espacio entre icono y nombre */
+}
+
+.user-icon {
+  color: #dc2626; /* opcional: color rojo como la marca */
+}

@@ -14,7 +14,9 @@ def api_info(request):
             'radio': '/api/radio/',
             'chat': '/api/chat/',
             'blog': '/api/blog/',
-            'contact': '/api/contact/'
+            'contact': '/api/contact/',
+            'emergentes': '/api/emergentes/'  # ← agregado
+
         }
     })
 
@@ -27,6 +29,7 @@ urlpatterns = [
     path('api/chat/', include('apps.chat.urls')),
     path('api/blog/', include('apps.blog.urls')),
     path('api/contact/', include('apps.contact.urls')),
+    path('api/emergentes/', include('apps.emergente.urls')),
 ]
 
 if settings.DEBUG:

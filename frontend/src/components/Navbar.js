@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Menu, X, Radio } from "lucide-react";
+import { Menu, X, Radio, User } from "lucide-react"; // agregamos User
 import "./Navbar.css";
 
 const Navbar = () => {
@@ -56,7 +56,8 @@ const Navbar = () => {
           <div className="nav-auth desktop">
             {isAuthenticated ? (
               <div className="user-menu">
-                <span className="user-name">Hola {user.usuario || user.first_name || 'Usuario'}</span>
+                <User className="user-icon" size={20} /> {/* icono al lado del nombre */}
+                <span className="user-name">Hola {user.username}</span>
                 <button onClick={handleLogout} className="btn btn-outline">
                   Cerrar Sesión
                 </button>
@@ -95,7 +96,8 @@ const Navbar = () => {
             <div className="mobile-auth">
               {isAuthenticated ? (
                 <>
-                  <span className="user-name">Hola {user.usuario || user.first_name || 'Usuario'}</span>
+                  <User className="user-icon" size={18} />
+                  <span className="user-name">Hola {user.username}</span>
                   <button onClick={handleLogout} className="btn btn-outline">
                     Cerrar Sesión
                   </button>

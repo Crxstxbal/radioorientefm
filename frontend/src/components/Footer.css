@@ -1,0 +1,46 @@
+.footer {
+    background-color: #111;
+    color: #fff;
+    padding: 20px 0;
+    position: relative; /* para que quede encima si hay z-index */
+    z-index: 10;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.footer-left p {
+    margin: 0;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.footer-right {
+    display: flex;
+    gap: 15px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #222;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background-color: #e60023; /* puedes usar el color rojo de tu branding */
+    transform: scale(1.1);
+    color: #fff;
+}

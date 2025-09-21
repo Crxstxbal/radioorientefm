@@ -13,6 +13,8 @@ import Subscription from './pages/Subscription';
 import Blog from './pages/Blog';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Emergente from './components/Emergente';
+import Footer from "./components/Footer";
 import './App.css';
 
 function App() {
@@ -48,12 +50,14 @@ function App() {
               <Route path="/contacto" element={<Contact />} />
               <Route path="/suscripcion" element={<Subscription />} />
               <Route path="/blog" element={<Blog />} />
+              <Route path="/emergente" element={<Emergente />} />
               <Route path="/login" element={<Login />} />
               <Route path="/registro" element={<Register />} />
             </Routes>
           </main>
           <RadioPlayer />
           <LiveChat />
+          <Footer />
           <Toaster 
             position="top-right"
             toastOptions={{

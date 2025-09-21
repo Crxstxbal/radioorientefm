@@ -30,19 +30,19 @@
                     Estado de la Estación
                 </h5>
             </div>
-            <div class="card-body">
+            <div class="card-body" id="station-status">
                 {% if station %}
                 <div class="row">
                     <div class="col-md-6">
-                        <h6>{{ station.nombre }}</h6>
-                        <p class="text-muted mb-1">{{ station.descripcion|default:"Sin descripción" }}</p>
+                        <h6 id="station-name">{{ station.nombre }}</h6>
+                        <p class="text-muted mb-1" id="station-desc">{{ station.descripcion|default:"Sin descripción" }}</p>
                         <p class="mb-0">
                             <strong>Stream URL:</strong> 
-                            <code>{{ station.stream_url|default:"No configurado" }}</code>
+                            <code id="station-url">{{ station.stream_url|default:"No configurado" }}</code>
                         </p>
                     </div>
-                    <div class="col-md-6">
-                        <div class="d-flex align-items-center justify-content-end">
+                    <div class="col-md-6 text-end">
+                        <div id="station-live-status">
                             {% if station.activo %}
                                 <span class="badge bg-success fs-6 me-3">
                                     <i class="fas fa-broadcast-tower me-1"></i>
@@ -56,7 +56,7 @@
                             {% endif %}
                         </div>
                         <div class="text-end mt-2">
-                            <small class="text-muted">
+                            <small class="text-muted" id="station-current-song">
                                 Canción actual: {{ station.cancion_actual|default:"Sin información" }}
                             </small>
                         </div>
@@ -74,6 +74,8 @@
             </div>
         </div>
     </div>
+    
+    <!-- Estadísticas de la radio -->
     <div class="col-md-4">
         <div class="card">
             <div class="card-header bg-white">
@@ -103,6 +105,7 @@
 
 <!-- Programación -->
 <div class="row">
+    <!-- Tabla de Programas -->
     <div class="col-md-8">
         <div class="card">
             <div class="card-header bg-white">
@@ -184,7 +187,8 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Noticias -->
     <div class="col-md-4">
         <div class="card">
             <div class="card-header bg-white">
@@ -221,46 +225,45 @@
                 <h5 class="modal-title">Nuevo Programa</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <form>
+            <form method="post" action="{% url 'create_program' %}">
+                {% csrf_token %}
+                <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Nombre del Programa</label>
-                        <input type="text" class="form-control" required>
+                        <label for="nombre" class="form-label">Nombre del Programa</label>
+                        <input type="text" class="form-control" name="nombre" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Descripción</label>
-                        <textarea class="form-control" rows="3"></textarea>
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" name="descripcion" rows="3"></textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Hora Inicio</label>
-                                <input type="time" class="form-control" required>
+                                <label for="hora_inicio" class="form-label">Hora de Inicio</label>
+                                <input type="time" class="form-control" name="hora_inicio" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Hora Fin</label>
-                                <input type="time" class="form-control" required>
+                                <label for="hora_fin" class="form-label">Hora de Fin</label>
+                                <input type="time" class="form-control" name="hora_fin" required>
                             </div>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Días de la Semana</label>
-                        <input type="text" class="form-control" placeholder="Ej: Lunes a Viernes">
+                        <label for="dias_semana" class="form-label">Días de la Semana</label>
+                        <input type="text" class="form-control" name="dias_semana" placeholder="Ej: Lunes a Viernes">
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="programActive" checked>
-                        <label class="form-check-label" for="programActive">
-                            Programa activo
-                        </label>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="activo" id="activo" checked>
+                        <label class="form-check-label" for="activo">Programa activo</label>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary">Crear Programa</button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Programa</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -269,40 +272,39 @@
 <div class="modal fade" id="stationConfigModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Configuración de Estación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form>
+            <form method="post" action="{% url 'update_station' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Configuración de Estación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Nombre de la Estación</label>
-                        <input type="text" class="form-control" value="{{ station.nombre|default:'Radio Oriente FM' }}" required>
+                        <input type="text" class="form-control" name="nombre" value="{{ station.nombre|default:'Radio Oriente FM' }}" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Descripción</label>
-                        <textarea class="form-control" rows="3">{{ station.descripcion|default:'' }}</textarea>
+                        <textarea class="form-control" name="descripcion" rows="3">{{ station.descripcion|default:'' }}</textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">URL del Stream</label>
-                        <input type="url" class="form-control" value="{{ station.stream_url|default:'' }}" placeholder="https://stream.example.com/radio">
+                        <input type="url" class="form-control" name="stream_url" value="{{ station.stream_url|default:'' }}" placeholder="https://stream.example.com/radio">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Canción Actual</label>
-                        <input type="text" class="form-control" value="{{ station.cancion_actual|default:'' }}" placeholder="Artista - Canción">
+                        <input type="text" class="form-control" name="cancion_actual" value="{{ station.cancion_actual|default:'' }}" placeholder="Artista - Canción">
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="stationActive" {% if station.activo %}checked{% endif %}>
-                        <label class="form-check-label" for="stationActive">
-                            Estación en vivo
-                        </label>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="activo" id="stationActive" {% if station.activo %}checked{% endif %}>
+                        <label class="form-check-label" for="stationActive">Estación en vivo</label>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary">Guardar Configuración</button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

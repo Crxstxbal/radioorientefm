@@ -11,6 +11,13 @@ urlpatterns = [
     path('chat/', views.dashboard_chat, name='dashboard_chat'),
     path('analytics/', views.dashboard_analytics, name='dashboard_analytics'),
     path('api/stats/', views.api_dashboard_stats, name='api_dashboard_stats'),
+
+    # Bandas Emergentes CRUD
+    path('emergentes/', views.dashboard_emergentes, name='dashboard_emergentes'),
+    path('emergentes/<int:banda_id>/<str:nuevo_estado>/', views.cambiar_estado_banda, name='cambiar_estado_banda'),
+    path('emergentes/<int:banda_id>/eliminar/', views.delete_banda, name='delete_banda'),
+    path('emergentes/<int:banda_id>/detalle/', views.view_banda, name='view_banda'),
+
     
     # User CRUD
     path('users/create/', views.create_user, name='create_user'),
@@ -28,7 +35,8 @@ urlpatterns = [
     path('radio/delete-program/<int:program_id>/', views.delete_program, name='delete_program'),
     path('radio/create-news/', views.create_news, name='create_news'),
     path('radio/delete-news/<int:news_id>/', views.delete_news, name='delete_news'),
-    
+    path('radio/update_station/', views.update_station, name='update_station'),
+
     # Chat Moderation
     path('chat/delete-message/<int:message_id>/', views.delete_message, name='delete_message'),
 ]

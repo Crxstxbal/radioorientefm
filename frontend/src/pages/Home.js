@@ -37,8 +37,12 @@ const Home = () => {
           <div className="hero-content">
             <div className="hero-text">
               <h1 className="hero-title">
-                Bienvenidos a <span className="text-red">Radio Oriente FM</span>
+                Bienvenidos a
               </h1>
+              <h1 className="hero-title">
+                <span className="text-red">Radio Oriente FM</span>
+              </h1>
+              
               <p className="hero-description">
                 La mejor música, noticias y entretenimiento de la Zona oriente
                 de santiago. Conectando comunidades a través de las ondas
@@ -71,7 +75,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Secciones */}
       <section className="stats">
         <div className="container">
           <div className="stats-grid">
@@ -92,16 +96,19 @@ const Home = () => {
               <div className="stat-number">50+</div>
               <div className="stat-label">Noticias Diarias</div>
             </div>
+            
             <div className="stat-item">
               <Radio className="stat-icon" />
-              <div className="stat-number">15</div>
+              <div className="stat-number">
+                {new Date().getFullYear() - 2011 - (new Date().getMonth() < 8 || (new Date().getMonth() === 8 && new Date().getDate() < 20) ? 1 : 0)}
+              </div>
               <div className="stat-label">Años al Aire</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured News */}
+      {/* Noticias */}
       <section className="featured-news">
         <div className="container">
           <h2 className="section-title">Últimas Noticias</h2>
@@ -144,21 +151,46 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="cta">
-        <div className="container">
-          <div className="cta-content">
-            <h2 className="cta-title">¿Quieres estar al día?</h2>
-            <p className="cta-description">
-              Suscríbete a nuestro boletín y recibe las últimas noticias y
-              actualizaciones
+      <section className="cards-section">
+        <div className="card">
+          <div>
+            <div className="icon mb-4">
+              <Music className="icon-white" size={48} />
+            </div>
+            <h2 className="title mb-2 text-2xl font-bold">
+              ¿Eres una banda o artista emergente?
+            </h2>
+            <p className="description mb-4 text-lg">
+              ¡Queremos escucharte! Envía tu información y podrías aparecer en nuestra programación especial para artistas locales.
             </p>
-            <Link to="/suscripcion" className="btn btn-primary">
-              Suscribirse Ahora
-            </Link>
           </div>
+          <Link to="/emergente" className="btn-white mt-2">
+            Postular Ahora
+          </Link>
+        </div>
+
+        <div className="card">
+          <div>
+            <div className="icon mb-4">
+              <Newspaper className="icon-white" size={48} />
+            </div>
+            <h2 className="title mb-2 text-2xl font-bold">
+              ¿Quieres estar al día?
+            </h2>
+            <p className="description mb-4 text-lg">
+              Suscríbete a nuestro boletín y recibe las últimas noticias y actualizaciones directamente en tu correo.
+            </p>
+          </div>
+          <Link to="/suscripcion" className="btn-white mt-2">
+            Suscribirse ahora
+          </Link>
         </div>
       </section>
+
+
+
+
+
     </div>
   );
 };

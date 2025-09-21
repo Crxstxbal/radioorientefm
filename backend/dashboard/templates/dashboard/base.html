@@ -170,12 +170,22 @@
                         Analytics
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard_emergentes' %}active{% endif %}" 
+                    href="{% url 'dashboard_emergentes' %}">
+                        <i class="fas fa-guitar me-2"></i>
+                        Emergentes
+                    </a>
+                </li>
+
                 <li class="nav-item mt-4">
                     <a class="nav-link" href="{% url 'dashboard_logout' %}">
                         <i class="fas fa-sign-out-alt me-2"></i>
                         Cerrar Sesión
                     </a>
                 </li>
+                
+
             </ul>
         </div>
     </nav>

@@ -11,6 +11,8 @@ from apps.blog.models import BlogPost, BlogComment
 from apps.radio.models import Program, News, RadioStation
 from apps.chat.models import ChatMessage
 from apps.contact.models import ContactMessage, Subscription
+from apps.emergente.models import BandaEmergente 
+
 
 def is_staff_user(user):
     return user.is_authenticated and user.is_staff
@@ -425,3 +427,67 @@ def delete_message(request, message_id):
             messages.error(request, f'Error al eliminar mensaje: {str(e)}')
     
     return redirect('dashboard_chat')
+
+@login_required
+@user_passes_test(is_staff_user)
+def update_station(request):
+    """Actualizar configuración de la estación"""
+    station = RadioStation.objects.first()
+    
+    if request.method == 'POST':
+        station.nombre = request.POST.get('nombre', station.nombre)
+        station.descripcion = request.POST.get('descripcion', station.descripcion)
+        station.stream_url = request.POST.get('stream_url', station.stream_url)
+        station.activo = request.POST.get('activo') == 'on'
+        
+        station.save()
+        messages.success(request, 'Configuración de estación actualizada exitosamente')
+    
+    return redirect('dashboard_radio')
+
+# ===============================
+# Bandas Emergentes (CRUD + Estado)
+# ===============================
+@login_required
+@user_passes_test(is_staff_user)
+def dashboard_emergentes(request):
+    """Gestión de bandas emergentes"""
+    bandas = BandaEmergente.objects.all().order_by('-fecha_envio')
+    return render(request, 'dashboard/emergente.html', {'bandas': bandas})
+
+
+@login_required
+@user_passes_test(is_staff_user)
+def cambiar_estado_banda(request, banda_id, nuevo_estado):
+    """Cambiar el estado de una banda (pendiente, aprobado, rechazado)"""
+    banda = get_object_or_404(BandaEmergente, id=banda_id)
+    if nuevo_estado in dict(BandaEmergente.ESTADOS):
+        banda.estado = nuevo_estado
+        banda.save()
+        messages.success(request, f"Estado de '{banda.nombre_banda}' actualizado a {nuevo_estado}.")
+    else:
+        messages.error(request, "Estado inválido.")
+    return redirect('dashboard_emergentes')
+
+
+@login_required
+@user_passes_test(is_staff_user)
+def delete_banda(request, banda_id):
+    """Eliminar una banda emergente"""
+    banda = get_object_or_404(BandaEmergente, id=banda_id)
+    if request.method == 'POST':
+        nombre = banda.nombre_banda
+        try:
+            banda.delete()
+            messages.success(request, f"Banda '{nombre}' eliminada exitosamente.")
+        except Exception as e:
+            messages.error(request, f"Error al eliminar banda: {str(e)}")
+    return redirect('dashboard_emergentes')
+
+
+@login_required
+@user_passes_test(is_staff_user)
+def view_banda(request, banda_id):
+    """Ver detalle completo de una banda emergente"""
+    banda = get_object_or_404(BandaEmergente, id=banda_id)
+    return render(request, 'dashboard/emergente_detail.html', {'banda': banda})
