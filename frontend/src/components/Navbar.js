@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Menu, X, Radio, User } from "lucide-react"; // agregamos User
+import { Menu, X, Radio, User } from "lucide-react";
 import "./Navbar.css";
 
 const Navbar = () => {
@@ -16,6 +16,7 @@ const Navbar = () => {
     { name: "Contacto", path: "/contacto" },
     { name: "Suscripción", path: "/suscripcion" },
     { name: "Blog", path: "/blog" },
+    { name: "Reproductor", path: "/reproductor", icon: <Radio size={18}/> }, // <-- NUEVO
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -39,7 +40,7 @@ const Navbar = () => {
             <span className="logo-text">Radio Oriente FM</span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Links desktop */}
           <div className="nav-links desktop">
             {navItems.map((item) => (
               <Link
@@ -47,16 +48,17 @@ const Navbar = () => {
                 to={item.path}
                 className={`nav-link ${isActive(item.path) ? "active" : ""}`}
               >
+                {item.icon && <span className="nav-icon">{item.icon}</span>}
                 {item.name}
               </Link>
             ))}
           </div>
 
-          {/* Auth Section */}
+          {/* Sección autenticación desktop */}
           <div className="nav-auth desktop">
             {isAuthenticated ? (
               <div className="user-menu">
-                <User className="user-icon" size={20} /> {/* icono al lado del nombre */}
+                <User className="user-icon" size={20} />
                 <span className="user-name">Hola {user.username}</span>
                 <button onClick={handleLogout} className="btn btn-outline">
                   Cerrar Sesión
@@ -69,7 +71,7 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Botón de menú mobile */}
           <button
             className="mobile-menu-btn"
             onClick={() => setIsOpen(!isOpen)}
@@ -78,18 +80,17 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Navegación mobile */}
         {isOpen && (
           <div className="mobile-nav">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`mobile-nav-link ${
-                  isActive(item.path) ? "active" : ""
-                }`}
+                className={`mobile-nav-link ${isActive(item.path) ? "active" : ""}`}
                 onClick={() => setIsOpen(false)}
               >
+                {item.icon && <span className="nav-icon">{item.icon}</span>}
                 {item.name}
               </Link>
             ))}
@@ -98,7 +99,7 @@ const Navbar = () => {
                 <>
                   <User className="user-icon" size={18} />
                   <span className="user-name">Hola {user.username}</span>
-                  <button onClick={handleLogout} className="btn btn-outline">
+                  <button onClick={handleLogout} className="btn btn-primary">
                     Cerrar Sesión
                   </button>
                 </>

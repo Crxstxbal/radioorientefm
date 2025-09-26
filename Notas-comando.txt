@@ -15,3 +15,4 @@ pip install channels
 npm install
 npm start
 npm install axios lucide-react react-hot-toast react-router-dom
+npm install react-tsparticles tsparticles

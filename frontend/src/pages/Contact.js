@@ -4,22 +4,22 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import './Pages.css';
 
-const Contact = () => {
+const Contacto = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: 'general',
-    message: ''
+    nombre: '',
+    correo: '',
+    telefono: '',
+    asunto: 'general',
+    mensaje: ''
   });
   const [loading, setLoading] = useState(false);
 
-  const subjectOptions = [
+  const opcionesAsunto = [
     { value: 'general', label: 'Consulta General' },
-    { value: 'programming', label: 'Programación' },
-    { value: 'advertising', label: 'Publicidad' },
-    { value: 'technical', label: 'Soporte Técnico' },
-    { value: 'other', label: 'Otro' }
+    { value: 'programacion', label: 'Programación' },
+    { value: 'publicidad', label: 'Publicidad' },
+    { value: 'soporte', label: 'Soporte Técnico' },
+    { value: 'otro', label: 'Otro' }
   ];
 
   const handleChange = (e) => {
@@ -37,11 +37,11 @@ const Contact = () => {
       await axios.post('/api/contact/message/', formData);
       toast.success('Mensaje enviado exitosamente. Te contactaremos pronto.');
       setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        subject: 'general',
-        message: ''
+        nombre: '',
+        correo: '',
+        telefono: '',
+        asunto: 'general',
+        mensaje: ''
       });
     } catch (error) {
       toast.error('Error al enviar el mensaje. Inténtalo de nuevo.');
@@ -70,7 +70,7 @@ const Contact = () => {
             <div className="contact-item">
               <Phone className="contact-icon" />
               <div>
-                <h3>Teléfono</h3>
+                <h3>Teléfonos</h3>
                 <p>+58 414-123-4567</p>
                 <p>+58 212-987-6543</p>
               </div>
@@ -79,7 +79,7 @@ const Contact = () => {
             <div className="contact-item">
               <Mail className="contact-icon" />
               <div>
-                <h3>Email</h3>
+                <h3>Correos</h3>
                 <p>info@radioorientefm.com</p>
                 <p>programacion@radioorientefm.com</p>
               </div>
@@ -120,14 +120,14 @@ const Contact = () => {
             <form onSubmit={handleSubmit} className="contact-form">
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="name" className="form-label">
+                  <label htmlFor="nombre" className="form-label">
                     Nombre Completo *
                   </label>
                   <input
                     type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
+                    id="nombre"
+                    name="nombre"
+                    value={formData.nombre}
                     onChange={handleChange}
                     className="form-input"
                     required
@@ -135,14 +135,14 @@ const Contact = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="email" className="form-label">
+                  <label htmlFor="correo" className="form-label">
                     Correo Electrónico *
                   </label>
                   <input
                     type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
+                    id="correo"
+                    name="correo"
+                    value={formData.correo}
                     onChange={handleChange}
                     className="form-input"
                     required
@@ -152,32 +152,32 @@ const Contact = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="phone" className="form-label">
+                  <label htmlFor="telefono" className="form-label">
                     Teléfono
                   </label>
                   <input
                     type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
+                    id="telefono"
+                    name="telefono"
+                    value={formData.telefono}
                     onChange={handleChange}
                     className="form-input"
                   />
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="subject" className="form-label">
+                  <label htmlFor="asunto" className="form-label">
                     Asunto *
                   </label>
                   <select
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
+                    id="asunto"
+                    name="asunto"
+                    value={formData.asunto}
                     onChange={handleChange}
                     className="form-select"
                     required
                   >
-                    {subjectOptions.map((option) => (
+                    {opcionesAsunto.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -187,13 +187,13 @@ const Contact = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="message" className="form-label">
+                <label htmlFor="mensaje" className="form-label">
                   Mensaje *
                 </label>
                 <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
+                  id="mensaje"
+                  name="mensaje"
+                  value={formData.mensaje}
                   onChange={handleChange}
                   className="form-textarea"
                   rows="6"
@@ -217,4 +217,4 @@ const Contact = () => {
   );
 };
 
-export default Contact;
+export default Contacto;

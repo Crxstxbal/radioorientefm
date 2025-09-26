@@ -1,34 +1,23 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Play, Pause, Volume2, VolumeX, ChevronDown, ChevronUp } from "lucide-react";
+import { AudioContextGlobal } from "../contexts/AudioContext";
 import './RadioPlayer.css';
 
 const RadioPlayer = () => {
-  const audioRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(() => {
-    const saved = localStorage.getItem("radioVolume");
-    return saved !== null ? Number(saved) : 1;
-  });
+  const { audioRef, isPlaying, togglePlay, volume, setVolume, toggleMute, streamUrl } = useContext(AudioContextGlobal);
+
   const [lastVolume, setLastVolume] = useState(volume);
   const [isMuted, setIsMuted] = useState(volume === 0);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [streamUrl, setStreamUrl] = useState(null);
 
-  // Traer URL desde backend
+  // Actualiza mute según volumen
   useEffect(() => {
-    fetch("/api/radio/station/") // Endpoint que devuelve JSON con el stream_url
-      .then(res => res.json())
-      .then(data => {
-        setStreamUrl(data.stream_url);
-        if (!audioRef.current) {
-          audioRef.current = new Audio(data.stream_url);
-          audioRef.current.volume = volume;
-        }
-      })
-      .catch(err => console.error("Error fetching stream URL:", err));
-  }, []);
+    setIsMuted(volume === 0);
+    if (volume > 0) setLastVolume(volume);
+  }, [volume]);
 
+  // Reloj en tiempo real
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
@@ -36,47 +25,15 @@ const RadioPlayer = () => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (audioRef.current) audioRef.current.volume = volume;
-    setIsMuted(volume === 0);
-    localStorage.setItem("radioVolume", volume);
-  }, [volume]);
-
-  useEffect(() => {
-    const wasPlaying = sessionStorage.getItem("radioPlaying") === "true";
-    if (wasPlaying && audioRef.current) {
-      audioRef.current.play().catch(console.error);
-      setIsPlaying(true);
-    }
-    return () => {
-      if (audioRef.current) {
-        sessionStorage.setItem("radioPlaying", audioRef.current.paused ? "false" : "true");
-      }
-    };
-  }, []);
-
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play().catch(console.error);
-      setIsPlaying(true);
-    }
-  };
-
   const handleVolumeChange = (e) => {
     const newVol = Number(e.target.value);
     setVolume(newVol);
-    if (newVol > 0) setLastVolume(newVol);
   };
 
-  const toggleMute = () => {
+  const handleToggleMute = () => {
     if (isMuted) {
       setVolume(lastVolume || 1);
     } else {
-      setLastVolume(volume);
       setVolume(0);
     }
   };
@@ -132,7 +89,7 @@ const RadioPlayer = () => {
         {/* Controles de volumen */}
         <div className="volume-controls">
           <button
-            onClick={toggleMute}
+            onClick={handleToggleMute}
             aria-label="Mute/Unmute"
             className="control-button"
           >

@@ -32,7 +32,6 @@ INSTALLED_APPS = [
     'apps.contact',
     'dashboard',
     'apps.emergente',
-
 ]
 
 MIDDLEWARE = [

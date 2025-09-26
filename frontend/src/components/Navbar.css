@@ -135,6 +135,7 @@
   background-color: var(--color-red);
   color: white;
   border: 1px solid var(--color-red);
+
 }
 
 .btn-outline {
@@ -166,9 +167,15 @@
 .user-menu {
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* espacio entre icono y nombre */
+  gap: 0.5rem;
 }
 
 .user-icon {
-  color: #dc2626; /* opcional: color rojo como la marca */
+  color: #dc2626;
+}
+
+.nav-icon {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-right: 6px;
 }
