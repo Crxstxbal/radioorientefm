@@ -1,4 +1,4 @@
-/* Common page styles */
+/* Estilo comun para algunas paginas*/
 .page-header {
   display: flex;
   align-items: center;
@@ -52,7 +52,7 @@
   margin-bottom: 1rem;
 }
 
-/* Programming Page */
+/* pagiona de programacion */
 .programming-page {
   padding: 2rem 0;
 }
@@ -150,7 +150,7 @@
   font-style: italic;
 }
 
-/* Contact Page */
+/* Pagina de contacto */
 .contact-page {
   padding: 2rem 0;
 }
@@ -261,7 +261,7 @@
   cursor: not-allowed;
 }
 
-/* Responsive Design */
+/* Diseño responsivo */
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
@@ -298,15 +298,34 @@
   }
 }
 
-/* News Page Styles */
+/* Pagina de noticias */
+/* Corrección específica para el layout de noticias */
 .news-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.news-page .container {
+  flex: 1;
   padding: 2rem 0;
+}
+
+/* Espacio adicional para el contenido de noticias */
+.news-container {
+  margin-bottom: 3rem;
+}
+
+.all-news-section {
+  margin-bottom: 2rem;
 }
 
 .featured-section {
   margin-bottom: 4rem;
 }
 
+/* Mantener todos los demás estilos de noticias iguales */
 .featured-news-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -431,7 +450,7 @@
   background: var(--color-red-dark);
 }
 
-/* Modal Styles */
+/* Estilo del modal */
 .news-modal-overlay,
 .post-modal-overlay {
   position: fixed;
@@ -507,7 +526,7 @@
   margin-bottom: 1rem;
 }
 
-/* Subscription Page Styles */
+/* Pagina de Suscripcion */
 .subscription-page {
   padding: 2rem 0;
 }
@@ -666,9 +685,25 @@
   line-height: 1.6;
 }
 
-/* Blog Page Styles */
+/* Pagina de blog */
 .blog-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.blog-page .container {
+  flex: 1;
   padding: 2rem 0;
+}
+
+.blog-container {
+  margin-bottom: 3rem;
+}
+
+.all-posts-section {
+  margin-bottom: 2rem;
 }
 
 .featured-posts-grid {
@@ -758,60 +793,4 @@
   color: var(--color-gray-600);
   margin-bottom: 1rem;
   line-height: 1.6;
-}
-
-@media (max-width: 768px) {
-  .featured-news-grid,
-  .featured-posts-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .subscription-content {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-
-  .benefits-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .news-modal,
-  .post-modal {
-    margin: 1rem;
-    max-height: 85vh;
-  }
-
-  .modal-content {
-    padding: 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .page-title {
-    font-size: 1.75rem;
-  }
-
-  .section-title {
-    font-size: 1.5rem;
-  }
-
-  .contact-form-container {
-    padding: 1.5rem;
-  }
-
-  .program-meta {
-    flex-direction: column;
-  }
-
-  .subscription-form-container {
-    padding: 1.5rem;
-  }
-
-  .modal-title {
-    font-size: 1.5rem;
-  }
 }

@@ -1,23 +1,24 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Play, Pause, Volume2, VolumeX, ChevronDown, ChevronUp } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, ChevronDown, ChevronUp, Maximize2 } from "lucide-react";
 import { AudioContextGlobal } from "../contexts/AudioContext";
+import { useNavigate } from "react-router-dom";
 import './RadioPlayer.css';
 
 const RadioPlayer = () => {
   const { audioRef, isPlaying, togglePlay, volume, setVolume, toggleMute, streamUrl } = useContext(AudioContextGlobal);
+  const navigate = useNavigate();
 
   const [lastVolume, setLastVolume] = useState(volume);
   const [isMuted, setIsMuted] = useState(volume === 0);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isExpanding, setIsExpanding] = useState(false);
 
-  // Actualiza mute según volumen
   useEffect(() => {
     setIsMuted(volume === 0);
     if (volume > 0) setLastVolume(volume);
   }, [volume]);
 
-  // Reloj en tiempo real
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
@@ -25,42 +26,75 @@ const RadioPlayer = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleVolumeChange = (e) => {
-    const newVol = Number(e.target.value);
-    setVolume(newVol);
-  };
-
-  const handleToggleMute = () => {
-    if (isMuted) {
-      setVolume(lastVolume || 1);
-    } else {
-      setVolume(0);
-    }
-  };
-
+  const handleVolumeChange = (e) => setVolume(Number(e.target.value));
+  const handleToggleMute = () => setVolume(isMuted ? (lastVolume || 1) : 0);
   const toggleCollapse = () => setIsCollapsed(prev => !prev);
 
+  const handleExpand = () => {
+    if (isExpanding) return;
+    setIsExpanding(true);
+
+    const playerElement = document.querySelector('.radio-player');
+    const rect = playerElement.getBoundingClientRect();
+
+    const expandOverlay = document.createElement('div');
+    expandOverlay.className = 'expand-animation-overlay';
+    document.body.appendChild(expandOverlay);
+
+    // Exactamente centrado horizontal y abajo
+    expandOverlay.style.cssText = `
+      position: fixed;
+      left: 50%;
+      top: 100%;
+      transform: translateX(-50%);
+      width: ${rect.width}px;
+      height: ${rect.height}px;
+      background: linear-gradient(135deg, #dc2626, #991b1b);
+      z-index: 9999;
+      transition: all 0.2s cubic-bezier(0.45, 0.46, 0.45, 0.94);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    `;
+
+    // Forzar repaint
+    void expandOverlay.offsetHeight;
+
+    // Animación a pantalla completa
+    setTimeout(() => {
+      expandOverlay.style.cssText += `
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        transform: none;
+        border-radius: 0;
+        background: #c20606;
+        background: radial-gradient(circle, rgba(139,0,0,1) 0%, rgba(0,0,0,1) 100%);
+      `;
+    }, 50);
+
+    setTimeout(() => {
+      navigate('/reproductor');
+      document.body.removeChild(expandOverlay);
+      setIsExpanding(false);
+    }, 600);
+  };
+
   return (
-    <div className={`radio-player-wrapper ${isCollapsed ? 'collapsed' : ''}`}>
-      
-      {/* Botón de colapso sobresaliendo */}
+    <div className={`radio-player-wrapper ${isCollapsed ? 'collapsed' : ''} ${isExpanding ? 'expanding' : ''}`}>
       <div className="collapse-btn-wrapper">
         <button 
           className="collapse-btn" 
           onClick={toggleCollapse}
           aria-label={isCollapsed ? "Mostrar reproductor" : "Ocultar reproductor"}
         >
-          {isCollapsed ? <ChevronUp size={20}/> : <ChevronDown size={20}/>}
+          {isCollapsed ? <ChevronUp size={20}/> : <ChevronDown size={20}/> }
         </button>
       </div>
 
-      {/* Reproductor principal */}
       <div className={`radio-player ${isPlaying ? 'playing' : 'paused'}`}>
-        {/* Gradientes laterales */}
         <div className="gradient-left" />
         <div className="gradient-right" />
 
-        {/* Información de radio */}
         <div className="radio-info">
           <span
             className={`status-indicator ${isPlaying ? 'playing' : 'paused'}`}
@@ -73,31 +107,36 @@ const RadioPlayer = () => {
           </div>
         </div>     
 
-        {/* Controles centrales */}
         <div className="player-controls">
-          <button
-            onClick={togglePlay}
-            aria-label="Play/Pause"
-            className="control-icon"
-            disabled={!streamUrl} // Desactiva botón si no hay URL
-          >
-            {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-          </button>
+          <div className="control-buttons">
+            <button
+              onClick={togglePlay}
+              aria-label="Play/Pause"
+              className="control-icon play-pause-btn"
+              disabled={!streamUrl}
+            >
+              {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+            </button>
+            
+            <button
+              onClick={handleExpand}
+              aria-label="Expandir reproductor"
+              className="control-icon expand-btn"
+              disabled={isExpanding}
+            >
+              <Maximize2 size={18} />
+            </button>
+          </div>
           <span className="text-sm mt-1 opacity-75">{currentTime}</span>
         </div>
 
-        {/* Controles de volumen */}
         <div className="volume-controls">
           <button
             onClick={handleToggleMute}
             aria-label="Mute/Unmute"
             className="control-button"
           >
-            {isMuted ? (
-              <VolumeX size={20} className="volume-icon" />
-            ) : (
-              <Volume2 size={20} className="volume-icon" />
-            )}
+            {isMuted ? <VolumeX size={20} className="volume-icon" /> : <Volume2 size={20} className="volume-icon" />}
           </button>
 
           <div className="volume-slider-container">

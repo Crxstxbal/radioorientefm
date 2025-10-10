@@ -16,7 +16,7 @@ const Navbar = () => {
     { name: "Contacto", path: "/contacto" },
     { name: "Suscripción", path: "/suscripcion" },
     { name: "Blog", path: "/blog" },
-    { name: "Reproductor", path: "/reproductor", icon: <Radio size={18}/> }, // <-- NUEVO
+    {/* { name: "Reproductor", path: "/reproductor", icon: <Radio size={18}/> }, */}
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -60,7 +60,7 @@ const Navbar = () => {
               <div className="user-menu">
                 <User className="user-icon" size={20} />
                 <span className="user-name">Hola {user.username}</span>
-                <button onClick={handleLogout} className="btn btn-outline">
+                <button onClick={handleLogout} className="btn btn-primary">
                   Cerrar Sesión
                 </button>
               </div>
@@ -71,7 +71,7 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Botón de menú mobile */}
+          {/* Botón de menú en dispositivo mobil */}
           <button
             className="mobile-menu-btn"
             onClick={() => setIsOpen(!isOpen)}

@@ -18,11 +18,11 @@ const FondoParticulas = () => {
         interactivity: {
           events: {
             onHover: {
-              enable: true, // DESHABILITADO para evitar interferencia con el reproductor
+              enable: true,
               mode: ["attract", "bubble"]
             },
             onClick: {
-              enable: true, // DESHABILITADO para evitar interferencia con el reproductor
+              enable: true,
               mode: "push"
             }
           },

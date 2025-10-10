@@ -186,11 +186,6 @@ const Home = () => {
           </Link>
         </div>
       </section>
-
-
-
-
-
     </div>
   );
 };
