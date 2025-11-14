@@ -1,8 +1,0 @@
-# Core Django packages (compatibles con Python 3.13)
-Django>=4.2.0
-djangorestframework>=3.14.0
-django-cors-headers>=4.0.0
-python-decouple>=3.6
-
-# Database (Python 3.13 compatible)
-psycopg[binary]>=3.1.0
