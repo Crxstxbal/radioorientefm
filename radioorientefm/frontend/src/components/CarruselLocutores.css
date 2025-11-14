@@ -1,0 +1,470 @@
+/* frontend/src/components/CarruselLocutores.css */
+
+.locutores-carrusel-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 40px auto; /* Espacio arriba y abajo */
+}
+
+/* Contenedor para el título - Mismo estilo que Últimos Artículos */
+.locutores-carrusel-container .title-container {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.locutores-carrusel-container h2 {
+  display: inline-block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-black, #111827);
+  margin: 0 0 1.5rem;
+  position: relative;
+  padding-bottom: 0.75rem;
+  text-align: center;
+}
+
+/* Línea decorativa debajo del título */
+.locutores-carrusel-container h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background-color: #dc2626; /* Color rojo de la radio */
+  border-radius: 3px;
+}
+
+/* Efecto hover sutil */
+.locutores-carrusel-container h2 {
+  transition: color 0.3s ease;
+}
+
+.locutores-carrusel-container h2:hover {
+  color: #dc2626; /* Rojo al hacer hover */
+}
+
+.locutores-carrusel-container h2::after {
+  transition: all 0.3s ease;
+}
+
+.locutores-carrusel-container h2:hover::after {
+  width: 100px;
+  background-color: #b91c1c; /* Rojo más oscuro al hacer hover */
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .locutores-carrusel-container h2 {
+    color: #f3f4f6 !important; /* Blanco en modo oscuro */
+  }
+  
+  .locutores-carrusel-container h2:hover {
+    color: #f87171 !important; /* Rojo más claro en modo oscuro al hacer hover */
+  }
+}
+
+/* Compatibilidad con temas que usan clase .dark */
+html.dark .locutores-carrusel-container h2 {
+  color: #f3f4f6 !important; /* Blanco cuando el sitio fuerza modo oscuro */
+}
+
+html.dark .locutores-carrusel-container h2:hover {
+  color: #f87171 !important; /* Rojo más claro en modo oscuro al hacer hover */
+}
+
+html:not(.dark) .locutores-carrusel-container h2 {
+  color: #111827 !important; /* Negro cuando el sitio fuerza modo claro */
+}
+
+/* Slide tipo card minimal */
+.locutor-slide {
+  text-align: center;
+  background: transparent;
+  border-radius: 12px;
+  padding: 8px 0 16px; /* sin card, solo separación vertical */
+  border: none; /* sin borde de tarjeta */
+  box-shadow: none; /* sin sombra de tarjeta */
+  transition: none;
+}
+
+.locutor-slide:hover {
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+/* Avatar circular con anillo degradado multicolor */
+.avatar-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.avatar-ring {
+  padding: 4px;
+  border-radius: 9999px;
+  /* Degradado vibrante: cyan → magenta → azul → cyan */
+  background: conic-gradient(
+    from 0deg,
+    #9e2a2a 0%,
+    #aa1010 25%,
+    #501818 50%,
+    #a12121 75%,
+    #000000 100%
+  );
+  box-shadow:
+    0 0 30px rgba(6, 182, 212, 0.4),
+    0 0 60px rgba(139, 92, 246, 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.avatar-ring:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 40px rgba(6, 182, 212, 0.6),
+    0 0 80px rgba(139, 92, 246, 0.4),
+    0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.avatar-inner {
+  width: 240px;
+  height: 240px;
+  border-radius: 9999px;
+  overflow: hidden;
+  /* Fondo del avatar: gradiente suave */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border: 3px solid white;
+}
+
+.avatar-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.avatar-ring:hover .avatar-inner img {
+  transform: scale(1.08);
+}
+
+/* Iconos de redes sociales flotantes */
+.social-icons {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.social-icon {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+  cursor: pointer;
+  color: #1e293b;
+}
+
+.social-icon:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Posicionamiento de cada icono alrededor del avatar */
+.social-icon-1 {
+  top: 10%;
+  right: 8%;
+  background: linear-gradient(135deg, #4267B2 0%, #1877F2 100%);
+  color: white;
+}
+
+.social-icon-2 {
+  top: 35%;
+  right: -2%;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.social-icon-3 {
+  bottom: 35%;
+  right: -2%;
+  background: linear-gradient(135deg, #000000 0%, #14171A 100%);
+  color: white;
+}
+
+.social-icon-4 {
+  bottom: 10%;
+  right: 8%;
+  background: linear-gradient(135deg, #00f2ea 0%, #ff0050 100%);
+  color: white;
+}
+
+/* Animación de entrada para los iconos */
+@keyframes fadeInIcon {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.social-icon {
+  animation: fadeInIcon 0.4s ease backwards;
+}
+
+.social-icon-1 { animation-delay: 0.1s; }
+.social-icon-2 { animation-delay: 0.2s; }
+.social-icon-3 { animation-delay: 0.3s; }
+.social-icon-4 { animation-delay: 0.4s; }
+
+.placeholder-avatar {
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 48px;
+  display: none;
+  background: linear-gradient(135deg, #ef4444 0%, #0b0b0b 100%);
+}
+
+.locutor-slide .locutor-nombre {
+  margin-top: 16px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #111827; /* Negro por defecto (modo claro) */
+}
+
+/* Modo oscuro: texto blanco */
+@media (prefers-color-scheme: dark) {
+  .locutor-slide .locutor-nombre {
+    color: #f3f4f6; /* Blanco en modo oscuro */
+  }
+  .locutor-slide .locutor-rol {
+    color: #f3f4f6; /* Blanco en modo oscuro */
+  }
+}
+
+/* Modo claro: texto negro/gris oscuro */
+@media (prefers-color-scheme: light) {
+  .locutor-slide .locutor-nombre {
+    color: #111827; /* Negro en modo claro */
+  }
+  .locutor-slide .locutor-rol {
+    color: #111827; /* Negro en modo claro */
+  }
+}
+
+.locutor-slide .locutor-rol {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #111827; /* Negro por defecto (modo claro) */
+}
+
+/* Reset genérico de h3/p dentro del slide para no interferir con clases personalizadas */
+.locutor-slide h3,
+.locutor-slide p {
+  margin: 0;
+}
+
+/* ====================================
+   ESTILOS MEJORADOS PARA NAVEGACIÓN
+   ==================================== */
+
+/* Contenedor de navegación */
+.locutores-carrusel-container .swiper {
+  position: relative;
+  padding: 0 60px; /* Más espacio para los botones */
+}
+
+/* Botones de navegación - Diseño minimalista y elegante */
+.locutores-carrusel-container .swiper-button-next,
+.locutores-carrusel-container .swiper-button-prev {
+  --swiper-navigation-size: 24px;
+  --btn-size: 40px;
+  width: var(--btn-size);
+  height: var(--btn-size);
+  border-radius: 50px; /* Bordes redondeados suaves, no círculo */
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: none;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: #1e293b;
+  z-index: 10;
+  margin: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Posicionamiento específico para cada botón */
+.locutores-carrusel-container .swiper-button-prev {
+  left: 0;
+}
+
+.locutores-carrusel-container .swiper-button-next {
+  right: 0;
+}
+
+/* Efecto hover elegante con rebote */
+.locutores-carrusel-container .swiper-button-next:hover,
+.locutores-carrusel-container .swiper-button-prev:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.18),
+    0 4px 8px rgba(0, 0, 0, 0.12);
+  color: #dc2626; /* Rojo de la marca */
+}
+
+/* Efecto al hacer clic con rebote hacia adentro */
+.locutores-carrusel-container .swiper-button-next:active,
+.locutores-carrusel-container .swiper-button-prev:active {
+  transform: translateY(-50%) scale(0.95);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Flechas personalizadas - Limpias y modernas */
+.locutores-carrusel-container .swiper-button-next::after,
+.locutores-carrusel-container .swiper-button-prev::after {
+  font-size: var(--swiper-navigation-size);
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Efecto hover en las flechas con desplazamiento suave */
+.locutores-carrusel-container .swiper-button-next:hover::after {
+  transform: translateX(2px);
+}
+
+.locutores-carrusel-container .swiper-button-prev:hover::after {
+  transform: translateX(-2px);
+}
+
+/* Estado deshabilitado sutil */
+.locutores-carrusel-container .swiper-button-disabled {
+  opacity: 0.3 !important;
+  transform: translateY(-50%) scale(0.9);
+  cursor: not-allowed;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Paginación mejorada */
+.swiper-pagination {
+  position: relative;
+  margin-top: 20px;
+  bottom: 0 !important;
+}
+
+.swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  opacity: 1;
+  transition: all 0.3s ease;
+  margin: 0 5px !important;
+}
+
+.swiper-pagination-bullet-active {
+  width: 30px;
+  height: 10px;
+  border-radius: 5px;
+  background: #dc2626 !important;
+  transform: scale(1);
+}
+
+/* Modo oscuro para navegación */
+@media (prefers-color-scheme: dark) {
+  .locutores-carrusel-container .swiper-button-next,
+  .locutores-carrusel-container .swiper-button-prev {
+    background: rgba(30, 30, 30, 0.85);
+    color: #f3f4f6;
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.4),
+      0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .locutores-carrusel-container .swiper-button-next:hover,
+  .locutores-carrusel-container .swiper-button-prev:hover {
+    background: rgba(40, 40, 40, 0.95);
+    color: #f87171; /* Rojo más claro para modo oscuro */
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.5),
+      0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .swiper-pagination-bullet {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Efecto de foco para accesibilidad */
+.swiper-button-next:focus-visible,
+.swiper-button-prev:focus-visible {
+  outline: 2px solid #dc2626;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.3);
+}
+
+/* Responsivo: ajustar tamaño del avatar en pantallas pequeñas */
+@media (max-width: 768px) {
+  .avatar-inner {
+    width: 160px;
+    height: 160px;
+  }
+}
+
+/* Fuerza colores con mayor especificidad (por si hay estilos globales) */
+@media (prefers-color-scheme: light) {
+  .locutores-carrusel-container .locutor-slide .locutor-nombre,
+  .locutores-carrusel-container .locutor-slide .locutor-rol {
+    color: #111827 !important; /* Negro en modo claro */
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .locutores-carrusel-container .locutor-slide .locutor-nombre,
+  .locutores-carrusel-container .locutor-slide .locutor-rol {
+    color: #f3f4f6 !important; /* Blanco en modo oscuro */
+  }
+}
+
+/* Compatibilidad con temas que usan clase .dark en <html> (e.g., Tailwind) */
+html.dark .locutores-carrusel-container .locutor-slide .locutor-nombre,
+html.dark .locutores-carrusel-container .locutor-slide .locutor-rol {
+  color: #f3f4f6 !important; /* Blanco cuando el sitio fuerza modo oscuro */
+}
+html:not(.dark) .locutores-carrusel-container .locutor-slide .locutor-nombre,
+html:not(.dark) .locutores-carrusel-container .locutor-slide .locutor-rol {
+  color: #111827 !important; /* Negro cuando el sitio fuerza modo claro */
+}

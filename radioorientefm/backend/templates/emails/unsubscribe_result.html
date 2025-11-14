@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if success %}Desuscripción exitosa{% else %}Error{% endif %} - Radio Oriente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        .icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .icon.success {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .icon.error {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .message {
+            font-size: 16px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .email {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer p {
+            font-size: 13px;
+            color: #9ca3af;
+            line-height: 1.6;
+        }
+
+        .radio-name {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon {% if success %}success{% else %}error{% endif %}">
+            {% if success %}
+                ✓
+            {% else %}
+                ✕
+            {% endif %}
+        </div>
+
+        <h1>
+            {% if success %}
+                ¡Desuscripción Exitosa!
+            {% else %}
+                Error en la Desuscripción
+            {% endif %}
+        </h1>
+
+        <p class="message">{{ message }}</p>
+
+        {% if email %}
+        <p class="email">{{ email }}</p>
+        {% endif %}
+
+        {% if success %}
+        <p class="message" style="font-size: 14px; margin-top: 20px;">
+            Lamentamos verte partir. Si cambias de opinión, siempre puedes volver a suscribirte desde nuestra página web.
+        </p>
+        {% endif %}
+
+        <a href="http://localhost:3000" class="button">
+            Volver a Radio Oriente
+        </a>
+
+        <div class="footer">
+            <p class="radio-name">📻 Radio Oriente FM</p>
+            <p style="margin-top: 10px;">Tu mejor compañía en la radio</p>
+        </div>
+    </div>
+</body>
+</html>

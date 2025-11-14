@@ -1,0 +1,840 @@
+{% extends 'dashboard/base.html' %}
+{% block page_title %}Gestión de Artículos{% endblock %}
+
+{% block content %}
+<style>
+  .article-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    background: var(--card-bg);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .article-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .stat-card-modern {
+    border: none;
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+  }
+
+  .stat-card-modern:hover {
+    transform: translateY(-4px);
+  }
+
+  .stat-card-modern .icon-wrapper {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  .stat-card-modern h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .stat-card-modern p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-bg-1 {
+    background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+  }
+
+  .stat-bg-1 .icon-wrapper {
+    background: linear-gradient(135deg, #818CF8 0%, #6366F1 100%);
+    color: white;
+  }
+
+  .stat-bg-2 {
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  }
+
+  .stat-bg-2 .icon-wrapper {
+    background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+    color: white;
+  }
+
+  .stat-bg-3 {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  }
+
+  .stat-bg-3 .icon-wrapper {
+    background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+    color: white;
+  }
+
+  .stat-bg-4 {
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+  }
+
+  .stat-bg-4 .icon-wrapper {
+    background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+    color: white;
+  }
+
+  .search-box-modern {
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+    background: var(--card-bg);
+    color: var(--text-primary);
+  }
+
+  .search-box-modern:focus {
+    border-color: #6366F1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    outline: none;
+    background: var(--card-bg);
+    color: var(--text-primary);
+  }
+
+  .btn-add-modern {
+    background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .btn-add-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    color: white;
+  }
+
+  .table-articles {
+    border-collapse: separate;
+    border-spacing: 0 8px;
+  }
+
+  .table-articles thead th {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    border: none;
+    padding: 12px 16px;
+  }
+
+  .table-articles tbody tr {
+    background: var(--card-bg);
+    transition: all 0.2s ease;
+  }
+
+  .table-articles tbody tr:hover {
+    transform: scale(1.005);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .table-articles tbody td {
+    border: none;
+    padding: 16px;
+    vertical-align: middle;
+    color: var(--text-primary);
+  }
+
+  .table-articles tbody tr td:first-child {
+    border-radius: 12px 0 0 12px;
+  }
+
+  .table-articles tbody tr td:last-child {
+    border-radius: 0 12px 12px 0;
+  }
+
+  .article-title {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .article-resumen {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .article-author {
+    color: var(--text-secondary);
+  }
+
+  .article-date {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .article-views {
+    color: var(--text-secondary);
+  }
+
+  .badge-status {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+
+  .badge-published {
+    background: #D1FAE5;
+    color: #065F46;
+  }
+
+  html.dark .badge-published {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6EE7B7;
+  }
+
+  .badge-draft {
+    background: #FEF3C7;
+    color: #92400E;
+  }
+
+  html.dark .badge-draft {
+    background: rgba(245, 158, 11, 0.2);
+    color: #FCD34D;
+  }
+
+  .badge-category {
+    background: #EEF2FF;
+    color: #4338CA;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  html.dark .badge-category {
+    background: rgba(99, 102, 241, 0.2);
+    color: #A5B4FC;
+  }
+
+  .btn-action-modern {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: all 0.2s ease;
+    margin: 0 4px;
+  }
+
+  .btn-action-edit {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366F1;
+  }
+
+  .btn-action-edit:hover {
+    background: #6366F1;
+    color: white;
+  }
+
+  .btn-action-delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #EF4444;
+  }
+
+  .btn-action-delete:hover {
+    background: #EF4444;
+    color: white;
+  }
+
+  .pagination {
+    gap: 8px;
+  }
+
+  .pagination .page-link {
+    border: none;
+    border-radius: 10px;
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    font-weight: 600;
+    padding: 10px 16px;
+    transition: all 0.2s ease;
+  }
+
+  .pagination .page-link:hover {
+    background: #6366F1;
+    color: white;
+  }
+
+  .pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+    color: white;
+  }
+
+  .pagination .page-item.disabled .page-link {
+    background: var(--bg-tertiary);
+    color: var(--text-tertiary);
+  }
+
+  .collapse-header {
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-primary);
+  }
+
+  .collapse-header:hover {
+    background: rgba(99, 102, 241, 0.1);
+  }
+
+  .form-label {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .page-title {
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  .page-subtitle {
+    color: var(--text-secondary);
+  }
+</style>
+
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-2 page-title">
+        <i class="fas fa-newspaper me-2" style="color: #6366F1;"></i>
+        Gestión de Artículos
+      </h2>
+      <p class="page-subtitle mb-0">Administra el contenido de tu radio</p>
+    </div>
+    <button class="btn btn-add-modern" data-bs-toggle="modal" data-bs-target="#addArticuloModal">
+      <i class="fas fa-plus me-2"></i>Nuevo Artículo
+    </button>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card-modern stat-bg-1">
+        <div class="icon-wrapper">
+          <i class="fas fa-newspaper"></i>
+        </div>
+        <h3>{{ total_articles }}</h3>
+        <p>Total Artículos</p>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card-modern stat-bg-2">
+        <div class="icon-wrapper">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h3>{{ published_count }}</h3>
+        <p>Publicados</p>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card-modern stat-bg-3">
+        <div class="icon-wrapper">
+          <i class="fas fa-edit"></i>
+        </div>
+        <h3>{{ draft_count }}</h3>
+        <p>Borradores</p>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card-modern stat-bg-4">
+        <div class="icon-wrapper">
+          <i class="fas fa-folder"></i>
+        </div>
+        <h3>{{ categorias|length }}</h3>
+        <p>Categorías</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categorías Section (Collapsible) -->
+  <div class="card article-card mb-4">
+    <div class="card-body p-0">
+      <div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#categoriasCollapse">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0" style="font-weight: 600;">
+            <i class="fas fa-tags me-2" style="color: #6366F1;"></i>
+            Gestión de Categorías
+          </h5>
+          <i class="fas fa-chevron-down" style="color: var(--text-tertiary);"></i>
+        </div>
+      </div>
+
+      <div class="collapse" id="categoriasCollapse">
+        <div class="p-4">
+          <form method="post" action="{% url 'agregar_categoria' %}" class="row g-3 mb-4">
+            {% csrf_token %}
+            <div class="col-md-5">
+              <label class="form-label">
+                <i class="fas fa-tag me-2"></i>Nombre de la Categoría
+              </label>
+              <input type="text" class="form-control search-box-modern" name="nombre" placeholder="Ej: Noticias, Eventos..." required>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label">
+                <i class="fas fa-info-circle me-2"></i>Descripción
+              </label>
+              <input type="text" class="form-control search-box-modern" name="descripcion" placeholder="Breve descripción...">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="submit" class="btn btn-add-modern w-100">
+                <i class="fas fa-plus me-1"></i>Agregar
+              </button>
+            </div>
+          </form>
+
+          <div class="table-responsive">
+            <table class="table">
+              <thead style="background: var(--bg-tertiary);">
+                <tr>
+                  <th style="border: none; color: var(--text-secondary); font-weight: 600;">Nombre</th>
+                  <th style="border: none; color: var(--text-secondary); font-weight: 600;">Descripción</th>
+                  <th style="border: none; color: var(--text-secondary); font-weight: 600;">Artículos</th>
+                  <th style="border: none; color: var(--text-secondary); font-weight: 600;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for categoria in categorias %}
+                <tr>
+                  <td style="border: none;"><strong style="color: var(--text-primary);">{{ categoria.nombre }}</strong></td>
+                  <td style="border: none; color: var(--text-secondary);">{{ categoria.descripcion|default:"Sin descripción" }}</td>
+                  <td style="border: none;">
+                    <span class="badge-category">{{ categoria.articulos.count }}</span>
+                  </td>
+                  <td style="border: none;">
+                    <form method="post" action="{% url 'eliminar_categoria' categoria.id %}" class="d-inline">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-action-modern btn-action-delete"
+                              {% if categoria.articulos.exists %}disabled title="No se puede eliminar una categoría con artículos"{% endif %}>
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center py-4" style="border: none;">
+                    <i class="fas fa-tags fa-3x mb-2" style="color: var(--text-tertiary); opacity: 0.5;"></i>
+                    <p class="mb-0" style="color: var(--text-tertiary);">No hay categorías registradas</p>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Búsqueda y Filtros -->
+  <div class="card article-card mb-4">
+    <div class="card-body p-4">
+      <form method="get" action="{% url 'dashboard_articulos' %}" class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">
+            <i class="fas fa-filter me-2"></i>Estado
+          </label>
+          <select class="form-select search-box-modern" name="status">
+            <option value="" {% if not status_filter %}selected{% endif %}>Todos los estados</option>
+            <option value="publicado" {% if status_filter == 'publicado' %}selected{% endif %}>Publicados</option>
+            <option value="borrador" {% if status_filter == 'borrador' %}selected{% endif %}>Borradores</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">
+            <i class="fas fa-search me-2"></i>Buscar
+          </label>
+          <input type="text" class="form-control search-box-modern" name="search"
+                 placeholder="Buscar por título, resumen o contenido..." value="{{ search_query }}">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-add-modern w-100">
+            <i class="fas fa-search me-2"></i>Buscar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tabla de Artículos -->
+  <div class="card article-card">
+    <div class="card-body p-0">
+      <div class="table-responsive p-3">
+        <table class="table table-articles mb-0">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Autor</th>
+              <th>Categoría</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Vistas</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for articulo in articulos %}
+            <tr>
+              <td>
+                <div>
+                  <strong class="article-title">{{ articulo.titulo|truncatechars:40 }}</strong>
+                  {% if articulo.resumen %}
+                    <br><small class="article-resumen">{{ articulo.resumen|truncatechars:60 }}</small>
+                  {% endif %}
+                </div>
+              </td>
+              <td class="article-author">
+                {% if articulo.autor.first_name or articulo.autor.last_name %}
+                  {{ articulo.autor.first_name }} {{ articulo.autor.last_name }}
+                {% else %}
+                  {{ articulo.autor.username }}
+                {% endif %}
+              </td>
+              <td>
+                {% if articulo.categoria %}
+                  <span class="badge-category">{{ articulo.categoria.nombre }}</span>
+                {% else %}
+                  <span class="article-author">Sin categoría</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if articulo.publicado %}
+                  <span class="badge-status badge-published">
+                    <i class="fas fa-check-circle me-1"></i>Publicado
+                  </span>
+                {% else %}
+                  <span class="badge-status badge-draft">
+                    <i class="fas fa-edit me-1"></i>Borrador
+                  </span>
+                {% endif %}
+              </td>
+              <td class="article-date">
+                {{ articulo.fecha_creacion|date:"d/m/Y" }}
+              </td>
+              <td class="article-views">
+                <i class="fas fa-eye me-1"></i>{{ articulo.vistas|default:0 }}
+              </td>
+              <td class="text-center">
+                <button type="button" class="btn btn-action-modern btn-action-edit"
+                        data-bs-toggle="modal" data-bs-target="#editArticuloModal"
+                        data-articulo-id="{{ articulo.id }}"
+                        data-articulo-titulo="{{ articulo.titulo }}"
+                        data-articulo-contenido="{{ articulo.contenido }}"
+                        data-articulo-resumen="{{ articulo.resumen }}"
+                        data-articulo-categoria="{{ articulo.categoria.id }}"
+                        data-articulo-imagen="{{ articulo.imagen_url }}"
+                        data-articulo-publicado="{{ articulo.publicado }}"
+                        title="Editar artículo">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="btn btn-action-modern btn-action-delete"
+                        onclick="deleteItem('{% url 'delete_articulo' articulo.id %}', '{{ articulo.titulo|escapejs }}')"
+                        title="Eliminar artículo">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5">
+                <i class="fas fa-newspaper fa-4x mb-3 d-block" style="color: var(--text-tertiary); opacity: 0.5;"></i>
+                <p class="mb-3" style="color: var(--text-tertiary);">
+                  {% if search_query or status_filter %}
+                    No se encontraron artículos que coincidan con los filtros
+                  {% else %}
+                    No hay artículos registrados
+                  {% endif %}
+                </p>
+                {% if not search_query and not status_filter %}
+                <button class="btn btn-add-modern" data-bs-toggle="modal" data-bs-target="#addArticuloModal">
+                  <i class="fas fa-plus me-2"></i>Crear Primer Artículo
+                </button>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      {% if articulos.paginator.num_pages > 1 %}
+      <div class="card-footer border-top-0" style="background: var(--card-bg);">
+        <div class="d-flex justify-content-between align-items-center">
+          <div style="color: var(--text-tertiary);">
+            Mostrando {{ articulos.start_index }} - {{ articulos.end_index }} de {{ paginator.count }} artículos
+          </div>
+          <nav>
+            <ul class="pagination mb-0">
+              {% if articulos.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                    <i class="fas fa-angle-double-left"></i>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ articulos.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                    <i class="fas fa-angle-left"></i>
+                  </a>
+                </li>
+              {% endif %}
+
+              {% for num in articulos.paginator.page_range %}
+                {% if articulos.number == num %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                  </li>
+                {% elif num > articulos.number|add:'-3' and num < articulos.number|add:'3' %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+
+              {% if articulos.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ articulos.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                    <i class="fas fa-angle-right"></i>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                    <i class="fas fa-angle-double-right"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Modal para agregar artículo -->
+<div class="modal fade" id="addArticuloModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="border-radius: 16px; border: none;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%); color: white; border-radius: 16px 16px 0 0;">
+        <h5 class="modal-title">
+          <i class="fas fa-plus-circle me-2"></i>Nuevo Artículo
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="post" action="{% url 'create_articulo' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-heading me-2"></i>Título *
+            </label>
+            <input type="text" class="form-control search-box-modern" name="titulo" required placeholder="Ingrese el título del artículo">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-folder me-2"></i>Categoría *
+            </label>
+            <select class="form-select search-box-modern" name="categoria" required>
+              <option value="">Seleccione una categoría</option>
+              {% for categoria in categorias %}
+                <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-align-left me-2"></i>Resumen
+            </label>
+            <textarea class="form-control search-box-modern" name="resumen" rows="2" placeholder="Breve resumen del artículo"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-file-alt me-2"></i>Contenido *
+            </label>
+            <textarea class="form-control search-box-modern" name="contenido" rows="8" required placeholder="Escriba el contenido del artículo..."></textarea>
+          </div>
+
+          <hr class="my-4">
+          <h6 class="mb-3 fw-bold"><i class="fas fa-image me-2" style="color: #6366F1;"></i>Imagen (Opcional)</h6>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Subir Imagen</label>
+                <input type="file" class="form-control search-box-modern" name="imagen_portada" accept="image/*">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">O URL de Imagen</label>
+                <input type="url" class="form-control search-box-modern" name="imagen_url" placeholder="https://ejemplo.com/imagen.jpg">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-check p-3" style="background: var(--bg-tertiary); border-radius: 12px;">
+            <input class="form-check-input" type="checkbox" name="publicado" id="publicado" checked>
+            <label class="form-check-label" for="publicado" style="color: var(--text-primary); font-weight: 600;">
+              <i class="fas fa-eye me-2"></i>Publicar inmediatamente
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-add-modern">
+            <i class="fas fa-save me-2"></i>Crear Artículo
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar artículo -->
+<div class="modal fade" id="editArticuloModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="border-radius: 16px; border: none;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%); color: white; border-radius: 16px 16px 0 0;">
+        <h5 class="modal-title">
+          <i class="fas fa-edit me-2"></i>Editar Artículo
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="post" id="editArticuloForm" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-heading me-2"></i>Título *
+            </label>
+            <input type="text" class="form-control search-box-modern" name="titulo" id="edit-titulo" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-folder me-2"></i>Categoría *
+            </label>
+            <select class="form-select search-box-modern" name="categoria" id="edit-categoria" required>
+              <option value="">Seleccione una categoría</option>
+              {% for categoria in categorias %}
+                <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-align-left me-2"></i>Resumen
+            </label>
+            <textarea class="form-control search-box-modern" name="resumen" id="edit-resumen" rows="2"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-file-alt me-2"></i>Contenido *
+            </label>
+            <textarea class="form-control search-box-modern" name="contenido" id="edit-contenido" rows="8" required></textarea>
+          </div>
+
+          <hr class="my-4">
+          <h6 class="mb-3 fw-bold"><i class="fas fa-image me-2" style="color: #6366F1;"></i>Actualizar Imagen (Opcional)</h6>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Cambiar Imagen</label>
+                <input type="file" class="form-control search-box-modern" name="imagen_portada" accept="image/*">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">O URL de Imagen</label>
+                <input type="url" class="form-control search-box-modern" name="imagen_url" id="edit-imagen_url" placeholder="https://ejemplo.com/imagen.jpg">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-check p-3" style="background: var(--bg-tertiary); border-radius: 12px;">
+            <input class="form-check-input" type="checkbox" name="publicado" id="edit-publicado">
+            <label class="form-check-label" for="edit-publicado" style="color: var(--text-primary); font-weight: 600;">
+              <i class="fas fa-eye me-2"></i>Artículo publicado
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-add-modern">
+            <i class="fas fa-save me-2"></i>Actualizar Artículo
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Manejar click en botones de editar
+  document.querySelectorAll('[data-bs-target="#editArticuloModal"]').forEach(button => {
+    button.addEventListener('click', function() {
+      const articuloId = this.getAttribute('data-articulo-id');
+      const titulo = this.getAttribute('data-articulo-titulo');
+      const contenido = this.getAttribute('data-articulo-contenido');
+      const resumen = this.getAttribute('data-articulo-resumen');
+      const categoria = this.getAttribute('data-articulo-categoria');
+      const imagenUrl = this.getAttribute('data-articulo-imagen');
+      const publicado = this.getAttribute('data-articulo-publicado') === 'True';
+
+      // Llenar el formulario
+      document.getElementById('edit-titulo').value = titulo || '';
+      document.getElementById('edit-contenido').value = contenido || '';
+      document.getElementById('edit-resumen').value = resumen || '';
+      document.getElementById('edit-categoria').value = categoria || '';
+      document.getElementById('edit-imagen_url').value = imagenUrl || '';
+      document.getElementById('edit-publicado').checked = publicado;
+
+      // Actualizar la acción del formulario
+      document.getElementById('editArticuloForm').action = `/dashboard/articulos/edit/${articuloId}/`;
+    });
+  });
+});
+</script>
+{% endblock %}

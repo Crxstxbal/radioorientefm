@@ -1,0 +1,346 @@
+{% extends 'dashboard/base.html' %} 
+{% block page_title %} Analytics
+{% endblock %} 
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>
+    <i class="fas fa-chart-line text-primary me-2"></i>
+    Analytics y Estadísticas
+  </h2>
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-outline-primary active">7 días</button>
+    <button type="button" class="btn btn-outline-primary">30 días</button>
+    <button type="button" class="btn btn-outline-primary">90 días</button>
+  </div>
+</div>
+
+<!-- Métricas principales -->
+<div class="row mb-4">
+  <div class="col-lg-3 col-md-6 mb-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <i class="fas fa-users fa-2x text-primary mb-3"></i>
+        <h3 class="mb-1">1,247</h3>
+        <p class="text-muted mb-0">Visitantes Únicos</p>
+        <small class="text-success">
+          <i class="fas fa-arrow-up"></i> +12% vs semana anterior
+        </small>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 mb-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <i class="fas fa-play fa-2x text-success mb-3"></i>
+        <h3 class="mb-1">3,842</h3>
+        <p class="text-muted mb-0">Reproducciones</p>
+        <small class="text-success">
+          <i class="fas fa-arrow-up"></i> +8% vs semana anterior
+        </small>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 mb-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <i class="fas fa-clock fa-2x text-warning mb-3"></i>
+        <h3 class="mb-1">24:32</h3>
+        <p class="text-muted mb-0">Tiempo Promedio</p>
+        <small class="text-danger">
+          <i class="fas fa-arrow-down"></i> -3% vs semana anterior
+        </small>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 mb-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <i class="fas fa-heart fa-2x text-danger mb-3"></i>
+        <h3 class="mb-1">89%</h3>
+        <p class="text-muted mb-0">Satisfacción</p>
+        <small class="text-success">
+          <i class="fas fa-arrow-up"></i> +2% vs semana anterior
+        </small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Gráfico de usuarios -->
+  <div class="col-lg-8 mb-4">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">
+          <i class="fas fa-chart-area text-primary me-2"></i>
+          Usuarios por Día (Últimos 30 días)
+        </h5>
+      </div>
+      <div class="card-body">
+        <canvas id="usersChart" height="100"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top páginas -->
+  <div class="col-lg-4 mb-4">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">
+          <i class="fas fa-trophy text-warning me-2"></i>
+          Páginas Más Visitadas
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-3">
+          <span>Inicio</span>
+          <div>
+            <span class="badge bg-primary">2,847</span>
+          </div>
+        </div>
+        <div class="progress mb-3" style="height: 6px">
+          <div class="progress-bar" style="width: 85%"></div>
+        </div>
+
+        <div class="d-flex justify-content-between mb-3">
+          <span>Artículos</span>
+          <div>
+            <span class="badge bg-primary">1,923</span>
+          </div>
+        </div>
+        <div class="progress mb-3" style="height: 6px">
+          <div class="progress-bar" style="width: 57%"></div>
+        </div>
+
+        <div class="d-flex justify-content-between mb-3">
+          <span>Programación</span>
+          <div>
+            <span class="badge bg-primary">1,456</span>
+          </div>
+        </div>
+        <div class="progress mb-3" style="height: 6px">
+          <div class="progress-bar" style="width: 43%"></div>
+        </div>
+
+        <div class="d-flex justify-content-between mb-3">
+          <span>Contacto</span>
+          <div>
+            <span class="badge bg-primary">892</span>
+          </div>
+        </div>
+        <div class="progress mb-3" style="height: 6px">
+          <div class="progress-bar" style="width: 27%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Gráfico de artículos -->
+  <div class="col-lg-6 mb-4">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">
+          <i class="fas fa-chart-bar text-success me-2"></i>
+          Artículos por Mes
+        </h5>
+      </div>
+      <div class="card-body">
+        <canvas id="postsChart" height="150"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dispositivos -->
+  <div class="col-lg-6 mb-4">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">
+          <i class="fas fa-mobile-alt text-info me-2"></i>
+          Dispositivos
+        </h5>
+      </div>
+      <div class="card-body">
+        <canvas id="devicesChart" height="150"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla de eventos recientes -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">
+          <i class="fas fa-list text-secondary me-2"></i>
+          Actividad Reciente
+        </h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Evento</th>
+                <th>Usuario</th>
+                <th>IP</th>
+                <th>Dispositivo</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <i class="fas fa-play text-success me-2"></i>
+                  Reproducir radio
+                </td>
+                <td>Usuario anónimo</td>
+                <td>192.168.1.100</td>
+                <td>
+                  <i class="fas fa-mobile me-1"></i>
+                  Mobile
+                </td>
+                <td>Hace 2 min</td>
+              </tr>
+              <tr>
+                <td>
+                  <i class="fas fa-eye text-info me-2"></i>
+                  Ver artículo
+                </td>
+                <td>juan.perez</td>
+                <td>10.0.0.15</td>
+                <td>
+                  <i class="fas fa-desktop me-1"></i>
+                  Desktop
+                </td>
+                <td>Hace 5 min</td>
+              </tr>
+              <tr>
+                <td>
+                  <i class="fas fa-comment text-primary me-2"></i>
+                  Nuevo comentario
+                </td>
+                <td>maria.garcia</td>
+                <td>172.16.0.5</td>
+                <td>
+                  <i class="fas fa-tablet me-1"></i>
+                  Tablet
+                </td>
+                <td>Hace 8 min</td>
+              </tr>
+              <tr>
+                <td>
+                  <i class="fas fa-user-plus text-success me-2"></i>
+                  Nuevo registro
+                </td>
+                <td>carlos.lopez</td>
+                <td>203.0.113.42</td>
+                <td>
+                  <i class="fas fa-mobile me-1"></i>
+                  Mobile
+                </td>
+                <td>Hace 15 min</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  // Gráfico de usuarios por día
+  const usersCtx = document.getElementById("usersChart").getContext("2d");
+  const usersChart = new Chart(usersCtx, {
+    type: "line",
+    data: {
+      labels: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+      datasets: [
+        {
+          label: "Usuarios",
+          data: [12, 19, 3, 5, 2, 3, 8],
+          borderColor: "#dc2626",
+          backgroundColor: "rgba(220, 38, 38, 0.1)",
+          tension: 0.4,
+          fill: true,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+
+  // Gráfico de artículos por mes
+  const postsCtx = document.getElementById("postsChart").getContext("2d");
+  const postsChart = new Chart(postsCtx, {
+    type: "bar",
+    data: {
+      labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun"],
+      datasets: [
+        {
+          label: "Artículos",
+          data: [5, 8, 12, 7, 15, 10],
+          backgroundColor: "rgba(16, 185, 129, 0.8)",
+          borderColor: "#10b981",
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+
+  // Gráfico de dispositivos
+  const devicesCtx = document.getElementById("devicesChart").getContext("2d");
+  const devicesChart = new Chart(devicesCtx, {
+    type: "doughnut",
+    data: {
+      labels: ["Desktop", "Mobile", "Tablet"],
+      datasets: [
+        {
+          data: [45, 35, 20],
+          backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"],
+          borderWidth: 2,
+          borderColor: "#fff",
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "bottom",
+        },
+      },
+    },
+  });
+</script>
+{% endblock %}

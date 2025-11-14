@@ -1,0 +1,838 @@
+{% extends 'dashboard/base.html' %}
+{% block page_title %}Estadísticas{% endblock %}
+{% block content %}
+
+<style>
+  /* Variables CSS para tema claro y oscuro */
+  :root {
+    --stats-card-bg: #ffffff;
+    --stats-card-hover: #f8f9fa;
+    --stats-border: #e2e8f0;
+    --stats-shadow: rgba(0, 0, 0, 0.06);
+    --stats-shadow-hover: rgba(0, 0, 0, 0.1);
+    --stats-text-primary: #1e293b;
+    --stats-text-secondary: #64748b;
+    --stats-header-bg: linear-gradient(135deg, #E8F0FE 0%, #F1F5F9 100%);
+    --stats-header-text: #334155;
+    --stats-filter-bg: #ffffff;
+    --stats-filter-hover: #f8fafc;
+    --stats-filter-border: #e2e8f0;
+    --stats-chart-grid: rgba(0, 0, 0, 0.05);
+  }
+
+  html.dark {
+    --stats-card-bg: #2d2d3a;
+    --stats-card-hover: #363647;
+    --stats-border: #404052;
+    --stats-shadow: rgba(0, 0, 0, 0.3);
+    --stats-shadow-hover: rgba(0, 0, 0, 0.5);
+    --stats-text-primary: #e8eaed;
+    --stats-text-secondary: #9ca3af;
+    --stats-header-bg: linear-gradient(135deg, #363647 0%, #2d2d3a 100%);
+    --stats-header-text: #e8eaed;
+    --stats-filter-bg: #2d2d3a;
+    --stats-filter-hover: #363647;
+    --stats-filter-border: #404052;
+    --stats-chart-grid: rgba(255, 255, 255, 0.1);
+  }
+
+  .stat-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px var(--stats-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    background: var(--stats-card-bg);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px var(--stats-shadow-hover);
+  }
+
+  .stat-card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: white;
+  }
+
+  .chart-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px var(--stats-shadow);
+    height: 100%;
+    background: var(--stats-card-bg);
+  }
+
+  .chart-card-header {
+    background: var(--stats-header-bg);
+    color: var(--stats-header-text);
+    border-radius: 16px 16px 0 0 !important;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--stats-border);
+  }
+
+  .filter-btn {
+    border: 2px solid var(--stats-filter-border);
+    background: var(--stats-filter-bg);
+    color: var(--stats-text-secondary);
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .filter-btn:hover {
+    border-color: #94A3B8;
+    color: var(--stats-text-primary);
+    background: var(--stats-filter-hover);
+  }
+
+  .filter-btn.active {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    color: white;
+    border-color: #3B82F6;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--stats-text-primary);
+  }
+
+  .stat-label {
+    color: var(--stats-text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .stat-change {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 16px;
+  }
+
+  .stat-change.positive {
+    background: #D1FAE5;
+    color: #047857;
+  }
+
+  html.dark .stat-change.positive {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+  }
+
+  .stat-change.negative {
+    background: #FEE2E2;
+    color: #DC2626;
+  }
+
+  html.dark .stat-change.negative {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--stats-border);
+    border-radius: 50%;
+    border-top-color: #3B82F6;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Título principal */
+  .stats-title {
+    font-weight: 700;
+    color: var(--stats-text-primary);
+  }
+
+  .stats-subtitle {
+    color: var(--stats-text-secondary);
+  }
+
+  /* Colores suaves y profesionales para los iconos */
+  .gradient-bg-1 { background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%); }
+  .gradient-bg-2 { background: linear-gradient(135deg, #34D399 0%, #10B981 100%); }
+  .gradient-bg-3 { background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%); }
+  .gradient-bg-4 { background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); }
+  .gradient-bg-5 { background: linear-gradient(135deg, #F472B6 0%, #EC4899 100%); }
+  .gradient-bg-6 { background: linear-gradient(135deg, #2DD4BF 0%, #14B8A6 100%); }
+  .gradient-bg-7 { background: linear-gradient(135deg, #FB923C 0%, #F97316 100%); }
+  .gradient-bg-8 { background: linear-gradient(135deg, #C084FC 0%, #A855F7 100%); }
+</style>
+
+<div class="container-fluid">
+  <!-- Header con filtros -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1 stats-title">
+        <i class="fas fa-chart-line me-2" style="color: #667eea;"></i>
+        Estadísticas
+      </h2>
+      <p class="stats-subtitle mb-0">Panel de análisis y métricas en tiempo real</p>
+    </div>
+    <div class="btn-group" role="group">
+      <button type="button" class="filter-btn active" data-filter="hoy">Hoy</button>
+      <button type="button" class="filter-btn" data-filter="semana">Semana</button>
+      <button type="button" class="filter-btn" data-filter="mes">Mes</button>
+      <button type="button" class="filter-btn" data-filter="todos">Todos</button>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div id="loadingState" class="text-center py-5">
+    <div class="loading-spinner mx-auto"></div>
+    <p class="text-muted mt-3">Cargando estadísticas...</p>
+  </div>
+
+  <!-- Content -->
+  <div id="statsContent" style="display: none;">
+    <!-- KPIs principales -->
+    <div class="row mb-4" id="kpiCards">
+      <!-- Los KPIs se insertarán dinámicamente aquí -->
+    </div>
+
+    <!-- Gráficos principales -->
+    <div class="row mb-4">
+      <!-- Usuarios por día -->
+      <div class="col-lg-8 mb-4">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h5 class="mb-0 fw-bold">
+              <i class="fas fa-users me-2"></i>
+              Usuarios Registrados
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="usersChart" height="100"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contactos por tipo -->
+      <div class="col-lg-4 mb-4">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h5 class="mb-0 fw-bold">
+              <i class="fas fa-envelope me-2"></i>
+              Contactos por Tipo
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="contactsChart" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segunda fila de gráficos -->
+    <div class="row mb-4">
+      <!-- Mensajes de chat -->
+      <div class="col-lg-6 mb-4">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h5 class="mb-0 fw-bold">
+              <i class="fas fa-comments me-2"></i>
+              Mensajes de Chat
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="messagesChart" height="150"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Artículos por categoría -->
+      <div class="col-lg-6 mb-4">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h5 class="mb-0 fw-bold">
+              <i class="fas fa-newspaper me-2"></i>
+              Artículos por Categoría
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="articlesChart" height="150"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tercera fila de gráficos -->
+    <div class="row mb-4">
+      <!-- Suscripciones -->
+      <div class="col-lg-8 mb-4">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h5 class="mb-0 fw-bold">
+              <i class="fas fa-user-plus me-2"></i>
+              Suscripciones al Newsletter
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="subscriptionsChart" height="100"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Infracciones -->
+      <div class="col-lg-4 mb-4">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h5 class="mb-0 fw-bold">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              Infracciones de Chat
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="infractionsChart" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cuarta fila -->
+    <div class="row mb-4">
+      <!-- Top artículos -->
+      <div class="col-lg-8 mb-4">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h5 class="mb-0 fw-bold">
+              <i class="fas fa-star me-2"></i>
+              Top 5 Artículos
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="topArticlesChart" height="120"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado publicidad -->
+      <div class="col-lg-4 mb-4">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h5 class="mb-0 fw-bold">
+              <i class="fas fa-ad me-2"></i>
+              Estado de Publicidad
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="publicidadChart" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+let charts = {};
+let currentFilter = 'hoy';
+
+// Verificar que Chart.js se haya cargado
+if (typeof Chart === 'undefined') {
+  console.error('Chart.js no se ha cargado correctamente');
+  document.getElementById('loadingState').innerHTML = `
+    <div class="alert alert-danger">
+      <i class="fas fa-exclamation-circle me-2"></i>
+      Error: Chart.js no se pudo cargar. Verifica tu conexión a internet.
+    </div>
+  `;
+}
+
+// Configuración global de Chart.js
+Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+Chart.defaults.responsive = true;
+Chart.defaults.maintainAspectRatio = false;
+
+// Detectar modo oscuro y ajustar colores de Chart.js
+function getChartColors() {
+  const isDark = document.documentElement.classList.contains('dark');
+  return {
+    textColor: isDark ? '#e8eaed' : '#64748b',
+    gridColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+    tooltipBg: isDark ? 'rgba(45, 45, 58, 0.95)' : 'rgba(0, 0, 0, 0.8)'
+  };
+}
+
+// Actualizar colores globales de Chart.js según el tema
+function updateChartDefaults() {
+  const colors = getChartColors();
+  Chart.defaults.color = colors.textColor;
+}
+
+// Función para cargar estadísticas
+async function loadStats(filter = 'hoy') {
+  currentFilter = filter;
+
+  // Mostrar loading
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('statsContent').style.display = 'none';
+
+  try {
+    const response = await fetch(`/dashboard/api/stats/?filter=${filter}`, {
+      credentials: 'same-origin',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Renderizar KPIs
+    renderKPIs(data.kpis);
+
+    // Renderizar gráficos
+    renderCharts(data.charts, filter);
+
+    // Mostrar contenido
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('statsContent').style.display = 'block';
+  } catch (error) {
+    console.error('Error loading stats:', error);
+    document.getElementById('loadingState').innerHTML = `
+      <div class="alert alert-danger">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        Error al cargar las estadísticas: ${error.message}
+        <br><small>Revisa la consola para más detalles.</small>
+      </div>
+    `;
+  }
+}
+
+// Renderizar KPIs
+function renderKPIs(kpis) {
+  const kpiData = [
+    {
+      icon: 'fa-users',
+      label: 'Usuarios',
+      value: kpis.total_users,
+      change: kpis.users_change,
+      gradient: 'gradient-bg-1'
+    },
+    {
+      icon: 'fa-comments',
+      label: 'Mensajes',
+      value: kpis.total_messages,
+      change: kpis.messages_change,
+      gradient: 'gradient-bg-2'
+    },
+    {
+      icon: 'fa-newspaper',
+      label: 'Artículos',
+      value: kpis.total_articles,
+      change: 0,
+      gradient: 'gradient-bg-3'
+    },
+    {
+      icon: 'fa-user-check',
+      label: 'Suscriptores',
+      value: kpis.total_subscriptions,
+      change: 0,
+      gradient: 'gradient-bg-4'
+    },
+    {
+      icon: 'fa-envelope',
+      label: 'Contactos',
+      value: kpis.total_contacts,
+      change: 0,
+      gradient: 'gradient-bg-5'
+    },
+    {
+      icon: 'fa-ad',
+      label: 'Publicidad',
+      value: kpis.total_publicidad,
+      change: 0,
+      gradient: 'gradient-bg-6'
+    },
+    {
+      icon: 'fa-guitar',
+      label: 'Bandas Postulantes',
+      value: kpis.total_bandas_emergentes,
+      change: 0,
+      gradient: 'gradient-bg-7'
+    },
+    {
+      icon: 'fa-play-circle',
+      label: 'Reproducciones Únicas',
+      value: kpis.total_reproducciones_unicas,
+      change: 0,
+      gradient: 'gradient-bg-8'
+    }
+  ];
+
+  const container = document.getElementById('kpiCards');
+  container.innerHTML = kpiData.map(kpi => `
+    <div class="col-lg-3 col-md-6 col-sm-6 mb-3">
+      <div class="stat-card card">
+        <div class="card-body">
+          <div class="d-flex align-items-start justify-content-between mb-3">
+            <div class="stat-card-icon ${kpi.gradient}">
+              <i class="fas ${kpi.icon} text-white"></i>
+            </div>
+            ${kpi.change !== 0 ? `
+              <span class="stat-change ${kpi.change > 0 ? 'positive' : 'negative'}">
+                <i class="fas fa-arrow-${kpi.change > 0 ? 'up' : 'down'} me-1"></i>
+                ${Math.abs(kpi.change)}%
+              </span>
+            ` : ''}
+          </div>
+          <h3 class="stat-number mb-1">${kpi.value.toLocaleString()}</h3>
+          <p class="stat-label mb-0">${kpi.label}</p>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Renderizar gráficos
+function renderCharts(chartsData, filter) {
+  // Destruir gráficos existentes
+  Object.values(charts).forEach(chart => chart.destroy());
+  charts = {};
+
+  // Obtener colores según el tema
+  const colors = getChartColors();
+
+  // Usuarios por día (línea)
+  const usersCtx = document.getElementById('usersChart').getContext('2d');
+  charts.users = new Chart(usersCtx, {
+    type: 'line',
+    data: {
+      labels: chartsData.users_by_day.map(d => formatDate(d.date, filter)),
+      datasets: [{
+        label: 'Nuevos Usuarios',
+        data: chartsData.users_by_day.map(d => d.count),
+        borderColor: '#3B82F6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#3B82F6',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      animation: {
+        duration: 1500,
+        easing: 'easeInOutQuart'
+      },
+      plugins: {
+        legend: {
+          display: false,
+          labels: { color: colors.textColor }
+        },
+        tooltip: {
+          backgroundColor: colors.tooltipBg,
+          padding: 12,
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: '#3B82F6',
+          borderWidth: 1
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: colors.gridColor },
+          ticks: { color: colors.textColor }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { color: colors.textColor }
+        }
+      }
+    }
+  });
+
+  // Mensajes de chat (área)
+  const messagesCtx = document.getElementById('messagesChart').getContext('2d');
+  charts.messages = new Chart(messagesCtx, {
+    type: 'line',
+    data: {
+      labels: chartsData.messages_by_day.map(d => formatDate(d.date, filter)),
+      datasets: [{
+        label: 'Mensajes',
+        data: chartsData.messages_by_day.map(d => d.count),
+        borderColor: '#10B981',
+        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      animation: { duration: 1500, easing: 'easeInOutQuart' },
+      plugins: {
+        legend: { display: false, labels: { color: colors.textColor } },
+        tooltip: { backgroundColor: colors.tooltipBg }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: colors.gridColor }, ticks: { color: colors.textColor } },
+        x: { grid: { display: false }, ticks: { color: colors.textColor } }
+      }
+    }
+  });
+
+  // Artículos por categoría (barras)
+  const articlesCtx = document.getElementById('articlesChart').getContext('2d');
+  charts.articles = new Chart(articlesCtx, {
+    type: 'bar',
+    data: {
+      labels: chartsData.articles_by_category.map(d => d.category || 'Sin categoría'),
+      datasets: [{
+        label: 'Artículos',
+        data: chartsData.articles_by_category.map(d => d.count),
+        backgroundColor: [
+          'rgba(96, 165, 250, 0.7)',
+          'rgba(52, 211, 153, 0.7)',
+          'rgba(167, 139, 250, 0.7)',
+          'rgba(251, 191, 36, 0.7)',
+          'rgba(244, 114, 182, 0.7)',
+          'rgba(45, 212, 191, 0.7)'
+        ],
+        borderWidth: 0,
+        borderRadius: 8
+      }]
+    },
+    options: {
+      animation: { duration: 1500, easing: 'easeInOutQuart' },
+      plugins: {
+        legend: { display: false, labels: { color: colors.textColor } },
+        tooltip: { backgroundColor: colors.tooltipBg }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: colors.gridColor }, ticks: { color: colors.textColor } },
+        x: { grid: { display: false }, ticks: { color: colors.textColor } }
+      }
+    }
+  });
+
+  // Contactos por tipo (donut)
+  const contactsCtx = document.getElementById('contactsChart').getContext('2d');
+  charts.contacts = new Chart(contactsCtx, {
+    type: 'doughnut',
+    data: {
+      labels: chartsData.contacts_by_type.map(d => d.type || 'Sin tipo'),
+      datasets: [{
+        data: chartsData.contacts_by_type.map(d => d.count),
+        backgroundColor: [
+          '#60A5FA', '#34D399', '#A78BFA', '#FBBF24', '#F472B6', '#2DD4BF'
+        ],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      animation: {
+        animateRotate: true,
+        animateScale: true,
+        duration: 1500
+      },
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 10
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { padding: 12, font: { size: 11 }, color: colors.textColor }
+        },
+        tooltip: { backgroundColor: colors.tooltipBg }
+      },
+      cutout: '65%'
+    }
+  });
+
+  // Suscripciones (línea)
+  const subscriptionsCtx = document.getElementById('subscriptionsChart').getContext('2d');
+  charts.subscriptions = new Chart(subscriptionsCtx, {
+    type: 'line',
+    data: {
+      labels: chartsData.subscriptions_by_day.map(d => formatDate(d.date, filter)),
+      datasets: [{
+        label: 'Suscripciones',
+        data: chartsData.subscriptions_by_day.map(d => d.count),
+        borderColor: '#8B5CF6',
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      animation: { duration: 2000, easing: 'easeInOutQuart' },
+      plugins: {
+        legend: { display: false, labels: { color: colors.textColor } },
+        tooltip: { backgroundColor: colors.tooltipBg }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: colors.gridColor }, ticks: { color: colors.textColor } },
+        x: { grid: { display: false }, ticks: { color: colors.textColor } }
+      }
+    }
+  });
+
+  // Infracciones (donut)
+  const infractionsCtx = document.getElementById('infractionsChart').getContext('2d');
+  const infractionLabels = {
+    'toxicidad_ml': 'Toxicidad ML',
+    'palabra_prohibida': 'Palabra Prohibida',
+    'enlace_prohibido': 'Enlace Prohibido',
+    'spam': 'Spam'
+  };
+  charts.infractions = new Chart(infractionsCtx, {
+    type: 'doughnut',
+    data: {
+      labels: chartsData.infractions_by_type.map(d => infractionLabels[d.type] || d.type),
+      datasets: [{
+        data: chartsData.infractions_by_type.map(d => d.count),
+        backgroundColor: ['#FBBF24', '#EF4444', '#A78BFA', '#EC4899'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      animation: { animateRotate: true, duration: 1500 },
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 10
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { padding: 12, font: { size: 11 }, color: colors.textColor }
+        },
+        tooltip: { backgroundColor: colors.tooltipBg }
+      },
+      cutout: '65%'
+    }
+  });
+
+  // Top artículos (barras horizontales)
+  const topArticlesCtx = document.getElementById('topArticlesChart').getContext('2d');
+  charts.topArticles = new Chart(topArticlesCtx, {
+    type: 'bar',
+    data: {
+      labels: chartsData.top_articles.map(d => d.title ? (d.title.length > 40 ? d.title.substring(0, 40) + '...' : d.title) : 'Sin título'),
+      datasets: [{
+        label: 'Vistas',
+        data: chartsData.top_articles.map(d => d.views),
+        backgroundColor: 'rgba(96, 165, 250, 0.7)',
+        borderWidth: 0,
+        borderRadius: 8
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      animation: { duration: 1500, easing: 'easeInOutQuart' },
+      plugins: {
+        legend: { display: false, labels: { color: colors.textColor } },
+        tooltip: { backgroundColor: colors.tooltipBg }
+      },
+      scales: {
+        x: { beginAtZero: true, grid: { color: colors.gridColor }, ticks: { color: colors.textColor } },
+        y: { grid: { display: false }, ticks: { color: colors.textColor } }
+      }
+    }
+  });
+
+  // Publicidad (donut)
+  const publicidadCtx = document.getElementById('publicidadChart').getContext('2d');
+  charts.publicidad = new Chart(publicidadCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Activa', 'Inactiva'],
+      datasets: [{
+        data: [chartsData.publicidad_status.activa, chartsData.publicidad_status.inactiva],
+        backgroundColor: ['#34D399', '#F87171'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      animation: { animateRotate: true, duration: 1500 },
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 10
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { padding: 12, color: colors.textColor }
+        },
+        tooltip: { backgroundColor: colors.tooltipBg }
+      },
+      cutout: '65%'
+    }
+  });
+}
+
+// Formatear fecha según el filtro
+function formatDate(dateStr, filter) {
+  const date = new Date(dateStr);
+  if (filter === 'hoy') {
+    return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  } else if (filter === 'semana') {
+    return date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' });
+  } else {
+    return date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+  }
+}
+
+// Event listeners para filtros
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    loadStats(this.dataset.filter);
+  });
+});
+
+// Cargar estadísticas cuando el DOM y Chart.js estén completamente listos
+window.addEventListener('load', function() {
+  // Verificar que Chart.js esté disponible antes de cargar
+  if (typeof Chart !== 'undefined') {
+    loadStats('hoy');
+  } else {
+    console.error('Chart.js not available after window load');
+    document.getElementById('loadingState').innerHTML = `
+      <div class="alert alert-danger">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        Error: No se pudo cargar la librería de gráficos.
+      </div>
+    `;
+  }
+});
+</script>
+{% endblock %}

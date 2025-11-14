@@ -1,0 +1,108 @@
+{% extends 'dashboard/base.html' %}
+{% load static %} {% block page_title %}
+Calendario de Programación
+{% endblock %}
+
+{% block content %}
+
+<style>
+  /* Oculta el copyright de FullCalendar si es necesario */
+  .fc-license-message {
+    display: none !important;
+  }
+
+  /* 1. Arregla el texto azul: 
+    Hace que los enlaces (números, etc.) dentro del calendario 
+    hereden el color de texto normal.
+  */
+  #calendar a {
+    color: inherit !important;
+    /* Hereda el color (¡importante!) */
+    text-decoration: none !important;
+    /* Quita el subrayado */
+  }
+
+  /* 2. Estiliza los botones (prev, next, today, etc.)
+    para que coincidan con el color rojo de tu dashboard.
+  */
+  .fc-button-primary {
+    background-color: var(--primary-color, #dc2626) !important;
+    /* Usa tu variable --primary-color (rojo) o un default */
+    border-color: var(--primary-color, #dc2626) !important;
+  }
+
+  .fc-button-primary:hover {
+    background-color: #ef4444 !important;
+    /* Un rojo un poco más claro */
+    border-color: #ef4444 !important;
+  }
+</style>
+
+<h1 class="h3 mb-4 text-gray-800">Calendario de Programación</h1>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Calendario</h6>
+      </div>
+      <div class="card-body">
+
+        <div id="calendar"></div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+  {{ block.super }} <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Obtiene el <div> que creamos
+      var calendarEl = document.getElementById('calendar');
+
+      // Crea la instancia del calendario
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+
+        // ---- Configuración Básica ----
+        initialView: 'dayGridMonth', // Vista de mes
+        locale: 'es', // Pone el calendario en español
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+
+        // ---- CONECTAR A LA API DE DJANGO ----
+        // Pide los eventos a la URL que creamos
+        events: "{% url 'api_get_calendar_events' %}",
+        
+        // ---- Manejo de errores (Opcional pero recomendado) ----
+        loading: function(isLoading) {
+            if (isLoading) {
+                // Puedes mostrar un spinner de carga aquí
+                console.log('Cargando eventos...');
+            } else {
+                // Ocultar el spinner
+                console.log('Eventos cargados.');
+            }
+        },
+        eventSources: [{
+            url: "{% url 'api_get_calendar_events' %}",
+            failure: function() {
+                alert('Hubo un error al cargar los eventos del calendario. Revisa la consola de Django.');
+            }
+        }]
+
+      }); // <-- Fin de new FullCalendar.Calendar
+
+      // ¡Dibuja el calendario!
+      calendar.render();
+
+    }); // <-- Fin de addEventListener
+  </script>
+{% endblock %}

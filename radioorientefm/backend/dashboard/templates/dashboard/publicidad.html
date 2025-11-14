@@ -1,0 +1,1926 @@
+{% extends 'dashboard/base.html' %}
+
+// Activar/Desactivar campaña
+async function toggleEstadoCampania(campaniaId, activo) {
+  try {
+    const resp = await fetch(`/dashboard/api/publicidad/campanias/${campaniaId}/actualizar/`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({ activo })
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.message || 'No se pudo actualizar el estado');
+    }
+    // Refrescar los detalles para reflejar el nuevo estado
+    verDetallesCampania(campaniaId);
+  } catch (e) {
+    alert(e.message || 'Error al cambiar estado de campaña');
+  }
+}
+{% load static %}
+
+{% block title %}Publicidad Web - Dashboard{% endblock %}
+{% block page_title %}Publicidad Web{% endblock %}
+
+{% block content %}
+<style>
+    /* Variables CSS para tema claro y oscuro */
+    :root {
+        --pub-card-bg: #ffffff;
+        --pub-card-hover: #f8f9fa;
+        --pub-border: #e0e0e0;
+        --pub-shadow: rgba(0, 0, 0, 0.05);
+        --pub-shadow-hover: rgba(0, 0, 0, 0.1);
+        --pub-text: #2c3e50;
+        --pub-text-muted: #6c757d;
+    }
+
+    html.dark {
+        --pub-card-bg: #2d2d3a;
+        --pub-card-hover: #363647;
+        --pub-border: #404052;
+        --pub-shadow: rgba(0, 0, 0, 0.3);
+        --pub-shadow-hover: rgba(0, 0, 0, 0.5);
+        --pub-text: #e8eaed;
+        --pub-text-muted: #9ca3af;
+    }
+
+    /* Cards con diseño elegante */
+    #publicidad-page .card {
+        background: var(--pub-card-bg) !important;
+        border: 1px solid var(--pub-border) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 2px 8px var(--pub-shadow) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    #publicidad-page .card:hover {
+        box-shadow: 0 4px 16px var(--pub-shadow-hover) !important;
+    }
+
+    #publicidad-page .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border-bottom: none !important;
+        border-radius: 12px 12px 0 0 !important;
+        padding: 1rem 1.5rem !important;
+    }
+
+    #publicidad-page .card-header h5,
+    #publicidad-page .card-header h6 {
+        color: white !important;
+        font-weight: 600 !important;
+        margin: 0 !important;
+    }
+
+    #publicidad-page .card-body {
+        padding: 1.5rem !important;
+    }
+
+    /* Tablas elegantes */
+    #publicidad-page .table {
+        color: var(--pub-text) !important;
+        margin-bottom: 0 !important;
+    }
+
+    #publicidad-page .table thead th {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+        color: #495057 !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        font-size: 0.85rem !important;
+        letter-spacing: 0.5px !important;
+        padding: 1rem !important;
+        border: none !important;
+    }
+
+    html.dark #publicidad-page .table thead th {
+        background: linear-gradient(135deg, #363647 0%, #2d2d3a 100%) !important;
+        color: #e8eaed !important;
+    }
+
+    #publicidad-page .table tbody tr {
+        transition: all 0.2s ease !important;
+        border-bottom: 1px solid var(--pub-border) !important;
+    }
+
+    #publicidad-page .table tbody tr:hover {
+        background: var(--pub-card-hover) !important;
+        transform: scale(1.01) !important;
+    }
+
+    #publicidad-page .table tbody td {
+        padding: 1rem !important;
+        vertical-align: middle !important;
+        color: var(--pub-text) !important;
+    }
+
+    /* Botones principales */
+    #publicidad-page .btn-primary,
+    #publicidad-page button.btn-primary {
+        background: #667eea !important;
+        border-color: #667eea !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1.2rem !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease !important;
+    }
+
+    #publicidad-page .btn-primary:hover,
+    #publicidad-page button.btn-primary:hover {
+        background: #5568d3 !important;
+        border-color: #5568d3 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+    }
+
+    #publicidad-page .btn-secondary {
+        background: #6c757d !important;
+        border-color: #6c757d !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1.2rem !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease !important;
+    }
+
+    #publicidad-page .btn-secondary:hover {
+        background: #5a6268 !important;
+        border-color: #5a6268 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3) !important;
+    }
+
+    /* Botones de acción en tabla */
+    #publicidad-page .btn-sm {
+        padding: 0.4rem 0.8rem !important;
+        border-radius: 6px !important;
+        font-size: 0.875rem !important;
+        transition: all 0.2s ease !important;
+    }
+
+    #publicidad-page .btn-success {
+        background: #10b981 !important;
+        border-color: #10b981 !important;
+        color: white !important;
+    }
+
+    #publicidad-page .btn-success:hover {
+        background: #059669 !important;
+        border-color: #059669 !important;
+        transform: translateY(-2px) !important;
+    }
+
+    #publicidad-page .btn-danger {
+        background: #ef4444 !important;
+        border-color: #ef4444 !important;
+        color: white !important;
+    }
+
+    #publicidad-page .btn-danger:hover {
+        background: #dc2626 !important;
+        border-color: #dc2626 !important;
+        transform: translateY(-2px) !important;
+    }
+
+    #publicidad-page .btn-info {
+        background: #3b82f6 !important;
+        border-color: #3b82f6 !important;
+        color: white !important;
+    }
+
+    #publicidad-page .btn-info:hover {
+        background: #2563eb !important;
+        border-color: #2563eb !important;
+        transform: translateY(-2px) !important;
+    }
+
+    #publicidad-page .btn-warning {
+        background: #f59e0b !important;
+        border-color: #f59e0b !important;
+        color: white !important;
+    }
+
+    #publicidad-page .btn-warning:hover {
+        background: #d97706 !important;
+        border-color: #d97706 !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* Badges */
+    #publicidad-page .badge {
+        padding: 0.4rem 0.8rem !important;
+        border-radius: 6px !important;
+        font-weight: 500 !important;
+        font-size: 0.85rem !important;
+    }
+
+    #publicidad-page .badge.bg-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    }
+
+    #publicidad-page .badge.bg-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    }
+
+    #publicidad-page .badge.bg-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    }
+
+    #publicidad-page .badge.bg-info {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    }
+
+    #publicidad-page .badge.bg-secondary {
+        background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+    }
+
+    /* Nav tabs elegantes */
+    #publicidad-page .nav-tabs {
+        border-bottom: 2px solid var(--pub-border) !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    #publicidad-page .nav-tabs .nav-link {
+        color: var(--pub-text-muted) !important;
+        border: none !important;
+        padding: 0.75rem 1.5rem !important;
+        border-radius: 8px 8px 0 0 !important;
+        transition: all 0.3s ease !important;
+        font-weight: 500 !important;
+    }
+
+    #publicidad-page .nav-tabs .nav-link:hover {
+        color: #667eea !important;
+        background: var(--pub-card-hover) !important;
+    }
+
+    #publicidad-page .nav-tabs .nav-link.active {
+        color: #667eea !important;
+        background: var(--pub-card-bg) !important;
+        border-bottom: 3px solid #667eea !important;
+        font-weight: 600 !important;
+    }
+
+    /* Modales */
+    #publicidad-page .modal-content {
+        background: var(--pub-card-bg) !important;
+        border: 1px solid var(--pub-border) !important;
+        border-radius: 12px !important;
+    }
+
+    #publicidad-page .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border-bottom: none !important;
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+    #publicidad-page .modal-header h5 {
+        color: white !important;
+    }
+
+    #publicidad-page .modal-footer {
+        border-top: 1px solid var(--pub-border) !important;
+        background: var(--pub-card-bg) !important;
+    }
+
+    html.dark #publicidad-page .btn-close {
+        filter: invert(1) !important;
+    }
+
+    /* Paginación elegante */
+    #publicidad-page .pagination {
+        margin: 0 !important;
+    }
+
+    #publicidad-page .page-link {
+        color: #667eea !important;
+        border: 1px solid var(--pub-border) !important;
+        background: var(--pub-card-bg) !important;
+        padding: 0.5rem 0.75rem !important;
+        margin: 0 0.25rem !important;
+        border-radius: 6px !important;
+        transition: all 0.2s ease !important;
+    }
+
+    #publicidad-page .page-link:hover {
+        background: #667eea !important;
+        color: white !important;
+        border-color: #667eea !important;
+        transform: translateY(-2px) !important;
+    }
+
+    #publicidad-page .page-item.active .page-link {
+        background: #667eea !important;
+        border-color: #667eea !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+
+    #publicidad-page .page-item.disabled .page-link {
+        opacity: 0.5 !important;
+        cursor: not-allowed !important;
+    }
+
+    /* Card footer para paginación */
+    #publicidad-page .card-footer {
+        background: var(--pub-card-bg) !important;
+        border-top: 1px solid var(--pub-border) !important;
+        border-radius: 0 0 12px 12px !important;
+        padding: 1rem 1.5rem !important;
+    }
+
+    /* Texto muted */
+    #publicidad-page .text-muted {
+        color: var(--pub-text-muted) !important;
+    }
+
+    /* Forms en modales */
+    #publicidad-page .form-control,
+    #publicidad-page .form-select {
+        background: var(--pub-card-bg) !important;
+        border: 1px solid var(--pub-border) !important;
+        color: var(--pub-text) !important;
+        border-radius: 8px !important;
+    }
+
+    #publicidad-page .form-control:focus,
+    #publicidad-page .form-select:focus {
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+    }
+
+    #publicidad-page .form-label {
+        color: var(--pub-text) !important;
+        font-weight: 500 !important;
+    }
+</style>
+
+<!-- Mover las funciones JavaScript al principio del contenido -->
+<script>
+// Helper CSRF: define si no existe
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+}
+
+// Inicialización de modales
+let editarModal;
+let detallesCampaniaModal;
+let detallesSolicitudModal;
+let currentSolicitudId = null;
+
+// Inicializar los modales cuando el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', function() {
+    detallesCampaniaModal = new bootstrap.Modal(document.getElementById('detallesCampaniaModal'));
+    detallesSolicitudModal = new bootstrap.Modal(document.getElementById('detallesSolicitudModal'));
+    
+    // Configurar el modal para que se cierre correctamente
+    document.getElementById('detallesSolicitudModal').addEventListener('hidden.bs.modal', function () {
+        // Limpiar el contenido al cerrar
+        document.getElementById('detallesSolicitudBody').innerHTML = '';
+    });
+
+    // Cargar información de ubicación para todas las campañas
+    cargarUbicacionesCampanias();
+});
+
+// Función para cargar la información de ubicación de las campañas
+async function cargarUbicacionesCampanias() {
+    const celdasUbicacion = document.querySelectorAll('.ubicacion-celda');
+    
+    for (const celda of celdasUbicacion) {
+        const campaniaId = celda.getAttribute('data-campania-id');
+        if (!campaniaId) continue;
+        
+        try {
+            const response = await fetch(`/dashboard/api/publicidad/campanias/${campaniaId}/`);
+            if (!response.ok) continue;
+            
+            const data = await response.json();
+            const ubicacion = data?.ubicacion;
+            
+            if (ubicacion) {
+                // Formato: "Nombre — Tipo Dimensiones"
+                const partes = [];
+                if (ubicacion.nombre) partes.push(ubicacion.nombre);
+                if (ubicacion.tipo) partes.push(ubicacion.tipo);
+                if (ubicacion.dimensiones) partes.push(ubicacion.dimensiones);
+                
+                celda.textContent = partes.join(' — ');
+                celda.setAttribute('title', partes.join(' — '));
+            }
+        } catch (error) {
+            console.error('Error al cargar ubicación para campaña', campaniaId, error);
+        }
+    }
+}
+
+// Función para formatear fechas
+function formatDate(dateString) {
+  if (!dateString) return 'No especificada';
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(dateString).toLocaleDateString('es-ES', options);
+}
+
+// Función auxiliar para obtener la clase del badge según el estado
+function getEstadoBadgeClass(estado) {
+  switch(estado) {
+    case 'pendiente': return 'bg-secondary';
+    case 'en_revision': return 'bg-warning text-dark';
+    case 'aprobada': return 'bg-success';
+    case 'rechazada': return 'bg-danger';
+    default: return 'bg-secondary';
+  }
+}
+
+// Funciones de la interfaz
+async function marcarEnRevision(id) {
+  if (!confirm('¿Marcar la solicitud #' + id + ' como "Contactado en breve"?')) return;
+  try {
+    const resp = await fetch(`/dashboard/api/publicidad/solicitudes/${id}/estado/`, {
+      method: 'PATCH',
+      headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ estado: 'en_revision' })
+    });
+    if (!resp.ok) throw new Error('Error al marcar en revisión');
+    location.reload();
+  } catch (e) { alert(e.message); }
+}
+
+async function rechazarSolicitud(id) {
+  const motivo = prompt('Motivo de rechazo para la solicitud #' + id + ':');
+  if (motivo === null) return; // cancelado
+  try {
+    const resp = await fetch(`/dashboard/api/publicidad/solicitudes/${id}/estado/`, {
+      method: 'PATCH',
+      headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ estado: 'rechazada', motivo: motivo })
+    });
+    if (!resp.ok) throw new Error('Error al rechazar');
+    location.reload();
+  } catch (e) { alert(e.message); }
+}
+
+async function aprobarSolicitud(id) {
+  if (!confirm('¿Está seguro de aprobar la solicitud #' + id + '?')) return;
+  try {
+    const resp = await fetch(`/dashboard/api/publicidad/solicitudes/${id}/aprobar/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    if (!resp.ok) throw new Error('Error al aprobar');
+    location.reload();
+  } catch (e) { alert(e.message); }
+}
+
+// Función para cargar y mostrar los detalles de la solicitud
+async function verDetallesSolicitud(solicitudId) {
+    console.log('verDetallesSolicitud llamado con ID:', solicitudId);
+    currentSolicitudId = solicitudId;
+    const modalBody = document.getElementById('detallesSolicitudBody');
+    
+    // Mostrar indicador de carga
+    modalBody.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-2">Cargando detalles de la solicitud...</p>
+        </div>`;
+    
+    // Asegurarse de que el modal esté inicializado
+    if (!detallesSolicitudModal) {
+        detallesSolicitudModal = new bootstrap.Modal(document.getElementById('detallesSolicitudModal'));
+    }
+    detallesSolicitudModal.show();
+    
+    try {
+        // Hacer la petición para obtener los detalles
+        console.log('Haciendo petición a:', `/dashboard/api/publicidad/solicitud/${solicitudId}/`);
+        const response = await fetch(`/dashboard/api/publicidad/solicitud/${solicitudId}/`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al cargar los detalles de la solicitud');
+        }
+
+        const data = await response.json();
+        console.log('Datos recibidos:', data);
+        
+        // Construir el HTML con los detalles de la solicitud
+        let html = `
+        <div class="mb-3">
+            <h6>Información General</h6>
+            <table class="table table-sm">
+                <tr>
+                    <th style="width: 30%;">ID:</th>
+                    <td>#${data.id}</td>
+                </tr>
+                <tr>
+                    <th>Estado:</th>
+                    <td><span class="badge ${getEstadoBadgeClass(data.estado)}">
+                        ${data.estado === 'en_revision' ? 'Contactado en breve' : data.estado}
+                    </span></td>
+                </tr>
+                <tr>
+                    <th>Fecha de solicitud:</th>
+                    <td>${new Date(data.fecha_creacion).toLocaleString()}</td>
+                </tr>
+                <tr>
+                    <th>Cliente:</th>
+                    <td>${data.nombre_contacto || 'No especificado'}</td>
+                </tr>
+                <tr>
+                    <th>Usuario:</th>
+                    <td>${data.usuario_username || 'No autenticado'}</td>
+                </tr>
+                <tr>
+                    <th>Email de contacto:</th>
+                    <td>${data.email_contacto || 'No especificado'}</td>
+                </tr>
+                <tr>
+                    <th>Teléfono:</th>
+                    <td>${data.telefono_contacto || 'No especificado'}</td>
+                </tr>
+            </table>
+        </div>`;
+
+        // Mostrar los ítems de la solicitud
+        if (data.items_web && data.items_web.length > 0) {
+            html += `<h6 class="mt-4 mb-3">Ubicaciones Solicitadas</h6>`;
+            
+            for (const [index, item] of data.items_web.entries()) {
+                html += `
+                <div class="card mb-3">
+                    <div class="card-header py-2">
+                        <strong>Ubicación #${index + 1}:</strong> ${item.ubicacion_nombre || 'Sin nombre'}
+                    </div>
+                    <div class="card-body py-2">
+                        <p class="mb-1"><strong>Formato:</strong> ${item.formato || 'No especificado'}</p>
+                        <p class="mb-1"><strong>URL Destino:</strong> ${item.url_destino || 'No especificada'}</p>
+                        `;
+                
+                if (item.imagenes && item.imagenes.length > 0) {
+                    console.log('Imágenes encontradas:', item.imagenes); // Para depuración
+                    html += `
+                        <div class="mt-2">
+                            <strong>Imágenes:</strong>
+                            <div class="d-flex flex-wrap gap-2 mt-1">
+                                ${item.imagenes.map(img => {
+                                    // Manejar diferentes estructuras de objeto de imagen
+                                    const imagePath = img.imagen || img.archivo || img.url || img;
+                                    
+                                    if (!imagePath) {
+                                        console.warn('Objeto de imagen sin ruta válida:', img);
+                                        return '';
+                                    }
+                                    
+                                    // Asegurar que la URL de la imagen sea absoluta
+                                    const isFullUrl = /^https?:\/\//.test(imagePath);
+                                    const isAbsolutePath = imagePath.startsWith('/');
+                                    
+                                    let imageUrl = imagePath;
+                                    if (!isFullUrl) {
+                                        imageUrl = isAbsolutePath ? 
+                                            window.location.origin + imagePath : 
+                                            window.location.origin + '/media/' + imagePath;
+                                    }
+                                    
+                                    return `
+                                    <a href="${imageUrl}" target="_blank" class="d-block" style="width: 120px; height: 120px;">
+                                        <img src="${imageUrl}" 
+                                            class="img-fluid h-100 w-100 object-fit-cover border rounded bg-light" 
+                                            alt="Imagen de publicidad"
+                                            style="object-fit: cover;"
+                                            onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
+                                    </a>`;
+                                }).join('')}
+                            </div>
+                        </div>`;
+                } else {
+                    html += `
+                        <div class="mt-2">
+                            <strong>Imágenes:</strong>
+                            <p class="text-muted mb-0">Sin imágenes adjuntas</p>
+                        </div>`;
+                }
+                
+                html += `
+                    </div>
+                </div>`;
+            }
+        } else {
+            html += `
+                <div class="alert alert-warning">
+                    No se encontraron ubicaciones para esta solicitud.
+                </div>`;
+        }
+        
+        // Mostrar notas adicionales si existen
+        if (data.notas_adicionales) {
+            html += `
+            <div class="mt-3">
+                <h6>Notas Adicionales</h6>
+                <div class="alert alert-light border">
+                    ${data.notas_adicionales.replace(/\n/g, '<br>')}
+                </div>
+            </div>`;
+        }
+
+        // Mostrar motivo de rechazo si existe
+        if (data.estado === 'rechazada' && data.motivo_rechazo) {
+            html += `
+            <div class="mt-3">
+                <h6>Motivo de Rechazo</h6>
+                <div class="alert alert-danger">
+                    ${data.motivo_rechazo}
+                </div>
+            </div>`;
+        }
+
+        modalBody.innerHTML = html;
+
+        // Configurar el botón de aprobación
+        const aprobarBtn = document.getElementById('aprobarSolicitudBtn');
+        if (aprobarBtn) {
+            aprobarBtn.onclick = () => aprobarSolicitud(solicitudId);
+            // Mostrar solo si está pendiente o en revisión
+            aprobarBtn.style.display = (data.estado === 'pendiente' || data.estado === 'en_revision') ? 'block' : 'none';
+        }
+
+    } catch (error) {
+        console.error('Error al cargar los detalles:', error);
+        modalBody.innerHTML = `
+            <div class="alert alert-danger">
+                <h5>Error al cargar los detalles</h5>
+                <p class="mb-0">${error.message || 'Ocurrió un error inesperado'}</p>
+            </div>`;
+    }
+}
+
+// Función para mostrar los detalles de la campaña
+async function verDetallesCampania(campaniaId) {
+  try {
+    const response = await fetch(`/dashboard/api/publicidad/campanias/${campaniaId}/`);
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Error response:', errorData);
+      throw new Error('Error al cargar los detalles de la campaña');
+    }
+    
+    const campania = await response.json();
+    const detallesDiv = document.getElementById('detallesCampaniaBody');
+
+    // Resolver Nombre, Tipo y Resolución de la ubicación con fallback al formato
+    const formatoStr = campania?.web_config?.formato || '';
+    const nombreFromFormato = (() => {
+      if (!formatoStr) return null;
+      const parts = formatoStr.split('—');
+      if (parts.length > 1) return parts[0].trim();
+      return null;
+    })();
+    const resolFromFormato = (() => {
+      if (!formatoStr) return null;
+      const m = formatoStr.match(/\b\d+\s*x\s*\d+\b/i);
+      return m ? m[0].replace(/\s*/g, '') : null;
+    })();
+    const tipoFromFormato = (() => {
+      if (!formatoStr) return null;
+      const parts = formatoStr.split('—');
+      if (parts.length > 1) {
+        const right = parts[1].trim();
+        const m = right.match(/^[^\d]+/); // texto antes de números
+        return m ? m[0].trim() : null;
+      }
+      return null;
+    })();
+
+    const nombreUbicacion = campania?.ubicacion?.nombre || nombreFromFormato || null;
+    const tipoUbicacion = campania?.ubicacion?.tipo || tipoFromFormato || null;
+    const resolucionUbic = campania?.ubicacion?.dimensiones || resolFromFormato || null;
+
+    const detUbicacionHtml = `
+            <li class="list-group-item">
+              <div class="fw-bold mb-1">Detalles de ubicación:</div>
+              <div><strong>Nombre:</strong> ${nombreUbicacion || 'No disponible'}</div>
+              <div><strong>Tipo:</strong> ${tipoUbicacion || 'No disponible'}</div>
+              <div><strong>Resolución:</strong> ${resolucionUbic || 'No disponible'}</div>
+            </li>`;
+    
+    // Calcular días restantes y estado visual
+    const hoy = new Date();
+    const fin = campania.fecha_fin ? new Date(campania.fecha_fin) : null;
+    const inicio = campania.fecha_inicio ? new Date(campania.fecha_inicio) : null;
+    const diasRestantes = fin ? Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24)) : null;
+    const nearExpire = typeof diasRestantes === 'number' && diasRestantes <= 5;
+    const diasBadge = diasRestantes !== null
+      ? `<span class="badge ${nearExpire ? 'bg-danger' : 'bg-info'}">${diasRestantes} día${diasRestantes === 1 ? '' : 's'} restantes</span>`
+      : '<span class="badge bg-secondary">Sin fecha fin</span>';
+
+    // Construir el HTML con los detalles de la campaña
+    let html = `
+      <div class="row">
+        <div class="col-md-6">
+          <h5 class="mb-3">Información General</h5>
+          <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-bold">ID:</span>
+              <span>#${campania.id}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-bold">Cliente:</span>
+              <span>${campania.nombre_cliente || 'No especificado'}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-bold">Estado:</span>
+              <span class="badge ${campania.activo ? 'bg-success' : 'bg-secondary'}">
+                ${campania.activo ? 'Activa' : 'Inactiva'}
+              </span>
+            </li>
+            <li class="list-group-item">
+              <div class="fw-bold mb-1">Período:</div>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span>${formatDate(campania.fecha_inicio)} hasta ${formatDate(campania.fecha_fin)}</span>
+                ${diasBadge}
+              </div>
+            </li>
+          </ul>
+          
+          <h5 class="mb-3">Configuración WEB</h5>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <div class="fw-bold mb-1">URL de destino:</div>
+              ${campania.web_config?.url_destino ? 
+                `<a href="${campania.web_config.url_destino}" target="_blank">
+                  ${campania.web_config.url_destino}
+                </a>` : 
+                '<span class="text-muted">No especificada</span>'}
+            </li>
+            <li class="list-group-item">
+              <div class="fw-bold mb-1">Ubicación y resolución:</div>
+              ${campania.web_config?.formato || '<span class="text-muted">No especificado</span>'}
+            </li>
+            ${detUbicacionHtml}
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <h5 class="mb-3">Vista Previa</h5>
+          ${campania.web_config?.archivo_media ? 
+            `<div class="text-center mb-3">
+              <img src="${campania.web_config.archivo_media}" 
+                   class="img-fluid rounded border" 
+                   style="max-height: 200px;" 
+                   alt="Vista previa" 
+                   onerror="this.src='/static/img/placeholder-banner.png'" />
+              <div class="mt-2">
+                <a href="${campania.web_config.archivo_media}" 
+                   target="_blank" 
+                   class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-external-link-alt me-1"></i> Ver imagen completa
+                </a>
+              </div>
+            </div>` : 
+            '<div class="alert alert-warning">No hay imagen cargada</div>'}
+            
+          <div class="mt-4">
+            <h5 class="mb-3">Estadísticas</h5>
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <div class="h2 mb-0">${campania.web_config?.impresiones || 0}</div>
+                    <div class="text-muted">Impresiones</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <div class="h2 mb-0">${campania.web_config?.clics || 0}</div>
+                    <div class="text-muted">Clics</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            ${campania.web_config?.impresiones > 0 ? `
+              <div class="mt-3 text-center">
+                <small class="text-muted">
+                  Tasa de clics: ${((campania.web_config.clics / campania.web_config.impresiones) * 100).toFixed(2)}%
+                </small>
+              </div>` : ''}
+          </div>
+          <div class="mt-4">
+            <h5 class="mb-3">Acciones</h5>
+            <button class="btn ${campania.activo ? 'btn-danger' : 'btn-success'}" onclick="toggleEstadoCampania(${campania.id}, ${campania.activo ? 'false' : 'true'})">
+              <i class="fas ${campania.activo ? 'fa-pause-circle' : 'fa-play-circle'} me-1"></i>
+              ${campania.activo ? 'Desactivar campaña' : 'Activar campaña'}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    detallesDiv.innerHTML = html;
+    detallesCampaniaModal.show();
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error al cargar los detalles de la campaña');
+  }
+}
+
+// Actualizar la función editarCampania para mostrar la vista previa de la imagen
+function editarCampania(id, url, formato, media) {
+  document.getElementById('campaniaId').value = id;
+  document.getElementById('urlDestino').value = url || '';
+  document.getElementById('formato').value = formato || '';
+  document.getElementById('archivoMedia').value = media || '';
+  
+  // Mostrar/ocultar vista previa
+  const vistaPrevia = document.getElementById('vistaPreviaImagen');
+  const imagenPrevia = document.getElementById('imagenPrevia');
+  
+  if (media) {
+    imagenPrevia.src = media;
+    vistaPrevia.style.display = 'block';
+  } else {
+    vistaPrevia.style.display = 'none';
+  }
+  
+  // Inicializar el modal si no está inicializado
+  if (!editarModal) {
+    editarModal = new bootstrap.Modal(document.getElementById('editarCampaniaModal'));
+  }
+  
+  // Mostrar el modal
+  editarModal.show();
+}
+
+// Actualizar la vista previa cuando cambia la URL de la imagen
+document.addEventListener('DOMContentLoaded', function() {
+  const archivoMedia = document.getElementById('archivoMedia');
+  if (archivoMedia) {
+    archivoMedia.addEventListener('change', function() {
+      const url = this.value.trim();
+      const vistaPrevia = document.getElementById('vistaPreviaImagen');
+      const imagenPrevia = document.getElementById('imagenPrevia');
+      
+      if (url) {
+        imagenPrevia.src = url;
+        vistaPrevia.style.display = 'block';
+        
+        // Manejar errores de carga de imagen
+        imagenPrevia.onerror = function() {
+          imagenPrevia.src = '/static/img/placeholder-banner.png';
+        };
+      } else {
+        vistaPrevia.style.display = 'none';
+      }
+    });
+  }
+
+  // Manejar la subida de imágenes
+  const btnSubirImagen = document.getElementById('btnSubirImagen');
+  if (btnSubirImagen) {
+    btnSubirImagen.addEventListener('click', function() {
+      alert('Función de subida de imágenes no implementada. Por ahora, ingresa manualmente la URL de la imagen.');
+    });
+  }
+});
+
+// Función para eliminar una campaña
+async function eliminarCampania(campaniaId) {
+    if (!confirm('¿Está seguro de eliminar esta campaña? Esta acción no se puede deshacer.')) {
+        return;
+    }
+    
+    try {
+        const url = `/dashboard/api/publicidad/campanias-web/${campaniaId}/`;
+        console.log('Enviando solicitud DELETE a:', url);
+        
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        });
+        
+        console.log('Respuesta recibida. Estado:', response.status, response.statusText);
+        
+        let responseData = {};
+        try {
+            const responseText = await response.text();
+            console.log('Contenido de la respuesta:', responseText);
+            responseData = responseText ? JSON.parse(responseText) : {};
+        } catch (parseError) {
+            console.warn('No se pudo analizar la respuesta como JSON:', parseError);
+        }
+        
+        if (response.ok) {
+            // Mostrar notificación de éxito
+            const toast = new bootstrap.Toast(document.getElementById('toastExito'));
+            document.getElementById('toastMensaje').textContent = responseData.message || 'Campaña eliminada correctamente';
+            toast.show();
+            
+            // Recargar la página después de un breve retraso
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            const errorMessage = responseData.error || 
+                               responseData.message || 
+                               `Error ${response.status}: ${response.statusText}`;
+            throw new Error(errorMessage);
+        }
+    } catch (error) {
+        console.error('Error en eliminarCampania:', error);
+        const errorMessage = error.message || 'Error desconocido al intentar eliminar la campaña';
+        alert(`Error al eliminar la campaña: ${errorMessage}`);
+    }
+}
+
+// Función para guardar los cambios en la campaña
+async function guardarEdicionCampania() {
+  const id = document.getElementById('campaniaId').value;
+  const url = document.getElementById('urlDestino').value;
+  const formato = document.getElementById('formato').value;
+  const media = document.getElementById('archivoMedia').value;
+  
+  // Validación básica
+  if (!url) {
+    alert('Por favor ingresa una URL de destino válida');
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/dashboard/api/publicidad/campanias/${id}/actualizar/`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({
+        url_destino: url,
+        formato: formato,
+        archivo_media: media || null
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error al actualizar la campaña');
+    }
+    
+    // Mostrar notificación de éxito
+    const toast = new bootstrap.Toast(document.getElementById('toastExito'));
+    document.getElementById('toastMensaje').textContent = 'Campaña actualizada correctamente';
+    toast.show();
+    
+    // Cerrar el modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('editarCampaniaModal'));
+    modal.hide();
+    
+    // Recargar la página después de un breve retraso
+    setTimeout(() => location.reload(), 1000);
+    
+  } catch (error) {
+    console.error('Error al guardar cambios:', error);
+    alert(`Error al guardar los cambios: ${error.message}`);
+  }
+}
+
+// Agregar toast de notificación al final del body si no existe
+if (!document.getElementById('toastExito')) {
+  const toastHTML = `
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      <div id="toastExito" class="toast align-items-center text-white bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="fas fa-check-circle me-2"></i>
+            <span id="toastMensaje">Operación exitosa</span>
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', toastHTML);
+}
+</script>
+
+<div id="publicidad-page">
+<div class="container-fluid h-100 d-flex flex-column" style="min-height: calc(100vh - 2rem);">
+  <!-- Sección de Solicitudes Web -->
+  <div class="card flex-grow-1 mb-4" style="min-height: 40vh; max-height: 50vh;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Solicitudes Web</h5>
+      <span class="badge bg-primary">{{ solicitudes|length }}</span>
+    </div>
+    <div class="card-body p-0" style="overflow-y: auto;">
+      {% if solicitudes %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead style="position: sticky; top: 0; background: white; z-index: 10;">
+              <tr>
+                <th style="position: sticky; top: 0; background: white;">ID</th>
+                <th style="position: sticky; top: 0; background: white; min-width: 200px;">Usuario</th>
+                <th style="position: sticky; top: 0; background: white;">Estado</th>
+                <th style="position: sticky; top: 0; background: white;">Inicio</th>
+                <th style="position: sticky; top: 0; background: white;">Fin</th>
+                <th style="position: sticky; top: 0; background: white;">Costo Estimado</th>
+                <th style="position: sticky; top: 0; background: white;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in solicitudes %}
+                <tr>
+                  <td>#{{ s.id }}</td>
+                  <td>
+                    <div class="d-flex flex-column">
+                      <span class="fw-bold">{{ s.usuario.username|default:'Usuario' }}</span>
+                      <small class="text-muted">{{ s.usuario.email|default:'Sin email' }}</small>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge {% if s.estado == 'aprobada' %}bg-success{% elif s.estado == 'rechazada' %}bg-danger{% elif s.estado == 'en_revision' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                      {% if s.estado == 'en_revision' %}Contactado en breve{% else %}{{ s.estado|title }}{% endif %}
+                    </span>
+                  </td>
+                  <td>{{ s.fecha_inicio_solicitada }}</td>
+                  <td>{{ s.fecha_fin_solicitada }}</td>
+                  <td>${{ s.costo_total_estimado }}</td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <button class="btn btn-sm btn-info me-1" onclick="verDetallesSolicitud({{ s.id }}); return false;" title="Ver detalles">
+                        <i class="fas fa-eye"></i> Revisar
+                      </button>
+                      {% if not s.publicacion_id %}
+                        {% if s.estado != 'rechazada' %}
+                          <button class="btn btn-sm btn-outline-warning" onclick="marcarEnRevision({{ s.id }}); return false;">
+                            <i class="fas fa-hourglass-half"></i> En revisión
+                          </button>
+                        {% endif %}
+                        <button class="btn btn-sm btn-outline-danger ms-1" onclick="eliminarSolicitud({{ s.id }}); return false;" title="Eliminar solicitud">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="rechazarSolicitud({{ s.id }})">
+                          <i class="fas fa-times"></i> Rechazar
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="aprobarSolicitud({{ s.id }})">
+                          <i class="fas fa-check"></i> Aprobar
+                        </button>
+                      {% else %}
+                        {% if s.publicacion_id %}
+                          <a href="#camp-{{ s.publicacion_id }}" class="btn btn-sm btn-outline-primary">Ver campaña</a>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="7" class="text-center text-muted">Sin solicitudes</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación Solicitudes -->
+        {% if solicitudes.has_other_pages %}
+        <div class="card-footer">
+          <nav>
+            <ul class="pagination justify-content-center mb-0">
+              {% if solicitudes.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?solicitudes_page={{ solicitudes.previous_page_number }}">Anterior</a>
+                </li>
+              {% endif %}
+              {% for num in solicitudes.paginator.page_range %}
+                {% if solicitudes.number == num %}
+                  <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > solicitudes.number|add:'-3' and num < solicitudes.number|add:'3' %}
+                  <li class="page-item"><a class="page-link" href="?solicitudes_page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+              {% endfor %}
+              {% if solicitudes.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?solicitudes_page={{ solicitudes.next_page_number }}">Siguiente</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+        {% endif %}
+      {% else %}
+        <div class="alert alert-info m-3">No hay solicitudes de publicidad web pendientes.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Sección de Campañas Publicadas Mejorada -->
+  <div class="card flex-grow-1" style="min-height: 40vh; max-height: 50vh;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Campañas Publicadas (WEB)</h5>
+      <span class="badge bg-primary">{{ campanias|length }}</span>
+    </div>
+    <div class="card-body p-0" style="overflow-y: auto;">
+      {% if campanias %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead style="position: sticky; top: 0; background: white; z-index: 10;">
+              <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Período</th>
+                <th>Estado</th>
+                <th>Ubicación</th>
+                <th>URL Destino</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in campanias %}
+                <tr>
+                  <td>#{{ c.id }}</td>
+                  <td>{{ c.nombre_cliente|truncatechars:20 }}</td>
+                  <td>
+                    <small class="d-block">{{ c.fecha_inicio|date:"d/m/Y" }} - {{ c.fecha_fin|date:"d/m/Y" }}</small>
+                    <small class="text-muted">{{ c.get_estado_display }}</small>
+                  </td>
+                  <td>
+                    <span class="badge {% if c.activo %}bg-success{% else %}bg-secondary{% endif %}">
+                      {% if c.activo %}Activa{% else %}Inactiva{% endif %}
+                    </span>
+                  </td>
+                  <td>
+                    <span id="ubicacion-label-{{ c.id }}" class="ubicacion-celda" data-campania-id="{{ c.id }}">
+                      {% if c.web_config.formato %}
+                        {{ c.web_config.formato }}
+                      {% else %}
+                        <span class="text-muted">Cargando ubicación...</span>
+                      {% endif %}
+                    </span>
+                  </td>
+                  <td>
+                    {% if c.web_config.url_destino %}
+                      <a href="{{ c.web_config.url_destino }}" target="_blank" class="text-truncate d-inline-block" style="max-width: 150px;" title="{{ c.web_config.url_destino }}">
+                        {{ c.web_config.url_destino|truncatechars:20 }}
+                      </a>
+                    {% else %}
+                      <span class="text-muted">No especificada</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="btn-group">
+                      <button class="btn btn-sm btn-outline-primary" onclick="verDetallesCampania({{ c.id }}); return false;" title="Ver detalles">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-secondary" onclick="editarCampania({{ c.id }}, '{{ c.web_config.url_destino|default:''|escapejs }}', '{{ c.web_config.formato|default:''|escapejs }}', '{{ c.web_config.archivo_media|default:''|escapejs }}')" title="Editar">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger" onclick="eliminarCampania({{ c.id }}); return false;" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación Campañas -->
+        {% if campanias.has_other_pages %}
+        <div class="card-footer">
+          <nav>
+            <ul class="pagination justify-content-center mb-0">
+              {% if campanias.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?campanias_page={{ campanias.previous_page_number }}">Anterior</a>
+                </li>
+              {% endif %}
+              {% for num in campanias.paginator.page_range %}
+                {% if campanias.number == num %}
+                  <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > campanias.number|add:'-3' and num < campanias.number|add:'3' %}
+                  <li class="page-item"><a class="page-link" href="?campanias_page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+              {% endfor %}
+              {% if campanias.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?campanias_page={{ campanias.next_page_number }}">Siguiente</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+        {% endif %}
+      {% else %}
+        <div class="alert alert-info m-3">No hay campañas publicadas actualmente.</div>
+      {% endif %}
+    </div>
+  </div>
+
+<!-- Modal para editar campaña web -->
+<div class="modal fade" id="editarCampaniaModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Editar Campaña WEB</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formEditarCampania">
+          <input type="hidden" id="campaniaId" />
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">URL de destino</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-link"></i></span>
+                <input type="url" class="form-control" id="urlDestino" placeholder="https://ejemplo.com" required />
+              </div>
+              <div class="form-text">URL a la que redirigirá el banner publicitario</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Formato del banner</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-ruler-combined"></i></span>
+                <input type="text" class="form-control" id="formato" placeholder="Ej: 728x90, 300x250, etc." />
+              </div>
+              <div class="form-text">Dimensiones del banner (ancho x alto)</div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Imagen del banner</label>
+            <div class="input-group mb-2">
+              <span class="input-group-text"><i class="fas fa-image"></i></span>
+              <input type="text" class="form-control" id="archivoMedia" placeholder="URL de la imagen" />
+              <button class="btn btn-outline-secondary" type="button" id="btnSubirImagen" title="Subir nueva imagen">
+                <i class="fas fa-upload"></i>
+              </button>
+            </div>
+            <div id="vistaPreviaImagen" class="text-center mt-2 mb-3" style="display: none;">
+              <img src="" alt="Vista previa" class="img-fluid rounded border" style="max-height: 150px;" id="imagenPrevia" />
+              <div class="mt-1">
+                <small class="text-muted">Vista previa</small>
+              </div>
+            </div>
+            <div class="form-text">URL de la imagen del banner o sube una nueva</div>
+          </div>
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Los cambios se aplicarán a la campaña de inmediato.
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Cancelar
+        </button>
+        <button type="button" class="btn btn-primary" onclick="guardarEdicionCampania()">
+          <i class="fas fa-save me-1"></i> Guardar cambios
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para ver detalles de la campaña -->
+<div class="modal fade" id="detallesCampaniaModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i>Detalles de la Campaña</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" id="detallesCampaniaBody">
+        <!-- Contenido cargado dinámicamente -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para ver detalles de la solicitud -->
+<div class="modal fade" id="detallesSolicitudModal" tabindex="-1" aria-labelledby="detallesSolicitudModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="detallesSolicitudModalLabel">Detalles de la Solicitud</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" id="detallesSolicitudBody">
+        <!-- El contenido se cargará dinámicamente -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="aprobarSolicitudBtn">Aprobar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Helper CSRF: define si no existe
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+}
+
+async function marcarEnRevision(id) {
+  if (!confirm('¿Marcar la solicitud #' + id + ' como "Contactado en breve"?')) return;
+  try {
+    const resp = await fetch(`/dashboard/api/publicidad/solicitudes/${id}/estado/`, {
+      method: 'PATCH',
+      headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ estado: 'en_revision' })
+    });
+    if (!resp.ok) throw new Error('Error al marcar en revisión');
+    location.reload();
+  } catch (e) { alert(e.message); }
+}
+
+async function rechazarSolicitud(id) {
+  const motivo = prompt('Motivo de rechazo para la solicitud #' + id + ':');
+  if (motivo === null) return; // cancelado
+  try {
+    const resp = await fetch(`/dashboard/api/publicidad/solicitudes/${id}/estado/`, {
+      method: 'PATCH',
+      headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ estado: 'rechazada', motivo: motivo })
+    });
+    if (!resp.ok) throw new Error('Error al rechazar');
+    location.reload();
+  } catch (e) { alert(e.message); }
+}
+
+async function aprobarSolicitud(id) {
+  if (!confirm('¿Aprobar y publicar la solicitud #' + id + '?')) return;
+  try {
+    const resp = await fetch(`/dashboard/api/publicidad/solicitudes/${id}/aprobar/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    if (!resp.ok) throw new Error('Error al aprobar');
+    location.reload();
+  } catch (e) { alert(e.message); }
+}
+
+// Inicialización de modales (declarados arriba)
+
+// Inicializar los modales cuando el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', function() {
+    detallesCampaniaModal = new bootstrap.Modal(document.getElementById('detallesCampaniaModal'));
+    detallesSolicitudModal = new bootstrap.Modal(document.getElementById('detallesSolicitudModal'));
+    hydrateUbicacionesTabla();
+});
+
+// Reemplaza el contenido de la columna "Ubicación" con "Nombre — Tipo Dimensiones"
+async function hydrateUbicacionesTabla() {
+  try {
+    const spans = document.querySelectorAll('[id^="ubicacion-label-"]');
+    for (const el of spans) {
+      const idStr = el.id.replace('ubicacion-label-', '').trim();
+      const campId = parseInt(idStr, 10);
+      if (!campId || Number.isNaN(campId)) continue;
+      try {
+        const resp = await fetch(`/dashboard/api/publicidad/campanias/${campId}/`);
+        if (!resp.ok) continue;
+        const data = await resp.json();
+        const nombre = data?.ubicacion?.nombre || null;
+        const tipo = data?.ubicacion?.tipo || null;
+        const dims = data?.ubicacion?.dimensiones || null;
+        const right = [tipo, dims].filter(Boolean).join(' ').trim();
+        const texto = [nombre, right].filter(Boolean).join(' — ') || data?.web_config?.formato || el.textContent || 'No especificado';
+        el.textContent = texto;
+        el.title = texto;
+      } catch (e) {
+        // ignore row errors
+      }
+    }
+  } catch (e) {
+    console.warn('No se pudo hidratar ubicaciones:', e);
+  }
+}
+
+// Función para formatear fechas
+function formatDate(dateString) {
+  if (!dateString) return 'No especificada';
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(dateString).toLocaleDateString('es-ES', options);
+}
+
+// Función para mostrar los detalles de la campaña
+async function verDetallesCampania(campaniaId) {
+  try {
+    const response = await fetch(`/dashboard/api/publicidad/campanias/${campaniaId}/`);
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Error response:', errorData);
+      throw new Error('Error al cargar los detalles de la campaña');
+    }
+    
+    const campania = await response.json();
+    const detallesDiv = document.getElementById('detallesCampaniaBody');
+    
+    // Actualizar el título del modal con la ubicación y dimensiones
+    const modalTitle = document.querySelector('#detallesCampaniaModal .modal-title');
+    if (modalTitle) {
+      const ubicacion = campania?.ubicacion?.nombre || '';
+      const tipo = campania?.ubicacion?.tipo || '';
+      const dimensiones = campania?.ubicacion?.dimensiones || campania?.web_config?.formato?.match(/\d+x\d+/i)?.[0] || '';
+      
+      // Construir el título con formato: "Nombre — Tipo Dimensiones"
+      let titulo = [];
+      if (ubicacion) titulo.push(ubicacion);
+      if (tipo) titulo.push(tipo);
+      if (dimensiones) titulo.push(dimensiones);
+      
+      modalTitle.textContent = titulo.join(' — ') || 'Detalles de la Campaña';
+    }
+    
+    // Construir el HTML con los detalles de la campaña
+    let html = `
+      <div class="row">
+        <div class="col-md-6">
+          <h5 class="mb-3">Información General</h5>
+          <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-bold">ID:</span>
+              <span>#${campania.id}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-bold">Cliente:</span>
+              <span>${campania.nombre_cliente || 'No especificado'}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-bold">Estado:</span>
+              <span class="badge ${campania.activo ? 'bg-success' : 'bg-secondary'}">
+                ${campania.activo ? 'Activa' : 'Inactiva'}
+              </span>
+            </li>
+            <li class="list-group-item">
+              <div class="fw-bold mb-1">Período:</div>
+              <div>${formatDate(campania.fecha_inicio)} hasta ${formatDate(campania.fecha_fin)}</div>
+            </li>
+          </ul>
+          
+          <h5 class="mb-3">Configuración WEB</h5>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <div class="fw-bold mb-1">URL de destino:</div>
+              ${campania.web_config?.url_destino ? 
+                `<a href="${campania.web_config.url_destino}" target="_blank">
+                  ${campania.web_config.url_destino}
+                </a>` : 
+                '<span class="text-muted">No especificada</span>'}
+            </li>
+            <li class="list-group-item">
+              <div class="fw-bold mb-1">Ubicación y resolución:</div>
+              ${campania.web_config?.formato || '<span class="text-muted">No especificado</span>'}
+            </li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <h5 class="mb-3">Vista Previa</h5>
+          ${campania.web_config?.archivo_media ? 
+            `<div class="text-center mb-3">
+              <img src="${campania.web_config.archivo_media}" 
+                   class="img-fluid rounded border" 
+                   style="max-height: 200px;" 
+                   alt="Vista previa" 
+                   onerror="this.src='/static/img/placeholder-banner.png'" />
+              <div class="mt-2">
+                <a href="${campania.web_config.archivo_media}" 
+                   target="_blank" 
+                   class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-external-link-alt me-1"></i> Ver imagen completa
+                </a>
+              </div>
+            </div>` : 
+            '<div class="alert alert-warning">No hay imagen cargada</div>'}
+            
+          <div class="mt-4">
+            <h5 class="mb-3">Estadísticas</h5>
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <div class="h2 mb-0">${campania.web_config?.impresiones || 0}</div>
+                    <div class="text-muted">Impresiones</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <div class="h2 mb-0">${campania.web_config?.clics || 0}</div>
+                    <div class="text-muted">Clics</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            ${campania.web_config?.impresiones > 0 ? `
+              <div class="mt-3 text-center">
+                <small class="text-muted">
+                  Tasa de clics: ${((campania.web_config.clics / campania.web_config.impresiones) * 100).toFixed(2)}%
+                </small>
+              </div>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    detallesDiv.innerHTML = html;
+    detallesCampaniaModal.show();
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error al cargar los detalles de la campaña');
+  }
+}
+
+// Actualizar la función editarCampania para mostrar la vista previa de la imagen
+function editarCampania(id, url, formato, media) {
+  document.getElementById('campaniaId').value = id;
+  document.getElementById('urlDestino').value = url || '';
+  document.getElementById('formato').value = formato || '';
+  document.getElementById('archivoMedia').value = media || '';
+  
+  // Mostrar/ocultar vista previa
+  const vistaPrevia = document.getElementById('vistaPreviaImagen');
+  const imagenPrevia = document.getElementById('imagenPrevia');
+  
+  if (media) {
+    imagenPrevia.src = media;
+    vistaPrevia.style.display = 'block';
+  } else {
+    vistaPrevia.style.display = 'none';
+  }
+  
+  // Inicializar el modal si no está inicializado
+  if (!editarModal) {
+    editarModal = new bootstrap.Modal(document.getElementById('editarCampaniaModal'));
+  }
+  
+  // Mostrar el modal
+  editarModal.show();
+}
+
+// Actualizar la vista previa cuando cambia la URL de la imagen
+document.getElementById('archivoMedia').addEventListener('change', function() {
+  const url = this.value.trim();
+  const vistaPrevia = document.getElementById('vistaPreviaImagen');
+  const imagenPrevia = document.getElementById('imagenPrevia');
+  
+  if (url) {
+    imagenPrevia.src = url;
+    vistaPrevia.style.display = 'block';
+    
+    // Manejar errores de carga de imagen
+    imagenPrevia.onerror = function() {
+      imagenPrevia.src = '/static/img/placeholder-banner.png';
+    };
+  } else {
+    vistaPrevia.style.display = 'none';
+  }
+});
+
+// Manejar la subida de imágenes
+// Nota: Necesitarás implementar el backend para manejar la subida de archivos
+document.getElementById('btnSubirImagen').addEventListener('click', function() {
+  alert('Función de subida de imágenes no implementada. Por ahora, ingresa manualmente la URL de la imagen.');
+  // Aquí iría el código para manejar la subida de archivos
+});
+
+async function guardarEdicionCampania() {
+  const id = document.getElementById('campaniaId').value;
+  const url = document.getElementById('urlDestino').value;
+  const formato = document.getElementById('formato').value;
+  const media = document.getElementById('archivoMedia').value;
+  
+  // Validación básica
+  if (!url) {
+    alert('Por favor ingresa una URL de destino válida');
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/dashboard/api/publicidad/campanias/${id}/actualizar/`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({
+        url_destino: url,
+        formato: formato,
+        archivo_media: media || null
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error al actualizar la campaña');
+    }
+    
+    // Mostrar notificación de éxito
+    const toast = new bootstrap.Toast(document.getElementById('toastExito'));
+    document.getElementById('toastMensaje').textContent = 'Campaña actualizada correctamente';
+    toast.show();
+    
+    // Cerrar el modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('editarCampaniaModal'));
+    modal.hide();
+    
+    // Recargar la página después de un breve retraso
+    setTimeout(() => location.reload(), 1000);
+    
+  } catch (error) {
+    console.error('Error al guardar cambios:', error);
+    alert(`Error al guardar los cambios: ${error.message}`);
+  }
+}
+
+// Agregar toast de notificación al final del body si no existe
+if (!document.getElementById('toastExito')) {
+  const toastHTML = `
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      <div id="toastExito" class="toast align-items-center text-white bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="fas fa-check-circle me-2"></i>
+            <span id="toastMensaje">Operación exitosa</span>
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', toastHTML);
+}
+
+// Función para cargar y mostrar los detalles de la solicitud
+async function verDetallesSolicitud(solicitudId) {
+  
+    console.log('verDetallesSolicitud llamado con ID:', solicitudId);
+    currentSolicitudId = solicitudId;
+    const modalBody = document.getElementById('detallesSolicitudBody');
+    
+    // Mostrar indicador de carga
+    if (modalBody) {
+      modalBody.innerHTML = `
+          <div class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+              </div>
+              <p class="mt-2">Cargando detalles de la solicitud...</p>
+          </div>`;
+    }
+    
+    // Asegurarse de que el modal esté inicializado
+    const modalElement = document.getElementById('detallesSolicitudModal');
+    if (!modalElement) {
+      console.error('No se encontró el elemento del modal de detalles de solicitud');
+      return;
+    }
+    
+    // Inicializar el modal si no está inicializado
+    if (!detallesSolicitudModal) {
+      detallesSolicitudModal = new bootstrap.Modal(modalElement);
+    }
+    
+    // Mostrar el modal
+    detallesSolicitudModal.show();
+  
+  try {
+      // Mostrar loading
+      modalBody.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></div>';
+      
+      // Hacer la petición para obtener los detalles
+      console.log('Haciendo petición a:', `/dashboard/api/publicidad/solicitud/${solicitudId}/`);
+      const response = await fetch(`/dashboard/api/publicidad/solicitud/${solicitudId}/`, {
+          method: 'GET',
+          headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+          },
+          credentials: 'same-origin'
+      });
+      
+      if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error en la respuesta:', response.status, errorText);
+          throw new Error(`Error al cargar los detalles de la solicitud: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      // Construir el HTML con los detalles
+      let html = `
+          <div class="mb-4">
+              <h5 class="fw-bold">Información del Cliente</h5>
+              <div class="row">
+                  <div class="col-md-6">
+                      <p><strong>Nombre:</strong> ${data.nombre_contacto || 'No especificado'}</p>
+                      <p><strong>Email:</strong> ${data.email_contacto || 'No especificado'}</p>
+                  </div>
+                  <div class="col-md-6">
+                      <p><strong>Teléfono:</strong> ${data.telefono_contacto || 'No especificado'}</p>
+                      <p><strong>Preferencia de contacto:</strong> ${data.preferencia_contacto || 'No especificada'}</p>
+                  </div>
+              </div>
+              <p><strong>Mensaje:</strong> ${data.mensaje_usuario || 'Sin mensaje'}</p>
+          </div>
+          
+          <div class="mb-4">
+              <h5 class="fw-bold">Detalles de la Solicitud</h5>
+              <div class="row">
+                  <div class="col-md-6">
+                      <p><strong>Estado:</strong> <span class="badge ${getEstadoBadgeClass(data.estado)}">${data.estado_display}</span></p>
+                      <p><strong>Fecha de solicitud:</strong> ${new Date(data.fecha_solicitud).toLocaleString()}</p>
+                      <p><strong>Fecha inicio solicitada:</strong> ${data.fecha_inicio_solicitada}</p>
+                      <p><strong>Fecha fin solicitada:</strong> ${data.fecha_fin_solicitada}</p>
+                  </div>
+                  <div class="col-md-6">
+                      <p><strong>Costo total estimado:</strong> $${data.costo_total_estimado || '0'}</p>
+                      ${data.notas_admin ? `<p><strong>Notas internas:</strong> ${data.notas_admin}</p>` : ''}
+                      ${data.motivo_rechazo ? `<p class="text-danger"><strong>Motivo de rechazo:</strong> ${data.motivo_rechazo}</p>` : ''}
+                  </div>
+              </div>
+          </div>
+          
+          <div class="mb-4">
+              <h5 class="fw-bold">Ubicaciones Solicitadas</h5>
+              <div class="table-responsive">
+                  <table class="table table-sm table-bordered">
+                      <thead class="table-light">
+                          <tr>
+                              <th>Ubicación</th>
+                              <th>Formato</th>
+                              <th>Precio Acordado</th>
+                              <th>URL Destino</th>
+                          </tr>
+                      </thead>
+                      <tbody>`;
+      
+      // Agregar filas para cada ubicación
+      data.items_web.forEach(item => {
+          html += `
+                          <tr>
+                              <td>${item.ubicacion_nombre}</td>
+                              <td>${item.formato || 'No especificado'}</td>
+                              <td>$${item.precio_acordado || '0'}</td>
+                              <td><a href="${item.url_destino}" target="_blank">Ver enlace</a></td>
+                          </tr>`;
+          
+          // Agregar imágenes si existen
+          if (item.imagenes && item.imagenes.length > 0) {
+              html += `
+                          <tr>
+                              <td colspan="4">
+                                  <strong class="d-block mb-2">Imágenes adjuntas:</strong>
+                                  <div class="d-flex flex-wrap gap-2">`;
+              
+              item.imagenes.forEach(imagen => {
+                  html += `
+                                      <div class="position-relative" style="width: 120px; height: 120px;">
+                                          <img src="${imagen.url}" 
+                                               class="img-thumbnail" 
+                                               style="width: 100%; height: 100%; object-fit: cover;" 
+                                               alt="${imagen.descripcion || 'Imagen'}" 
+                                               onerror="this.src='/static/img/placeholder-banner.png'" />
+                                          <a href="${imagen.url}" 
+                                             target="_blank" 
+                                             class="position-absolute top-0 end-0 m-1 btn btn-sm btn-light" 
+                                             title="Ver imagen completa">
+                                              <i class="fas fa-external-link-alt"></i>
+                                          </a>
+                                      </div>`;
+              });
+              
+              html += `
+                                  </div>
+                              </td>
+                          </tr>`;
+          } else {
+              html += `
+                          <tr>
+                              <td colspan="4" class="text-muted fst-italic">
+                                  <i class="fas fa-info-circle me-1"></i> Sin imágenes adjuntas
+                              </td>
+                          </tr>`;
+          }
+      });
+      
+      html += `
+                      </tbody>
+                  </table>
+              </div>
+          </div>`;
+      
+      // Actualizar el modal
+      modalBody.innerHTML = html;
+
+      // Mostrar el modal (usando la variable ya inicializada)
+      if (detallesSolicitudModal) {
+          detallesSolicitudModal.show();
+      } else if (modalElement) {
+          // Fallback en caso de que no esté inicializado
+          modalElement.style.display = 'block';
+          modalElement.classList.add('show');
+      }
+      
+  } catch (error) {
+      console.error('Error:', error);
+      const errorMessage = error.message || 'Error desconocido';
+      modalBody.innerHTML = `
+          <div class="alert alert-danger">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              Error al cargar los detalles de la solicitud: ${errorMessage}
+          </div>`;
+      const modalElement = document.getElementById('detallesSolicitudModal');
+      if (window.bootstrap && modalElement) {
+          if (!detallesModal) detallesModal = new bootstrap.Modal(modalElement);
+          detallesModal.show();
+      } else if (modalElement) {
+          modalElement.style.display = 'block';
+          modalElement.classList.add('show');
+      }
+  }
+}
+
+ 
+
+// Función para eliminar una solicitud
+async function eliminarSolicitud(solicitudId) {
+  if (!confirm('¿Estás seguro de que deseas eliminar esta solicitud? Esta acción no se puede deshacer.')) {
+    return;
+  }
+  
+  try {
+    const csrftoken = getCookie('csrftoken');
+    const response = await fetch(`/dashboard/api/publicidad/solicitudes/${solicitudId}/eliminar/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      credentials: 'same-origin'
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorMessage = `Error ${response.status}: ${response.statusText}`;
+      
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch (e) {
+        // Si no es JSON válido, usar el texto del error
+        if (errorText) {
+          errorMessage = errorText;
+        }
+      }
+      
+      throw new Error(errorMessage);
+    }
+    
+    // Si llegamos aquí, la eliminación fue exitosa
+    location.reload();
+  } catch (error) {
+    console.error('Error al eliminar la solicitud:', error);
+    alert('Error al eliminar la solicitud: ' + (error.message || 'Error desconocido'));
+  }
+}
+
+// Configurar el modal para que se cierre correctamente
+document.getElementById('detallesSolicitudModal').addEventListener('hidden.bs.modal', function () {
+    // Limpiar el contenido al cerrar
+    document.getElementById('detallesSolicitudBody').innerHTML = '';
+});
+</script>
+
+  </div>
+</div>
+</div>
+{% endblock %}

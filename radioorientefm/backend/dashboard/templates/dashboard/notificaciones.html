@@ -1,0 +1,390 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Notificaciones - Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Estilos para modo claro y oscuro */
+.notif-container {
+    width: 100%;
+    margin: 0;
+    padding: 30px 40px;
+    background: var(--bg-secondary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+}
+
+.notif-stat-card, .notif-filters-card, .notif-list-card {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.notif-stat-label, .notif-filter-label {
+    color: var(--text-secondary) !important;
+}
+
+.notif-stat-value, .notif-title {
+    color: var(--text-primary) !important;
+}
+
+.notif-message, .notif-time {
+    color: var(--text-secondary) !important;
+}
+
+.notif-item {
+    background: var(--card-bg) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.notif-item:hover {
+    background: var(--bg-tertiary) !important;
+}
+
+.notif-item.unread {
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.08) 0%, var(--card-bg) 100%) !important;
+    border-left: 3px solid #667eea !important;
+}
+
+.notif-empty {
+    color: var(--text-secondary) !important;
+}
+
+.notif-empty h3 {
+    color: var(--text-primary) !important;
+}
+
+/* Select styling para modo claro */
+select {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border: 1px solid #d1d5db !important;
+}
+
+select option {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+}
+
+/* Select styling para modo oscuro */
+html.dark select {
+    background: #1f2937 !important;
+    color: #ffffff !important;
+    border: 1px solid #374151 !important;
+    /* Fuerza el estilo en navegadores webkit */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+html.dark select option {
+    background: #1f2937 !important;
+    color: #ffffff !important;
+}
+
+/* Fix para navegadores WebKit (Chrome, Safari, Edge) */
+select::-webkit-scrollbar {
+    width: 8px;
+}
+
+select::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+}
+
+select::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+select::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notif-container">
+
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 24px 32px; margin-bottom: 24px; color: white;">
+        <h1 style="font-size: 28px; font-weight: 700; margin: 0 0 8px 0; color: white; display: flex; align-items: center; gap: 12px;">
+            <i class="fas fa-bell"></i>
+            Notificaciones
+        </h1>
+        <p style="font-size: 15px; margin: 0 0 16px 0; opacity: 0.95; color: white;">Gestiona todas tus notificaciones del sistema en un solo lugar</p>
+        <form method="post" action="{% url 'marcar_todas_leidas' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" style="display: inline-block; padding: 10px 20px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer;" onclick="return confirm('¿Marcar todas las notificaciones como leídas?')">
+                <i class="fas fa-check-double"></i> Marcar todas como leídas
+            </button>
+        </form>
+    </div>
+
+    <!-- Stats -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+        <!-- Total -->
+        <div class="notif-stat-card" style="border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative;">
+            <div style="position: absolute; left: 0; top: 0; width: 3px; height: 100%; background: #4299e1; border-radius: 10px 0 0 10px;"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+                <div>
+                    <div class="notif-stat-label" style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">Total</div>
+                    <div class="notif-stat-value" style="font-size: 32px; font-weight: 700; margin: 0;">{{ total_notificaciones }}</div>
+                </div>
+                <div style="width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fas fa-bell"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Leídas -->
+        <div class="notif-stat-card" style="border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative;">
+            <div style="position: absolute; left: 0; top: 0; width: 3px; height: 100%; background: #f56565; border-radius: 10px 0 0 10px;"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+                <div>
+                    <div class="notif-stat-label" style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">No Leídas</div>
+                    <div class="notif-stat-value" style="font-size: 32px; font-weight: 700; margin: 0;">{{ no_leidas }}</div>
+                </div>
+                <div style="width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);">
+                    <i class="fas fa-envelope"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leídas -->
+        <div class="notif-stat-card" style="border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative;">
+            <div style="position: absolute; left: 0; top: 0; width: 3px; height: 100%; background: #48bb78; border-radius: 10px 0 0 10px;"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+                <div>
+                    <div class="notif-stat-label" style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">Leídas</div>
+                    <div class="notif-stat-value" style="font-size: 32px; font-weight: 700; margin: 0;">{{ leidas }}</div>
+                </div>
+                <div style="width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="notif-filters-card" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+        <div class="notif-stat-value" style="font-size: 15px; font-weight: 600; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-filter"></i>
+            Filtrar Notificaciones
+        </div>
+        <form method="get" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+            <div>
+                <label for="tipo" class="notif-filter-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 6px;">Tipo de notificación</label>
+                <select name="tipo" id="tipo" style="width: 100%; padding: 10px 14px; border-radius: 6px; font-size: 14px;">
+                    <option value="">Todas</option>
+                    <option value="contacto" {% if filtro_tipo == 'contacto' %}selected{% endif %}>Contactos</option>
+                    <option value="banda" {% if filtro_tipo == 'banda' %}selected{% endif %}>Bandas Emergentes</option>
+                    <option value="articulo" {% if filtro_tipo == 'articulo' %}selected{% endif %}>Artículos</option>
+                    <option value="programa" {% if filtro_tipo == 'programa' %}selected{% endif %}>Programas</option>
+                    <option value="suscripcion" {% if filtro_tipo == 'suscripcion' %}selected{% endif %}>Suscripciones</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="leidas" class="notif-filter-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 6px;">Estado</label>
+                <select name="leidas" id="leidas" style="width: 100%; padding: 10px 14px; border-radius: 6px; font-size: 14px;">
+                    <option value="">Todas</option>
+                    <option value="no" {% if filtro_leidas == 'no' %}selected{% endif %}>No leídas</option>
+                    <option value="si" {% if filtro_leidas == 'si' %}selected{% endif %}>Leídas</option>
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: flex-end; gap: 8px;">
+                <button type="submit" style="flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer;">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                {% if filtro_tipo or filtro_leidas %}
+                <a href="{% url 'dashboard_notificaciones' %}" style="background: #f3f4f6; color: #4b5563; padding: 10px 20px; border: 1px solid #d1d5db; border-radius: 6px; font-weight: 600; font-size: 13px; text-decoration: none;">
+                    <i class="fas fa-times"></i>
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="notif-list-card" style="border-radius: 10px; overflow: hidden;">
+        {% if page_obj %}
+            {% for notificacion in page_obj %}
+            <div class="notif-item {% if not notificacion.leido %}unread{% endif %}" style="padding: 16px 20px; display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center;">
+                <!-- Icon -->
+                <div style="width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; {% if notificacion.tipo == 'contacto' %}background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);{% elif notificacion.tipo == 'banda' %}background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);{% elif notificacion.tipo == 'articulo' %}background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);{% elif notificacion.tipo == 'programa' %}background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);{% else %}background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);{% endif %}">
+                    {% if notificacion.tipo == 'contacto' %}
+                        <i class="fas fa-envelope"></i>
+                    {% elif notificacion.tipo == 'banda' %}
+                        <i class="fas fa-music"></i>
+                    {% elif notificacion.tipo == 'articulo' %}
+                        <i class="fas fa-newspaper"></i>
+                    {% elif notificacion.tipo == 'programa' %}
+                        <i class="fas fa-microphone"></i>
+                    {% elif notificacion.tipo == 'suscripcion' %}
+                        <i class="fas fa-user-plus"></i>
+                    {% else %}
+                        <i class="fas fa-bell"></i>
+                    {% endif %}
+                </div>
+
+                <!-- Content -->
+                <div>
+                    <div class="notif-title" style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">{{ notificacion.titulo }}</div>
+                    <div class="notif-message" style="font-size: 13px; margin-bottom: 6px;">{{ notificacion.mensaje }}</div>
+                    <div class="notif-time" style="font-size: 11px;">
+                        <i class="fas fa-clock"></i>
+                        {{ notificacion.fecha_creacion|timesince }} atrás
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div style="display: flex; gap: 6px;">
+                    {% if not notificacion.leido %}
+                    <form method="post" action="{% url 'marcar_notificacion_leida' notificacion.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" style="width: 32px; height: 32px; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: white; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);" title="Marcar como leída">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    {% if notificacion.enlace %}
+                    <a href="{{ notificacion.enlace }}" style="width: 32px; height: 32px; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: white; background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); text-decoration: none;" title="Ver detalles">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    {% endif %}
+
+                    <form method="post" action="{% url 'eliminar_notificacion' notificacion.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" style="width: 32px; height: 32px; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: white; background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);" title="Eliminar" onclick="return confirm('¿Eliminar esta notificación?')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="notif-empty" style="padding: 60px 20px; text-align: center;">
+                <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #9ca3af;">
+                    <i class="fas fa-bell-slash"></i>
+                </div>
+                <h3 style="font-size: 20px; font-weight: 700; margin: 0 0 8px 0;">No hay notificaciones</h3>
+                <p style="font-size: 14px;">
+                    {% if filtro_tipo or filtro_leidas %}
+                        No se encontraron notificaciones con los filtros seleccionados.
+                    {% else %}
+                        No tienes notificaciones en este momento.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+
+        <!-- Paginación -->
+        {% if page_obj.has_other_pages %}
+        <div style="margin-top: 24px; display: flex; justify-content: center;">
+            <nav aria-label="Paginación de notificaciones">
+                <ul style="display: flex; list-style: none; padding: 0; margin: 0; gap: 6px;">
+                    {% if page_obj.has_previous %}
+                    <li>
+                        <a href="?page=1{% if filtro_tipo %}&tipo={{ filtro_tipo }}{% endif %}{% if filtro_leidas %}&leidas={{ filtro_leidas }}{% endif %}"
+                           style="display: flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 12px; border-radius: 8px; background: white; border: 1px solid #e5e7eb; color: #374151; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s;">
+                            Primera
+                        </a>
+                    </li>
+                    <li>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if filtro_tipo %}&tipo={{ filtro_tipo }}{% endif %}{% if filtro_leidas %}&leidas={{ filtro_leidas }}{% endif %}"
+                           style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; background: white; border: 1px solid #e5e7eb; color: #374151; text-decoration: none; font-size: 14px; transition: all 0.2s;">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li>
+                            <span style="display: flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 12px; border-radius: 8px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; font-size: 14px; font-weight: 600; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);">
+                                {{ num }}
+                            </span>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li>
+                            <a href="?page={{ num }}{% if filtro_tipo %}&tipo={{ filtro_tipo }}{% endif %}{% if filtro_leidas %}&leidas={{ filtro_leidas }}{% endif %}"
+                               style="display: flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 12px; border-radius: 8px; background: white; border: 1px solid #e5e7eb; color: #374151; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s;">
+                                {{ num }}
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li>
+                        <a href="?page={{ page_obj.next_page_number }}{% if filtro_tipo %}&tipo={{ filtro_tipo }}{% endif %}{% if filtro_leidas %}&leidas={{ filtro_leidas }}{% endif %}"
+                           style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; background: white; border: 1px solid #e5e7eb; color: #374151; text-decoration: none; font-size: 14px; transition: all 0.2s;">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if filtro_tipo %}&tipo={{ filtro_tipo }}{% endif %}{% if filtro_leidas %}&leidas={{ filtro_leidas }}{% endif %}"
+                           style="display: flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 12px; border-radius: 8px; background: white; border: 1px solid #e5e7eb; color: #374151; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s;">
+                            Última
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<style>
+/* Estilos de paginación */
+nav[aria-label="Paginación de notificaciones"] a:hover {
+    background: #f3f4f6 !important;
+    border-color: #6366f1 !important;
+    color: #6366f1 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .notif-page {
+        padding: 12px !important;
+    }
+    .notif-stats {
+        grid-template-columns: 1fr !important;
+    }
+    .notif-filters-form {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Paginación responsive */
+    nav[aria-label="Paginación de notificaciones"] ul {
+        gap: 4px !important;
+    }
+
+    nav[aria-label="Paginación de notificaciones"] a,
+    nav[aria-label="Paginación de notificaciones"] span {
+        min-width: 32px !important;
+        height: 32px !important;
+        font-size: 12px !important;
+        padding: 0 8px !important;
+    }
+
+    /* Ocultar botones "Primera" y "Última" en móvil */
+    nav[aria-label="Paginación de notificaciones"] li:first-child,
+    nav[aria-label="Paginación de notificaciones"] li:last-child {
+        display: none;
+    }
+}
+</style>
+{% endblock %}

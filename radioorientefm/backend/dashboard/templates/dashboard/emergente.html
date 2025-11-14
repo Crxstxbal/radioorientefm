@@ -1,0 +1,1025 @@
+{% extends 'dashboard/base.html' %}
+{% block page_title %}Bandas Emergentes{% endblock %}
+
+{% block content %}
+<style>
+  /* Card Styles */
+  .emergente-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    background: var(--card-bg);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .emergente-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Stat Card Styles */
+  .stat-card-emergente {
+    border: none;
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+  }
+
+  .stat-card-emergente:hover {
+    transform: translateY(-4px);
+  }
+
+  .stat-card-emergente .icon-wrapper {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+  }
+
+  .stat-card-emergente .icon-wrapper i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    line-height: 0;
+  }
+
+  .stat-card-emergente h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .stat-card-emergente p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Keep red gradient for stat cards - semantic color */
+  .stat-emergen-1 {
+    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  }
+
+  .stat-emergen-1 .icon-wrapper {
+    background: linear-gradient(135deg, #F87171 0%, #EF4444 100%);
+    color: white;
+  }
+
+  /* Collapse Header Styles */
+  .collapse-header-emergente {
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .collapse-header-emergente:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  html.dark .collapse-header-emergente:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  /* Search Box Styles */
+  .search-box-emergente {
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+    background: var(--card-bg);
+    color: var(--text-primary);
+  }
+
+  .search-box-emergente:focus {
+    border-color: #EF4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    outline: none;
+    background: var(--card-bg);
+    color: var(--text-primary);
+  }
+
+  /* Button Styles */
+  .btn-add-emergente {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .btn-add-emergente:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    color: white;
+  }
+
+  /* Table Styles */
+  .table-emergentes {
+    border-collapse: separate;
+    border-spacing: 0 8px;
+  }
+
+  .table-emergentes thead th {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    border: none;
+    padding: 12px 16px;
+  }
+
+  .table-emergentes tbody tr {
+    background: var(--card-bg);
+    transition: all 0.2s ease;
+  }
+
+  .table-emergentes tbody tr:hover {
+    transform: scale(1.005);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .table-emergentes tbody td {
+    border: none;
+    padding: 16px;
+    vertical-align: middle;
+    color: var(--text-primary);
+  }
+
+  .table-emergentes tbody tr td:first-child {
+    border-radius: 12px 0 0 12px;
+  }
+
+  .table-emergentes tbody tr td:last-child {
+    border-radius: 0 12px 12px 0;
+  }
+
+  /* Badge Styles - Keep semantic colors */
+  .badge-estado {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+
+  .badge-pendiente {
+    background: #FEF3C7;
+    color: #92400E;
+  }
+
+  .badge-revisado {
+    background: #DBEAFE;
+    color: #1E40AF;
+  }
+
+  .badge-aprobado {
+    background: #D1FAE5;
+    color: #065F46;
+  }
+
+  .badge-rechazado {
+    background: #FEE2E2;
+    color: #991B1B;
+  }
+
+  /* Action Button Styles */
+  .btn-action-emergente {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: all 0.2s ease;
+    margin: 0 2px;
+  }
+
+  .btn-action-view {
+    background: #EEF2FF;
+    color: #6366F1;
+  }
+
+  .btn-action-view:hover {
+    background: #6366F1;
+    color: white;
+  }
+
+  .btn-action-delete {
+    background: #FEE2E2;
+    color: #EF4444;
+  }
+
+  .btn-action-delete:hover {
+    background: #EF4444;
+    color: white;
+  }
+
+  .btn-estado {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: all 0.2s ease;
+    margin: 0 2px;
+  }
+
+  /* Pagination Styles */
+  .pagination {
+    gap: 8px;
+  }
+
+  .pagination .page-link {
+    border: none;
+    border-radius: 10px;
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    font-weight: 600;
+    padding: 10px 16px;
+    transition: all 0.2s ease;
+  }
+
+  .pagination .page-link:hover {
+    background: #EF4444;
+    color: white;
+  }
+
+  .pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: white;
+  }
+
+  /* Text Classes */
+  .page-title {
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  .page-subtitle {
+    color: var(--text-secondary);
+  }
+
+  .table-text {
+    color: var(--text-primary);
+  }
+
+  .table-text-secondary {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .stat-text {
+    color: var(--text-secondary);
+  }
+
+  /* Form Labels */
+  .form-label {
+    color: var(--text-primary);
+  }
+
+  /* Empty State Styles */
+  .empty-state-text {
+    color: var(--text-secondary);
+  }
+</style>
+
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-2 page-title">
+        <i class="fas fa-guitar me-2" style="color: #EF4444;"></i>
+        Bandas Emergentes
+      </h2>
+      <p class="page-subtitle mb-0">Gestiona las postulaciones de bandas emergentes</p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card-emergente stat-emergen-1">
+        <div class="icon-wrapper">
+          <i class="fas fa-music"></i>
+        </div>
+        <h3>{{ total_bandas }}</h3>
+        <p>Total Postulaciones</p>
+      </div>
+    </div>
+
+    <div class="col-lg-9">
+      <div class="row">
+        <!-- Estadísticas por Estado -->
+        <div class="col-md-6 mb-3">
+          <div class="emergente-card p-4 h-100">
+            <h6 class="mb-3 page-title">
+              <i class="fas fa-chart-bar me-2" style="color: #EF4444;"></i>
+              Estadísticas por Estado
+            </h6>
+            <div class="d-flex flex-wrap gap-2">
+              {% for estado, count in stats_estados.items %}
+              <span class="badge-estado {% if estado == 'Pendiente' %}badge-pendiente{% elif estado == 'Revisado' %}badge-revisado{% elif estado == 'Aprobado' %}badge-aprobado{% elif estado == 'Rechazado' %}badge-rechazado{% endif %}">
+                {{ estado }}: {{ count }}
+              </span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Estadísticas por Género -->
+        <div class="col-md-6 mb-3">
+          <div class="emergente-card p-4 h-100">
+            <h6 class="mb-3 page-title">
+              <i class="fas fa-guitar me-2" style="color: #EF4444;"></i>
+              Top Géneros Musicales
+            </h6>
+            <div class="d-flex flex-column gap-2">
+              {% for genero in top_generos %}
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="table-text-secondary">
+                  <i class="fas fa-music me-2" style="color: #EF4444; font-size: 0.75rem;"></i>
+                  {{ genero.genero__nombre }}
+                </span>
+                <span class="badge" style="background: #FEE2E2; color: #991B1B; font-weight: 600;">
+                  {{ genero.total }}
+                </span>
+              </div>
+              {% empty %}
+              <span class="empty-state-text">No hay géneros registrados</span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gestión de Géneros Musicales -->
+  <div class="emergente-card mb-4">
+    <div class="card-body p-0">
+      <div class="collapse-header-emergente" data-bs-toggle="collapse" data-bs-target="#generosCollapse">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 page-title">
+            <i class="fas fa-music me-2" style="color: #EF4444;"></i>
+            Gestión de Géneros Musicales
+          </h5>
+          <i class="fas fa-chevron-down" style="color: var(--text-tertiary);"></i>
+        </div>
+      </div>
+
+      <div class="collapse" id="generosCollapse">
+        <div class="p-4">
+          <div id="notification-container"></div>
+          <form id="form-agregar-genero" method="post" action="{% url 'agregar_genero' %}" class="row g-3 mb-4">
+            {% csrf_token %}
+            <div class="col-md-5">
+              <label class="form-label fw-bold">
+                <i class="fas fa-tag me-2"></i>Nombre del Género
+              </label>
+              <input type="text" class="form-control search-box-emergente" name="nombre" placeholder="Ej: Rock, Pop, Jazz..." required>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label fw-bold">
+                <i class="fas fa-info-circle me-2"></i>Descripción
+              </label>
+              <input type="text" class="form-control search-box-emergente" name="descripcion" placeholder="Breve descripción...">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="submit" class="btn btn-add-emergente w-100">
+                <i class="fas fa-plus me-1"></i>Agregar
+              </button>
+            </div>
+          </form>
+
+          <div class="table-responsive">
+            <table class="table table-emergentes">
+              <thead>
+                <tr>
+                  <th>Género</th>
+                  <th>Descripción</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="lista-generos-body">
+                {% for genero in generos %}
+                <tr id="genero-row-{{ genero.id }}">
+                  <td><strong>{{ genero.nombre }}</strong></td>
+                  <td class="table-text-secondary">{{ genero.descripcion|default:"Sin descripción" }}</td>
+                  <td>
+                    <form method="post" action="{% url 'eliminar_genero' genero.id %}" class="d-inline form-eliminar-genero">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-action-emergente btn-action-delete">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr id="no-generos-row">
+                  <td colspan="3" class="text-center py-4">
+                    <i class="fas fa-music fa-3x text-muted mb-2"></i>
+                    <p class="empty-state-text mb-0">No hay géneros registrados</p>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gestión de Estados -->
+  <div class="emergente-card mb-4">
+    <div class="card-body p-0">
+      <div class="collapse-header-emergente" data-bs-toggle="collapse" data-bs-target="#estadosCollapse">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 page-title">
+            <i class="fas fa-tasks me-2" style="color: #EF4444;"></i>
+            Gestión de Estados
+          </h5>
+          <i class="fas fa-chevron-down" style="color: var(--text-tertiary);"></i>
+        </div>
+      </div>
+
+      <div class="collapse" id="estadosCollapse">
+        <div class="p-4">
+          <div id="notification-container-estados"></div>
+          <form id="form-agregar-estado" method="post" action="{% url 'agregar_estado' %}" class="row g-3 mb-4">
+            {% csrf_token %}
+            <div class="col-md-4">
+              <label class="form-label fw-bold">
+                <i class="fas fa-tag me-2"></i>Nombre del Estado
+              </label>
+              <input type="text" class="form-control search-box-emergente" name="nombre" placeholder="Ej: En Proceso..." required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">
+                <i class="fas fa-info-circle me-2"></i>Descripción
+              </label>
+              <input type="text" class="form-control search-box-emergente" name="descripcion" placeholder="Breve descripción...">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-bold">Tipo</label>
+              <select class="form-select search-box-emergente" name="tipo_entidad" required>
+                <option value="banda">Banda</option>
+                <option value="contacto">Contacto</option>
+              </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="submit" class="btn btn-add-emergente w-100">
+                <i class="fas fa-plus me-1"></i>Agregar
+              </button>
+            </div>
+          </form>
+
+          <div class="table-responsive">
+            <table class="table table-emergentes">
+              <thead>
+                <tr>
+                  <th>Estado</th>
+                  <th>Descripción</th>
+                  <th>Tipo</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="lista-estados-body">
+                {% for estado in estados %}
+                <tr id="estado-row-{{ estado.id }}">
+                  <td><strong>{{ estado.nombre }}</strong></td>
+                  <td class="table-text-secondary">{{ estado.descripcion|default:"Sin descripción" }}</td>
+                  <td>
+                    <span class="badge-estado {% if estado.tipo_entidad == 'banda' %}badge-aprobado{% else %}badge-revisado{% endif %}">
+                      {{ estado.get_tipo_entidad_display }}
+                    </span>
+                  </td>
+                  <td>
+                    <form method="post" action="{% url 'eliminar_estado' estado.id %}" class="d-inline form-eliminar-estado">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-action-emergente btn-action-delete"
+                              {% if estado.contactos.exists or estado.bandas.exists %}disabled title="No se puede eliminar porque tiene elementos asociados"{% endif %}>
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr id="no-estados-row">
+                  <td colspan="4" class="text-center py-4">
+                    <i class="fas fa-tasks fa-3x text-muted mb-2"></i>
+                    <p class="empty-state-text mb-0">No hay estados registrados</p>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de Bandas -->
+  <div class="emergente-card">
+    <div class="card-body p-0">
+      <div class="table-responsive p-3">
+        <table class="table table-emergentes mb-0">
+          <thead>
+            <tr>
+              <th>Banda</th>
+              <th>Género</th>
+              <th>Ubicación</th>
+              <th>Contacto</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for banda in bandas %}
+            <tr>
+              <td>
+                <strong class="table-text">{{ banda.nombre_banda }}</strong>
+                {% if banda.integrantes.exists %}
+                <br><small class="empty-state-text">
+                  <i class="fas fa-users me-1"></i>
+                  {% for integrante in banda.integrantes.all %}
+                    {{ integrante.integrante.nombre }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                </small>
+                {% endif %}
+              </td>
+              <td class="table-text-secondary">{{ banda.genero.nombre }}</td>
+              <td class="table-text-secondary">
+                {% if banda.comuna %}
+                  {{ banda.comuna.nombre }}, {{ banda.comuna.ciudad.nombre }}
+                {% else %}
+                  <span class="empty-state-text">No especificada</span>
+                {% endif %}
+              </td>
+              <td class="table-text-secondary">
+                <div><i class="fas fa-envelope me-1"></i>{{ banda.email_contacto }}</div>
+                {% if banda.telefono_contacto %}
+                <div><i class="fas fa-phone me-1"></i>{{ banda.telefono_contacto }}</div>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge-estado {% if banda.estado.nombre == 'Pendiente' %}badge-pendiente{% elif banda.estado.nombre == 'Revisado' %}badge-revisado{% elif banda.estado.nombre == 'Aprobado' %}badge-aprobado{% elif banda.estado.nombre == 'Rechazado' %}badge-rechazado{% endif %}">
+                  {{ banda.estado.nombre }}
+                </span>
+              </td>
+              <td class="table-text-secondary">
+                {{ banda.fecha_envio|date:"d/m/Y H:i" }}
+              </td>
+              <td class="text-center">
+                <div class="d-flex justify-content-center">
+                  {% for estado in estados %}
+                    {% if estado.tipo_entidad == 'banda' %}
+                      <a href="{% url 'cambiar_estado_banda' banda.id estado.nombre %}"
+                         class="btn-estado {% if estado.nombre == 'Revisado' %}btn-action-view{% elif estado.nombre == 'Aprobado' %}btn-action-view{% elif estado.nombre == 'Rechazado' %}btn-action-delete{% elif estado.nombre == 'Pendiente' %}btn-action-view{% endif %}"
+                         title="{{ estado.nombre }}">
+                        {% if estado.nombre == 'Revisado' %}
+                          <i class="fas fa-eye"></i>
+                        {% elif estado.nombre == 'Aprobado' %}
+                          <i class="fas fa-check"></i>
+                        {% elif estado.nombre == 'Rechazado' %}
+                          <i class="fas fa-times"></i>
+                        {% elif estado.nombre == 'Pendiente' %}
+                          <i class="fas fa-clock"></i>
+                        {% endif %}
+                      </a>
+                    {% endif %}
+                  {% endfor %}
+                  <button class="btn btn-action-emergente btn-action-view"
+                          data-bs-toggle="modal" data-bs-target="#bandaModal{{ banda.id }}"
+                          title="Ver detalles">
+                    <i class="fas fa-search-plus"></i>
+                  </button>
+                  <form method="POST" action="{% url 'eliminar_banda_emergente' banda.id %}" class="d-inline"
+                        onsubmit="return confirm('¿Estás seguro de eliminar esta banda?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-action-emergente btn-action-delete" title="Eliminar">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5">
+                <i class="fas fa-music fa-4x text-muted mb-3 d-block"></i>
+                <p class="empty-state-text mb-0">No hay postulaciones de bandas emergentes</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      {% if bandas.paginator.num_pages > 1 %}
+      <div class="card-footer border-top-0" style="background: var(--card-bg); border-color: var(--border-color);">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="empty-state-text">
+            Mostrando {{ bandas.start_index }} - {{ bandas.end_index }} de {{ bandas.paginator.count }} bandas
+          </div>
+          <nav>
+            <ul class="pagination mb-0">
+              {% if bandas.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page=1{% if busqueda %}&q={{ busqueda }}{% endif %}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}{% if genero_actual %}&genero={{ genero_actual }}{% endif %}">
+                    <i class="fas fa-angle-double-left"></i>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ bandas.previous_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}{% if genero_actual %}&genero={{ genero_actual }}{% endif %}">
+                    <i class="fas fa-angle-left"></i>
+                  </a>
+                </li>
+              {% endif %}
+
+              {% for num in bandas.paginator.page_range %}
+                {% if bandas.number == num %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                  </li>
+                {% elif num > bandas.number|add:'-3' and num < bandas.number|add:'3' %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}{% if genero_actual %}&genero={{ genero_actual }}{% endif %}">{{ num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+
+              {% if bandas.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ bandas.next_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}{% if genero_actual %}&genero={{ genero_actual }}{% endif %}">
+                    <i class="fas fa-angle-right"></i>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ bandas.paginator.num_pages }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}{% if genero_actual %}&genero={{ genero_actual }}{% endif %}">
+                    <i class="fas fa-angle-double-right"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Modales de Detalle -->
+{% for banda in bandas %}
+<div class="modal fade" id="bandaModal{{ banda.id }}" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content" style="border-radius: 16px; border: none; background: var(--card-bg); color: var(--text-primary);">
+      <div class="modal-header" style="background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); color: white; border-radius: 16px 16px 0 0; border: none;">
+        <h5 class="modal-title">
+          <i class="fas fa-music me-2"></i>{{ banda.nombre_banda }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="page-title"><strong>Integrantes:</strong></p>
+            {% if banda.integrantes.exists %}
+            <ul class="list-unstyled">
+              {% for integrante in banda.integrantes.all %}
+              <li class="table-text"><i class="fas fa-user me-2"></i>{{ integrante.integrante.nombre }}</li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <p class="empty-state-text">No especificados</p>
+            {% endif %}
+
+            <p class="page-title"><strong>Género:</strong> <span class="table-text">{{ banda.genero.nombre }}</span></p>
+            <p class="page-title"><strong>Ubicación:</strong>
+              {% if banda.comuna %}
+                <span class="table-text">{{ banda.comuna.nombre }}, {{ banda.comuna.ciudad.nombre }}, {{ banda.comuna.ciudad.pais.nombre }}</span>
+              {% else %}
+                <span class="empty-state-text">No especificada</span>
+              {% endif %}
+            </p>
+          </div>
+          <div class="col-md-6">
+            <p class="page-title"><strong>Contacto:</strong></p>
+            <p class="table-text-secondary"><i class="fas fa-envelope me-1"></i>{{ banda.email_contacto }}</p>
+            {% if banda.telefono_contacto %}
+            <p class="table-text-secondary"><i class="fas fa-phone me-1"></i>{{ banda.telefono_contacto }}</p>
+            {% endif %}
+
+            <p class="page-title"><strong>Estado:</strong></p>
+            <span class="badge-estado {% if banda.estado.nombre == 'Pendiente' %}badge-pendiente{% elif banda.estado.nombre == 'Revisado' %}badge-revisado{% elif banda.estado.nombre == 'Aprobado' %}badge-aprobado{% elif banda.estado.nombre == 'Rechazado' %}badge-rechazado{% endif %}">
+              {{ banda.estado.nombre }}
+            </span>
+          </div>
+        </div>
+
+        <hr style="border-color: var(--border-color);">
+        <p class="page-title"><strong>Mensaje:</strong></p>
+        <div class="p-3 rounded" style="background: var(--bg-tertiary); color: var(--text-primary);">{{ banda.mensaje }}</div>
+
+        {% if banda.links.exists %}
+        <hr style="border-color: var(--border-color);">
+        <p class="page-title"><strong>Enlaces:</strong></p>
+        <div class="d-flex flex-wrap gap-2">
+          {% for link in banda.links.all %}
+          <a href="{{ link.url }}" target="_blank" class="btn btn-sm btn-outline-primary" style="border-radius: 10px;">
+            <i class="fas fa-external-link-alt me-1"></i>{{ link.tipo|title }}
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if banda.documento_presentacion %}
+        <hr style="border-color: var(--border-color);">
+        <p class="page-title"><strong>Documento de Presentación:</strong></p>
+        <a href="{{ banda.documento_presentacion }}" target="_blank" class="btn btn-sm btn-outline-primary" style="border-radius: 10px;">
+          <i class="fas fa-download"></i> Descargar
+        </a>
+        {% endif %}
+
+        <hr style="border-color: var(--border-color);">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="table-text-secondary"><strong class="page-title">Fecha de envío:</strong> {{ banda.fecha_envio|date:"d/m/Y H:i" }}</p>
+          </div>
+          <div class="col-md-6">
+            {% if banda.fecha_revision %}
+            <p class="table-text-secondary"><strong class="page-title">Fecha de revisión:</strong> {{ banda.fecha_revision|date:"d/m/Y H:i" }}</p>
+            <p class="table-text-secondary"><strong class="page-title">Revisado por:</strong> {{ banda.revisado_por.get_full_name|default:banda.revisado_por.username }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0" style="background: var(--card-bg); border-color: var(--border-color);">
+        <div class="btn-group" role="group">
+          {% for estado in estados %}
+            {% if estado.tipo_entidad == 'banda' %}
+              <a href="{% url 'cambiar_estado_banda' banda.id estado.nombre %}"
+                 class="btn {% if estado.nombre == 'Revisado' %}btn-info{% elif estado.nombre == 'Aprobado' %}btn-success{% elif estado.nombre == 'Rechazado' %}btn-danger{% elif estado.nombre == 'Pendiente' %}btn-secondary{% endif %}"
+                 style="border-radius: 10px; margin: 0 4px;">
+                {% if estado.nombre == 'Revisado' %}
+                  <i class="fas fa-eye"></i>
+                {% elif estado.nombre == 'Aprobado' %}
+                  <i class="fas fa-check"></i>
+                {% elif estado.nombre == 'Rechazado' %}
+                  <i class="fas fa-times"></i>
+                {% elif estado.nombre == 'Pendiente' %}
+                  <i class="fas fa-clock"></i>
+                {% endif %}
+                {{ estado.nombre }}
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const notificationContainer = document.getElementById('notification-container');
+    const notificationContainerEstados = document.getElementById('notification-container-estados');
+    const generosBody = document.getElementById('lista-generos-body');
+    const estadosBody = document.getElementById('lista-estados-body');
+
+    function showNotification(message, type = 'success', container = notificationContainer) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        container.innerHTML = '';
+        container.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 5000);
+    }
+
+    // Agregar Género
+    const formAgregar = document.getElementById('form-agregar-genero');
+    formAgregar.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(formAgregar);
+        const url = formAgregar.action;
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showNotification(data.message, 'success');
+                const genero = data.genero;
+                const newRow = document.createElement('tr');
+                newRow.id = `genero-row-${genero.id}`;
+                const deleteUrl = "{% url 'eliminar_genero' 0 %}".replace('0', genero.id);
+                newRow.innerHTML = `
+                    <td style="border: none;"><strong>${genero.nombre}</strong></td>
+                    <td style="border: none; color: #6B7280;">${genero.descripcion || 'Sin descripción'}</td>
+                    <td style="border: none;">
+                        <form method="post" action="${deleteUrl}" class="d-inline form-eliminar-genero">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${formData.get('csrfmiddlewaretoken')}">
+                            <button type="submit" class="btn btn-action-emergente btn-action-delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                `;
+                const noGenerosRow = document.getElementById('no-generos-row');
+                if (noGenerosRow) noGenerosRow.remove();
+                generosBody.appendChild(newRow);
+                formAgregar.reset();
+            } else {
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Ocurrió un error de red.', 'error');
+        });
+    });
+
+    // Eliminar Género
+    generosBody.addEventListener('submit', function(e) {
+        if (e.target.classList.contains('form-eliminar-genero')) {
+            e.preventDefault();
+            if (!confirm('¿Estás seguro de eliminar este género?')) return;
+
+            const formEliminar = e.target;
+            const formData = new FormData(formEliminar);
+            const url = formEliminar.action;
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showNotification(data.message, 'success');
+                    const row = formEliminar.closest('tr');
+                    row.remove();
+                    if (generosBody.children.length === 0) {
+                        const emptyRow = document.createElement('tr');
+                        emptyRow.id = 'no-generos-row';
+                        emptyRow.innerHTML = '<td colspan="3" class="text-center py-4" style="border: none;"><i class="fas fa-music fa-3x text-muted mb-2"></i><p class="text-muted mb-0">No hay géneros registrados</p></td>';
+                        generosBody.appendChild(emptyRow);
+                    }
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Ocurrió un error de red.', 'error');
+            });
+        }
+    });
+
+    // Agregar Estado
+    const formAgregarEstado = document.getElementById('form-agregar-estado');
+    formAgregarEstado.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(formAgregarEstado);
+        const url = formAgregarEstado.action;
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showNotification(data.message, 'success', notificationContainerEstados);
+                const estado = data.estado;
+                const newRow = document.createElement('tr');
+                newRow.id = `estado-row-${estado.id}`;
+                const deleteUrl = "{% url 'eliminar_estado' 0 %}".replace('0', estado.id);
+                newRow.innerHTML = `
+                    <td style="border: none;"><strong>${estado.nombre}</strong></td>
+                    <td style="border: none; color: #6B7280;">${estado.descripcion || 'Sin descripción'}</td>
+                    <td style="border: none;">
+                        <span class="badge-estado ${estado.tipo_entidad === 'banda' ? 'badge-aprobado' : 'badge-revisado'}">
+                            ${estado.tipo_entidad === 'banda' ? 'Banda' : 'Contacto'}
+                        </span>
+                    </td>
+                    <td style="border: none;">
+                        <form method="post" action="${deleteUrl}" class="d-inline form-eliminar-estado">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${formData.get('csrfmiddlewaretoken')}">
+                            <button type="submit" class="btn btn-action-emergente btn-action-delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                `;
+                const noEstadosRow = document.getElementById('no-estados-row');
+                if (noEstadosRow) noEstadosRow.remove();
+                estadosBody.appendChild(newRow);
+                formAgregarEstado.reset();
+            } else {
+                showNotification(data.message, 'error', notificationContainerEstados);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Ocurrió un error de red.', 'error', notificationContainerEstados);
+        });
+    });
+
+    // Eliminar Estado
+    estadosBody.addEventListener('submit', function(e) {
+        if (e.target.classList.contains('form-eliminar-estado')) {
+            e.preventDefault();
+            const button = e.target.querySelector('button');
+            if (button.disabled) {
+                showNotification('No se puede eliminar este estado porque tiene elementos asociados.', 'error', notificationContainerEstados);
+                return;
+            }
+            if (!confirm('¿Estás seguro de eliminar este estado?')) return;
+
+            const formEliminar = e.target;
+            const formData = new FormData(formEliminar);
+            const url = formEliminar.action;
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showNotification(data.message, 'success', notificationContainerEstados);
+                    const row = formEliminar.closest('tr');
+                    row.remove();
+                    if (estadosBody.children.length === 0) {
+                        const emptyRow = document.createElement('tr');
+                        emptyRow.id = 'no-estados-row';
+                        emptyRow.innerHTML = '<td colspan="4" class="text-center py-4" style="border: none;"><i class="fas fa-tasks fa-3x text-muted mb-2"></i><p class="text-muted mb-0">No hay estados registrados</p></td>';
+                        estadosBody.appendChild(emptyRow);
+                    }
+                } else {
+                    showNotification(data.message, 'error', notificationContainerEstados);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Ocurrió un error de red.', 'error', notificationContainerEstados);
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Artículo - {{ radio_name }}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .article-title {
+            font-size: 24px;
+            color: #1f2937;
+            margin: 0 0 15px 0;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .article-category {
+            display: inline-block;
+            background-color: #dc2626;
+            color: #ffffff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        .article-excerpt {
+            color: #4b5563;
+            line-height: 1.6;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+        .article-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #dc2626;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #991b1b;
+        }
+        .article-meta {
+            color: #6b7280;
+            font-size: 14px;
+            margin: 15px 0;
+        }
+        .footer {
+            background-color: #f9fafb;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 13px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .footer a {
+            color: #dc2626;
+            text-decoration: none;
+        }
+        .social-links {
+            margin: 15px 0;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 5px;
+            color: #6b7280;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📻 {{ radio_name }}</h1>
+            <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Nuevo artículo publicado</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <span class="article-category">{{ articulo.categoria.nombre }}</span>
+
+            <h2 class="article-title">{{ articulo.titulo }}</h2>
+
+            <div class="article-meta">
+                <strong>Por:</strong> {{ articulo.autor.username|title }} |
+                <strong>Fecha:</strong> {{ articulo.fecha_publicacion|date:"d/m/Y" }}
+            </div>
+
+            {% if imagen_articulo %}
+            <img src="{{ imagen_articulo }}" alt="{{ articulo.titulo }}" class="article-image">
+            {% endif %}
+
+            <div class="article-excerpt">
+                {{ articulo.resumen|default:articulo.contenido|truncatewords:50|safe }}
+            </div>
+
+            <center>
+                <a href="{{ site_url }}/articulos/{{ articulo.slug }}" class="button">
+                    Leer artículo completo →
+                </a>
+            </center>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>{{ radio_name }}</strong></p>
+            <p>Recibiste este email porque estás suscrito a nuestro newsletter.</p>
+            <p>
+                <a href="http://localhost:8000/api/contact/unsubscribe-token/?token={{ suscripcion_token }}">Cancelar suscripción</a>
+            </p>
+            <div class="social-links">
+                <p>Síguenos en nuestras redes sociales</p>
+            </div>
+            <p style="margin-top: 15px; font-size: 12px; color: #9ca3af;">
+                © {{ "now"|date:"Y" }} {{ radio_name }}. Todos los derechos reservados.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

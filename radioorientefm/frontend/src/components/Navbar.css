@@ -1,0 +1,660 @@
+.navbar {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 20, 25, 0.88) 0%,
+    rgba(20, 15, 18, 0.92) 50%,
+    rgba(25, 18, 22, 0.9) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  color: var(--color-white);
+  padding: 0.5rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 3px 12px rgba(220, 38, 38, 0.15),
+    inset 0 1px 0 rgba(255, 200, 200, 0.08);
+  width: 100%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-bottom: 1px solid rgba(220, 38, 38, 0.25);
+}
+
+.navbar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(239, 68, 68, 0.5) 20%,
+    rgba(220, 38, 38, 0.7) 50%,
+    rgba(239, 68, 68, 0.5) 80%,
+    transparent 100%
+  );
+  opacity: 0.9;
+  filter: blur(1px);
+  box-shadow: 0 0 8px rgba(220, 38, 38, 0.3);
+}
+
+.navbar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(239, 68, 68, 0.2) 30%,
+    rgba(248, 113, 113, 0.3) 50%,
+    rgba(239, 68, 68, 0.2) 70%,
+    transparent 100%
+  );
+  box-shadow: 0 1px 4px rgba(220, 38, 38, 0.25);
+}
+
+html.dark .navbar {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 15, 18, 0.9) 0%,
+    rgba(10, 10, 13, 0.95) 100%
+  );
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(220, 38, 38, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(220, 38, 38, 0.25);
+}
+
+.container {
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 70px;
+}
+
+.nav-logo {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  text-decoration: none !important;
+  color: var(--color-white) !important;
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+  transition: transform 0.2s !important;
+  margin-right: 2rem !important;
+  flex-shrink: 0 !important;
+}
+
+.nav-logo:hover {
+  transform: translateY(-1px);
+}
+
+.logo-icon {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.logo-icon:hover {
+  transform: scale(1.05);
+}
+
+.logo-text {
+  color: var(--color-white);
+  white-space: nowrap;
+  font-size: 1.4rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.nav-link {
+  color: var(--color-white);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  position: relative;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 50%, #ef4444 100%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-50%);
+  opacity: 0;
+  box-shadow: 0 0 8px rgba(220, 38, 38, 0.4);
+}
+
+.nav-link:hover {
+  background: rgba(220, 38, 38, 0.08);
+  transform: translateY(-1px);
+  color: #f87171;
+}
+
+.nav-link:hover::before {
+  width: 80%;
+  opacity: 1;
+}
+
+.nav-link.active {
+  color: #ef4444;
+  font-weight: 600;
+  position: relative;
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 50%, #ef4444 100%);
+  transform: scaleX(1);
+  transform-origin: center;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: lineIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+}
+
+@keyframes lineIn {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+.nav-link:not(.active)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--color-red);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  opacity: 0;
+}
+
+.nav-link:not(.active):hover::after {
+  transform: scaleX(0.8);
+  opacity: 0.7;
+}
+
+/* Estilo especial para el link del Dashboard */
+.nav-link.dashboard-link {
+  background: linear-gradient(135deg, var(--color-red) 0%, #380808 100%);
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.nav-link.dashboard-link:hover {
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+}
+
+.notification-toggle {
+  position: relative;
+  background: none;
+  border: none;
+  color: var(--color-white);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+}
+
+.notification-toggle:hover {
+  background-color: rgba(220, 38, 38, 0.15);
+  color: #f87171;
+  transform: scale(1.05);
+}
+
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--color-red);
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border: 2px solid var(--color-black);
+}
+
+.notif-wrapper {
+  position: relative;
+}
+
+.notifications-dropdown {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  width: 320px;
+  background: #111827;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.35);
+  overflow: hidden;
+  z-index: 1200;
+}
+
+.notifications-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.05);
+}
+
+.notifications-header .mark-all {
+  background: transparent;
+  color: var(--color-red);
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.notifications-body {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.notification-title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.notification-message {
+  font-size: 0.9rem;
+  color: #d1d5db;
+}
+
+.notification-meta {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.notifications-empty {
+  padding: 16px;
+  text-align: center;
+  color: #9ca3af;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.user-icon {
+  background: rgba(0, 0, 0, 0.705);
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.user-icon:hover {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.user-name {
+  color: var(--color-white);
+  font-weight: 500;
+}
+
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--color-white);
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--color-gray-700);
+  margin-top: 1rem;
+}
+
+.mobile-nav-link {
+  color: var(--color-white);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-gray-800);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobile-nav-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: var(--color-red);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s ease;
+}
+
+.mobile-nav-link:hover {
+  background: rgba(255, 255, 255, 0.05);
+  padding-left: 1.25rem;
+}
+
+.mobile-nav-link:hover::before {
+  transform: scaleY(1);
+}
+
+.mobile-nav-link.active {
+  color: var(--color-red);
+  background: rgba(220, 38, 38, 0.1);
+  border-left: 3px solid var(--color-red);
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link.active {
+  color: var(--color-red);
+}
+
+/* Estilo especial para el link del Dashboard en mobile */
+.mobile-nav-link.dashboard-link {
+  background: linear-gradient(135deg, var(--color-red) 0%, #ef4444 100%);
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  border-bottom: none;
+  margin-bottom: 0.5rem;
+}
+
+.mobile-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-gray-700);
+}
+
+.btn {
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-red) 0%, #380808 100%);
+  color: white;
+  border: 1px solid var(--color-red);
+  
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: white;
+  border: 1px solid white;
+}
+
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Theme toggle - Diseño más compacto */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  color: var(--color-white);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  font-weight: 500;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.theme-toggle:hover {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
+.theme-toggle:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.theme-toggle svg {
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover svg {
+  transform: rotate(20deg) scale(1.1);
+}
+
+.theme-toggle.mobile {
+  justify-content: center;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.theme-toggle-text {
+  margin-left: 0.25rem;
+  font-weight: 500;
+}
+
+/* --- Diseño Base: MÓVIL --- */
+@media (max-width: 1249px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+
+  .nav-content {
+    height: 65px;
+  }
+  
+  /* Escondemos los enlaces de escritorio */
+  .nav-links {
+    display: none;
+  }
+
+  /* Escondemos el botón de login de escritorio */
+  .nav-auth .btn-primary {
+    display: none;
+  }
+  
+  /* Escondemos el menú de usuario de escritorio */
+  .nav-auth .user-menu {
+    display: none;
+  }
+
+  /* MOSTRAMOS el botón de hamburguesa */
+  .mobile-menu-btn {
+    display: flex; /* Usamos flex para centrar el ícono */
+    align-items: center;
+    justify-content: center;
+    background: rgba(220, 38, 38, 0.1);
+    border: none;
+    color: var(--color-white);
+    cursor: pointer;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    margin-left: 0.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .mobile-menu-btn:hover {
+    background: rgba(220, 38, 38, 0.2);
+    color: #f87171;
+    transform: scale(1.05);
+  }
+
+  .nav-logo {
+    margin-right: auto; /* Empuja el logo a la izquierda y los botones a la derecha */
+  }
+
+  .logo-text {
+    font-size: 1.2rem;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  /* Ocultamos esto (si lo usabas) */
+  .desktop {
+    display: none !important;
+  }
+}
+
+/* --- 2. Diseño de ESCRITORIO (1024px y MÁS GRANDE) --- */
+/* (Aquí ocultamos el menú móvil) */
+@media (min-width: 1249px) {
+  .mobile-menu-btn {
+    display: none !important;
+  }
+  
+  .mobile-nav {
+    display: none !important;
+  }
+}
+
+/* --- 3. Ajustes para Teléfonos Pequeños (Por debajo de 480px) --- */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 0.75rem;
+  }
+  
+  .logo-text {
+    font-size: 1rem;
+  }
+  
+  .logo-icon {
+    width: 35px;
+    height: 35px;
+  }
+
+  .mobile-nav-link {
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+  }
+  
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* --- ESTILOS DE USUARIO (Deben estar fuera de @media) --- */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-icon {
+  color: #ffffff;
+}
+
+.nav-icon {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-right: 6px;
+}

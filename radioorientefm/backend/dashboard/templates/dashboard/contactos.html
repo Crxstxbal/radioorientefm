@@ -1,0 +1,1238 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Contactos - Radio Oriente FM{% endblock %}
+{% block page_title %}Gestión de Contactos{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --contact-card-bg: #ffffff;
+        --contact-card-hover: #f8f9fa;
+        --contact-border: #e0e0e0;
+        --contact-shadow: rgba(0, 0, 0, 0.05);
+        --contact-shadow-hover: rgba(0, 0, 0, 0.1);
+        --badge-primary-bg: #4A90E2;
+        --badge-warning-bg: #F5A623;
+        --badge-success-bg: #7ED321;
+        --badge-info-bg: #50E3C2;
+        --badge-secondary-bg: #9B9B9B;
+        --stat-bg-1: #f0f4ff;
+        --stat-bg-2: #fff0f5;
+        --stat-bg-3: #f0fbff;
+        --stat-bg-4: #f0fff4;
+        --stat-icon-1: #667eea;
+        --stat-icon-2: #f093fb;
+        --stat-icon-3: #4facfe;
+        --stat-icon-4: #43e97b;
+        --stat-accent-1: #667eea;
+        --stat-accent-2: #f093fb;
+        --stat-accent-3: #4facfe;
+        --stat-accent-4: #43e97b;
+        --filter-bg: #f8f9fa;
+        --modal-bg: #ffffff;
+        --modal-content-bg: #f8f9fa;
+    }
+
+    html.dark {
+        --contact-card-bg: #2d2d3a;
+        --contact-card-hover: #363647;
+        --contact-border: #404052;
+        --contact-shadow: rgba(0, 0, 0, 0.3);
+        --contact-shadow-hover: rgba(0, 0, 0, 0.5);
+        --badge-primary-bg: #5B9FED;
+        --badge-warning-bg: #FFB84D;
+        --badge-success-bg: #90E047;
+        --badge-info-bg: #6BECD8;
+        --badge-secondary-bg: #B0B0B0;
+        --stat-bg-1: #3a3a4f;
+        --stat-bg-2: #4a3a47;
+        --stat-bg-3: #3a4550;
+        --stat-bg-4: #3a4f42;
+        --stat-icon-1: #8896ea;
+        --stat-icon-2: #f5a5fb;
+        --stat-icon-3: #6fc4fe;
+        --stat-icon-4: #6beaa7;
+        --stat-accent-1: #667eea;
+        --stat-accent-2: #f093fb;
+        --stat-accent-3: #4facfe;
+        --stat-accent-4: #43e97b;
+        --filter-bg: #2d2d3a;
+        --modal-bg: #2d2d3a;
+        --modal-content-bg: #363647;
+    }
+
+    /* Stats Cards Elegantes */
+    #contactos-stats .stat-card {
+        border: 1px solid var(--contact-border);
+        border-radius: 16px;
+        box-shadow: 0 2px 8px var(--contact-shadow);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+
+    #contactos-stats .col-md-3:nth-child(1) .stat-card {
+        background: var(--stat-bg-1) !important;
+        border-left: 4px solid var(--stat-accent-1) !important;
+    }
+
+    #contactos-stats .col-md-3:nth-child(2) .stat-card {
+        background: var(--stat-bg-2) !important;
+        border-left: 4px solid var(--stat-accent-2) !important;
+    }
+
+    #contactos-stats .col-md-3:nth-child(3) .stat-card {
+        background: var(--stat-bg-3) !important;
+        border-left: 4px solid var(--stat-accent-3) !important;
+    }
+
+    #contactos-stats .col-md-3:nth-child(4) .stat-card {
+        background: var(--stat-bg-4) !important;
+        border-left: 4px solid var(--stat-accent-4) !important;
+    }
+
+    #contactos-stats .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px var(--contact-shadow-hover);
+    }
+
+    #contactos-stats .stat-card .card-body {
+        padding: 1.5rem !important;
+    }
+
+    #contactos-stats .stat-card h5 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-primary) !important;
+    }
+
+    #contactos-stats .stat-card p {
+        font-size: 0.875rem;
+        color: var(--text-secondary) !important;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    #contactos-stats .col-md-3:nth-child(1) .stat-card i {
+        color: var(--stat-icon-1) !important;
+        opacity: 0.3 !important;
+        transition: all 0.3s ease;
+    }
+
+    #contactos-stats .col-md-3:nth-child(2) .stat-card i {
+        color: var(--stat-icon-2) !important;
+        opacity: 0.3 !important;
+        transition: all 0.3s ease;
+    }
+
+    #contactos-stats .col-md-3:nth-child(3) .stat-card i {
+        color: var(--stat-icon-3) !important;
+        opacity: 0.3 !important;
+        transition: all 0.3s ease;
+    }
+
+    #contactos-stats .col-md-3:nth-child(4) .stat-card i {
+        color: var(--stat-icon-4) !important;
+        opacity: 0.3 !important;
+        transition: all 0.3s ease;
+    }
+
+    #contactos-stats .stat-card:hover i {
+        opacity: 0.5 !important;
+        transform: scale(1.1);
+    }
+
+    /* Card Styles */
+    .card {
+        background: var(--contact-card-bg);
+        border: 1px solid var(--contact-border);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px var(--contact-shadow);
+        transition: all 0.3s ease;
+    }
+
+    .card-header {
+        background: transparent;
+        border-bottom: 1px solid var(--contact-border);
+        padding: 1rem 1.5rem;
+    }
+
+    .card-header h5 {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Form Elements */
+    .form-label {
+        color: var(--text-primary);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-control, .form-select {
+        background: var(--contact-card-bg);
+        border: 1px solid var(--contact-border);
+        color: var(--text-primary);
+        border-radius: 8px;
+        padding: 0.625rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background: var(--contact-card-bg);
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        color: var(--text-primary);
+    }
+
+    html.dark .form-control::placeholder {
+        color: #888;
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 8px;
+        padding: 0.625rem 1.25rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-primary,
+    button.btn-primary,
+    a.btn-primary {
+        background: #667eea !important;
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2) !important;
+        border: none !important;
+    }
+
+    .btn-primary:hover,
+    button.btn-primary:hover,
+    a.btn-primary:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3) !important;
+        background: #7688eb !important;
+        color: white !important;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+        box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+        background: #5a6268;
+    }
+
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-info {
+        background: #4facfe;
+        color: white;
+        box-shadow: 0 2px 4px rgba(79, 172, 254, 0.2);
+    }
+
+    .btn-info:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(79, 172, 254, 0.3);
+        background: #6fc4fe;
+    }
+
+    .btn-warning {
+        background: #ffc107;
+        color: #000;
+        box-shadow: 0 2px 4px rgba(255, 193, 7, 0.2);
+    }
+
+    .btn-warning:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+        background: #ffca2c;
+        color: #000;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+        box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        background: #c82333;
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid var(--contact-border);
+        color: var(--text-primary);
+        background: transparent;
+    }
+
+    .btn-outline-secondary:hover {
+        background: var(--contact-card-hover);
+        border-color: var(--contact-border);
+        color: var(--text-primary);
+    }
+
+    .btn-outline-danger {
+        border: 1px solid #ff6b6b;
+        color: #ff6b6b;
+        background: transparent;
+    }
+
+    .btn-outline-danger:hover {
+        background: #ff6b6b;
+        color: white;
+    }
+
+    /* Table */
+    .table {
+        color: var(--text-primary);
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        border-bottom: 2px solid var(--contact-border);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+        color: var(--text-secondary);
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-top: 1px solid var(--contact-border);
+    }
+
+    .table-hover tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table-hover tbody tr:hover {
+        background: var(--contact-card-hover);
+    }
+
+    /* Badges */
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.75rem;
+        letter-spacing: 0.3px;
+    }
+
+    .badge.bg-primary {
+        background: var(--badge-primary-bg) !important;
+    }
+
+    .badge.bg-warning {
+        background: var(--badge-warning-bg) !important;
+        color: #000 !important;
+    }
+
+    .badge.bg-success {
+        background: var(--badge-success-bg) !important;
+        color: #000 !important;
+    }
+
+    .badge.bg-info {
+        background: var(--badge-info-bg) !important;
+        color: #000 !important;
+    }
+
+    .badge.bg-secondary {
+        background: var(--badge-secondary-bg) !important;
+    }
+
+    /* Modals */
+    .modal-content {
+        background: var(--modal-bg);
+        border: 1px solid var(--contact-border);
+        border-radius: 12px;
+    }
+
+    .modal-header {
+        border-bottom: 1px solid var(--contact-border);
+        padding: 1.5rem;
+    }
+
+    .modal-title {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        color: var(--text-primary);
+    }
+
+    .modal-footer {
+        border-top: 1px solid var(--contact-border);
+        padding: 1rem 1.5rem;
+    }
+
+    html.dark .btn-close {
+        filter: invert(1);
+    }
+
+    .modal-body .bg-light {
+        background: var(--modal-content-bg) !important;
+        color: var(--text-primary);
+    }
+
+    /* Collapse */
+    .collapse .card {
+        border: 1px solid var(--contact-border);
+        background: var(--filter-bg);
+    }
+
+    /* Empty State */
+    .table tbody td i.fa-3x {
+        color: var(--text-secondary);
+        opacity: 0.3;
+    }
+
+    /* Pagination */
+    .pagination {
+        margin-top: 2rem;
+        gap: 0.5rem;
+    }
+
+    .page-link {
+        background: var(--contact-card-bg);
+        border: 1px solid var(--contact-border);
+        color: var(--text-primary);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .page-link:hover {
+        background: var(--contact-card-hover);
+        border-color: #667eea;
+        color: #667eea;
+        transform: translateY(-1px);
+    }
+
+    .page-item.active .page-link {
+        background: #667eea;
+        border-color: #667eea;
+        color: white;
+        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    }
+
+    .page-item.disabled .page-link {
+        background: var(--contact-card-bg);
+        border-color: var(--contact-border);
+        color: var(--text-secondary);
+        opacity: 0.5;
+    }
+
+    /* Filter Section */
+    .filter-card {
+        background: var(--filter-bg);
+        border: 1px solid var(--contact-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Alerts */
+    .alert {
+        border-radius: 8px;
+        border: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stat-card h5 {
+            font-size: 1.5rem;
+        }
+
+        .table {
+            font-size: 0.875rem;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Stats Cards -->
+    <div class="row mb-4" id="contactos-stats">
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-1">Total Contactos</p>
+                            <h5>{{ total_contactos }}</h5>
+                        </div>
+                        <i class="fas fa-envelope fa-3x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-1">Pendientes</p>
+                            <h5>{{ contactos_pendientes }}</h5>
+                        </div>
+                        <i class="fas fa-clock fa-3x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-1">Respondidos</p>
+                            <h5>{{ contactos_respondidos }}</h5>
+                        </div>
+                        <i class="fas fa-check-circle fa-3x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-1">Esta Semana</p>
+                            <h5>{{ contactos_semana }}</h5>
+                        </div>
+                        <i class="fas fa-calendar-week fa-3x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estado Management -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tasks me-2"></i>
+                        Gestión de estados
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Formulario para agregar nuevo estado -->
+                    <form id="form-agregar-estado" method="POST" action="{% url 'agregar_estado' %}" class="mb-4">
+                        {% csrf_token %}
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label for="nombre_estado" class="form-label">Nuevo Estado</label>
+                                <input type="text" class="form-control" id="nombre_estado" name="nombre" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="descripcion_estado" class="form-label">Descripción (Opcional)</label>
+                                <input type="text" class="form-control" id="descripcion_estado" name="descripcion">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="tipo_entidad" class="form-label">Tipo</label>
+                                <select class="form-select" id="tipo_entidad" name="tipo_entidad" required>
+                                    <option value="contacto">Contacto</option>
+                                    <option value="banda">Banda</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-plus me-1"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Lista de estados -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Estados disponibles</h6>
+                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#listaEstados">
+                            <i class="fas fa-list me-1"></i> Mostrar estados
+                        </button>
+                    </div>
+
+                    <div class="collapse" id="listaEstados">
+                        <div class="card card-body">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Descripción</th>
+                                            <th>Tipo</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lista-estados-body">
+                                        {% for estado in estados %}
+                                        <tr id="estado-row-{{ estado.id }}">
+                                            <td><strong>{{ estado.nombre }}</strong></td>
+                                            <td>{{ estado.descripcion|default:"Sin descripción" }}</td>
+                                            <td>{{ estado.get_tipo_entidad_display }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-danger eliminar-estado" data-estado-id="{{ estado.id }}" {% if estado.contactos.exists or estado.bandas.exists %}disabled title="No se puede eliminar porque tiene elementos asociados"{% endif %}>
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr id="no-estados-row">
+                                            <td colspan="4" class="text-center text-muted">No hay estados registrados.</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tipo de Asunto Management -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tags me-2"></i>
+                        Gestión de tipos de asunto
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Formulario para agregar nuevo tipo de asunto -->
+                    <form id="form-agregar-tipo" method="POST" action="{% url 'agregar_tipo_asunto' %}" class="mb-4">
+                        {% csrf_token %}
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-5">
+                                <label for="nombre_tipo" class="form-label">Nuevo Tipo de Asunto</label>
+                                <input type="text" class="form-control" id="nombre_tipo" name="nombre" required>
+                            </div>
+                            <div class="col-md-5">
+                                <label for="descripcion_tipo" class="form-label">Descripción (Opcional)</label>
+                                <input type="text" class="form-control" id="descripcion_tipo" name="descripcion">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-plus me-1"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Lista de tipos de asunto -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Tipos de asunto disponibles</h6>
+                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#listaTiposAsunto">
+                            <i class="fas fa-list me-1"></i> Mostrar tipos
+                        </button>
+                    </div>
+
+                    <div class="collapse" id="listaTiposAsunto">
+                        <div class="card card-body">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Descripción</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lista-tipos-body">
+                                        {% for tipo in tipos_asunto %}
+                                        <tr id="tipo-row-{{ tipo.id }}">
+                                            <td><strong>{{ tipo.nombre }}</strong></td>
+                                            <td>{{ tipo.descripcion|default:"Sin descripción" }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-danger eliminar-tipo" data-tipo-id="{{ tipo.id }}" data-tipo-nombre="{{ tipo.nombre }}">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr id="no-tipos-row">
+                                            <td colspan="3" class="text-center text-muted">No hay tipos de asunto registrados.</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Estado</label>
+                            <select name="estado" class="form-select" onchange="this.form.submit()">
+                                <option value="">Todos</option>
+                                {% for estado in estados_disponibles %}
+                                <option value="{{ estado.id }}" {% if request.GET.estado == estado.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ estado.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo de Asunto</label>
+                            <select name="tipo" class="form-select" onchange="this.form.submit()">
+                                <option value="">Todos</option>
+                                {% for tipo in tipos_asunto %}
+                                <option value="{{ tipo.id }}" {% if request.GET.tipo == tipo.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ tipo.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Buscar</label>
+                            <input type="text" name="q" class="form-control" placeholder="Nombre o email..." value="{{ request.GET.q }}">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Buscar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contactos Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-inbox me-2"></i>
+                        Mensajes de Contacto
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Tipo de Asunto</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contacto in contactos %}
+                                <tr>
+                                    <td><strong>#{{ contacto.id }}</strong></td>
+                                    <td>{{ contacto.nombre }}</td>
+                                    <td>
+                                        <a href="mailto:{{ contacto.email }}" style="color: #667eea;">{{ contacto.email }}</a>
+                                    </td>
+                                    <td>{{ contacto.telefono|default:"-" }}</td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ contacto.tipo_asunto.nombre }}</span>
+                                    </td>
+                                    <td>
+                                        {% if contacto.estado.nombre == 'Recibida' or contacto.estado.nombre == 'Pendiente' %}
+                                            <span class="badge bg-warning text-dark">{{ contacto.estado.nombre }}</span>
+                                        {% elif contacto.estado.nombre == 'Respondida' %}
+                                            <span class="badge bg-success">{{ contacto.estado.nombre }}</span>
+                                        {% elif contacto.estado.nombre == 'En Revisión' %}
+                                            <span class="badge bg-info">{{ contacto.estado.nombre }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ contacto.estado.nombre }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ contacto.fecha_envio|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#viewModal{{ contacto.id }}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal{{ contacto.id }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteItem('{% url 'delete_contacto' contacto.id %}', '{{ contacto.nombre|escapejs }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-5">
+                                        <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                        No hay mensajes de contacto registrados
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                    <nav aria-label="Navegación de páginas">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-angle-double-left"></i></span>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-angle-left"></i></span>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-angle-right"></i></span>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-angle-double-right"></i></span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+{% for contacto in contactos %}
+<!-- View Modal for {{ contacto.id }} -->
+<div class="modal fade" id="viewModal{{ contacto.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalles del Contacto #{{ contacto.id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Nombre:</strong> {{ contacto.nombre }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Email:</strong> {{ contacto.email }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Teléfono:</strong> {{ contacto.telefono|default:"No proporcionado" }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Tipo de Asunto:</strong> {{ contacto.tipo_asunto.nombre }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Estado:</strong> {{ contacto.estado.nombre }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Fecha de Envío:</strong> {{ contacto.fecha_envio|date:"d/m/Y H:i" }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <strong>Mensaje:</strong>
+                        <p class="mt-2 p-3 bg-light rounded">{{ contacto.mensaje }}</p>
+                    </div>
+                </div>
+                {% if contacto.respondido_por %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Respondido por:</strong> {{ contacto.respondido_por.full_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Fecha de Respuesta:</strong> {{ contacto.fecha_respuesta|date:"d/m/Y H:i" }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="mailto:{{ contacto.email }}" class="btn btn-primary">
+                    <i class="fas fa-reply me-2"></i>Responder por Email
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal for {{ contacto.id }} -->
+<div class="modal fade" id="editModal{{ contacto.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'update_contacto' contacto.id %}" id="editForm{{ contacto.id }}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Estado - {{ contacto.nombre }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Estado</label>
+                        <select name="estado" class="form-select" required>
+                            {% for estado in estados_disponibles %}
+                            <option value="{{ estado.id }}" {% if contacto.estado.id == estado.id %}selected{% endif %}>
+                                {{ estado.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+// Mostrar notificación
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show`;
+    notification.role = 'alert';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    `;
+
+    const container = document.querySelector('.container-fluid');
+    container.insertBefore(notification, container.firstChild);
+
+    // Desaparecer después de 5 segundos
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 150);
+    }, 5000);
+}
+
+// Asegurar que los modals se cierren correctamente
+document.addEventListener('DOMContentLoaded', function() {
+    var modals = document.querySelectorAll('.modal');
+    modals.forEach(function(modal) {
+        modal.addEventListener('hidden.bs.modal', function (e) {
+            // Limpiar el foco del botón que abrió el modal
+            var modalToggle = document.querySelector('[data-bs-target="#' + e.target.id + '"]');
+            if (modalToggle) {
+                modalToggle.blur();
+            }
+        });
+    });
+
+    // Manejar el envío del formulario de agregar estado
+    const formAgregarEstado = document.getElementById('form-agregar-estado');
+    if (formAgregarEstado) {
+        formAgregarEstado.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    this.reset();
+                    // Agregar el nuevo estado a la tabla sin recargar
+                    const tbody = document.querySelector('#lista-estados-body');
+                    const noEstadosRow = document.getElementById('no-estados-row');
+
+                    if (noEstadosRow) {
+                        noEstadosRow.remove();
+                    }
+
+                    const newRow = document.createElement('tr');
+                    newRow.id = `estado-row-${data.estado.id}`;
+                    newRow.innerHTML = `
+                        <td><strong>${data.estado.nombre}</strong></td>
+                        <td>${data.estado.descripcion || 'Sin descripción'}</td>
+                        <td>${data.estado.tipo_entidad === 'banda' ? 'Banda' : 'Contacto'}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-danger eliminar-estado"
+                                    data-estado-id="${data.estado.id}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    `;
+
+                    tbody.insertBefore(newRow, tbody.firstChild);
+                    showNotification(data.message, 'success');
+                } else {
+                    showNotification(data.message || 'No se pudo agregar el estado', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error al procesar la solicitud', 'danger');
+            });
+        });
+    }
+
+    // Manejar la eliminación de estados
+    document.addEventListener('click', function(e) {
+        const button = e.target.closest('.eliminar-estado');
+        if (button) {
+            if (button.disabled) {
+                showNotification('No se puede eliminar este estado porque tiene elementos asociados', 'warning');
+                return;
+            }
+
+            const estadoId = button.dataset.estadoId;
+
+            if (confirm('¿Estás seguro de que deseas eliminar este estado?')) {
+                fetch(`/dashboard/estados/eliminar/${estadoId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const row = document.getElementById(`estado-row-${estadoId}`);
+                        if (row) {
+                            row.remove();
+
+                            // Si no quedan estados, mostrar mensaje
+                            const estadosRows = document.querySelectorAll('#lista-estados-body tr:not(#no-estados-row)');
+                            if (estadosRows.length === 0) {
+                                const tbody = document.querySelector('#lista-estados-body');
+                                const emptyRow = document.createElement('tr');
+                                emptyRow.id = 'no-estados-row';
+                                emptyRow.innerHTML = '<td colspan="4" class="text-center text-muted">No hay estados registrados.</td>';
+                                tbody.appendChild(emptyRow);
+                            }
+                        }
+                        showNotification(data.message, 'success');
+                    } else {
+                        showNotification(data.message || 'No se pudo eliminar el estado', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error al procesar la solicitud', 'danger');
+                });
+            }
+        }
+    });
+
+    // Función para eliminar contacto con confirmación
+    window.deleteItem = function(url, name) {
+        if (confirm('¿Estás seguro de que deseas eliminar el contacto de ' + name + '?')) {
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Contacto eliminado correctamente', 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showNotification('Error al eliminar el contacto: ' + (data.error || ''), 'danger');
+                }
+            })
+            .catch(error => {
+                showNotification('Error al procesar la solicitud', 'danger');
+                console.error('Error:', error);
+            });
+        }
+    };
+
+    // Manejar el envío del formulario de agregar tipo de asunto
+    const formAgregarTipo = document.getElementById('form-agregar-tipo');
+    if (formAgregarTipo) {
+        formAgregarTipo.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.reset();
+                    // Agregar el nuevo tipo a la tabla sin recargar
+                    const tbody = document.querySelector('#lista-tipos-body');
+                    const noTiposRow = document.getElementById('no-tipos-row');
+
+                    if (noTiposRow) {
+                        noTiposRow.style.display = 'none';
+                    }
+
+                    const newRow = document.createElement('tr');
+                    newRow.id = `tipo-row-${data.tipo.id}`;
+                    newRow.innerHTML = `
+                        <td><strong>${data.tipo.nombre}</strong></td>
+                        <td>${data.tipo.descripcion || 'Sin descripción'}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-danger eliminar-tipo"
+                                    data-tipo-id="${data.tipo.id}"
+                                    data-tipo-nombre="${data.tipo.nombre}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    `;
+
+                    tbody.insertBefore(newRow, tbody.firstChild);
+                    showNotification('Tipo de asunto agregado correctamente', 'success');
+                } else {
+                    showNotification('Error: ' + (data.error || 'No se pudo agregar el tipo de asunto'), 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error al procesar la solicitud', 'danger');
+            });
+        });
+    }
+
+    // Manejar la eliminación de tipos de asunto
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.eliminar-tipo')) {
+            const button = e.target.closest('.eliminar-tipo');
+            const tipoId = button.dataset.tipoId;
+            const tipoNombre = button.dataset.tipoNombre;
+
+            if (confirm(`¿Estás seguro de que deseas eliminar el tipo de asunto "${tipoNombre}"?`)) {
+                const formData = new FormData();
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                
+                fetch(`/dashboard/contactos/tipos/${tipoId}/eliminar/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const row = document.getElementById(`tipo-row-${tipoId}`);
+                        if (row) row.remove();
+
+                        // Si no quedan tipos, mostrar mensaje
+                        const tiposRows = document.querySelectorAll('#lista-tipos-body tr:not(#no-tipos-row)');
+                        if (tiposRows.length === 0) {
+                            const noTiposRow = document.getElementById('no-tipos-row');
+                            if (noTiposRow) noTiposRow.style.display = '';
+                        }
+                        showNotification('Tipo de asunto eliminado correctamente', 'success');
+                    } else {
+                        showNotification('Error: ' + (data.error || 'No se pudo eliminar el tipo de asunto'), 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error al procesar la solicitud', 'danger');
+                });
+            }
+        }
+    });
+});
+</script>
+
+{% endblock %}

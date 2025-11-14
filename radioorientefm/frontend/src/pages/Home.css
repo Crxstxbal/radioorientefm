@@ -1,0 +1,834 @@
+.home-page {
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.home-page .hero {
+  position: relative;
+  color: var(--color-white);
+  padding: 2.5rem 0;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+/* Animated gradient mesh background */
+.home-page .hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(198, 40, 40, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(211, 47, 47, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 40% 90%, rgba(183, 28, 28, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 90% 20%, rgba(229, 57, 53, 0.08) 0%, transparent 50%);
+  animation: gradient-shift 15s ease infinite;
+  z-index: 0;
+}
+
+/* Subtle overlay for depth */
+.home-page .hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.4) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Shimmer effect overlay - removed to avoid rectangular marks */
+
+/* Gradient animation */
+@keyframes gradient-shift {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
+  }
+  25% {
+    opacity: 0.8;
+    transform: scale(1.1) translate(5%, -5%);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05) translate(-3%, 3%);
+  }
+  75% {
+    opacity: 0.9;
+    transform: scale(1.08) translate(3%, 5%);
+  }
+}
+
+/* Contenedor de partículas flotantes */
+.floating-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Cada partícula individual */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  animation-name: float-particle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  box-shadow: 0 0 10px currentColor, 0 0 15px currentColor;
+  will-change: transform, opacity;
+  opacity: 0.7;
+  filter: blur(0.5px);
+}
+
+/* Animación de flotación con movimiento continuo y suave */
+@keyframes float-particle {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.4;
+  }
+
+  25% {
+    transform: translate(30px, -60px) scale(1.15);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: translate(-20px, -120px) scale(0.9);
+    opacity: 0.6;
+  }
+
+  75% {
+    transform: translate(15px, -60px) scale(1.1);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.4;
+  }
+}
+
+/* Ensure hero content is above background and particles */
+.home-page .hero .container {
+  position: relative;
+  z-index: 2;
+}
+
+.home-page .hero-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  position: relative;
+}
+
+/* Ensure hero text and image are above background */
+.home-page .hero-text,
+.home-page .hero-image {
+  position: relative;
+  z-index: 3;
+}
+
+.home-page .hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.home-page .hero-title .text-red {
+  text-shadow:
+    0 0 30px rgba(239, 68, 68, 0.4),
+    0 0 60px rgba(220, 38, 38, 0.2),
+    0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.home-page .typewriter-text {
+  display: inline-block;
+  min-height: 1.2em;
+}
+
+/* Cursor styles removed - now handled in JSX inline styles */
+
+.home-page .hero-description {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-gray-300);
+  line-height: 1.6;
+}
+
+.home-page .hero-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.home-page .hero-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-page .radio-graphic {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  height: 300px;
+  z-index: 3;
+}
+
+.home-page .hero-logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  z-index: 10;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 20px rgba(220, 38, 38, 0.4));
+}
+
+.home-page .radio-waves {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.home-page .wave {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 120px !important;
+  height: 120px !important;
+  margin: -60px 0 0 -60px !important;
+  border: 3px solid #ef4444 !important;
+  border-radius: 50% !important;
+  will-change: transform, opacity !important;
+  box-shadow:
+    0 0 20px rgba(239, 68, 68, 0.3),
+    inset 0 0 20px rgba(239, 68, 68, 0.1) !important;
+}
+
+.home-page .wave-1 {
+  animation: radio-pulse 3s ease-out 0s infinite !important;
+  border-color: #ef4444 !important;
+}
+
+.home-page .wave-2 {
+  animation: radio-pulse 3s ease-out 1s infinite !important;
+  border-color: #f87171 !important;
+}
+
+.home-page .wave-3 {
+  animation: radio-pulse 3s ease-out 2s infinite !important;
+  border-color: #dc2626 !important;
+}
+
+@keyframes radio-pulse {
+  0% {
+    transform: scale(0.8) !important;
+    opacity: 1 !important;
+  }
+  100% {
+    transform: scale(2.8) !important;
+    opacity: 0 !important;
+  }
+}
+
+/* Stats Section */
+.home-page .stats {
+  padding: 2.5rem 0;
+  background: var(--color-gray-100);
+}
+
+.home-page .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.home-page .stat-item {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--color-white);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.home-page .stat-item:hover {
+  transform: translateY(-4px);
+}
+
+.home-page .stat-icon {
+  color: var(--color-red);
+  margin-bottom: 1rem;
+  width: 48px;
+  height: 48px;
+}
+
+.home-page .stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-black);
+  margin-bottom: 0.5rem;
+}
+
+.home-page .stat-label {
+  color: var(--color-gray-600);
+  font-weight: 500;
+}
+
+/* Featured News */
+.home-page .featured-news {
+  padding: 1.5rem 0;
+}
+
+.home-page .section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--color-black);
+}
+
+.home-page .news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.home-page .news-card {
+  background: var(--color-white);
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.home-page .news-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.home-page .news-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.home-page .news-content {
+  padding: 1.5rem;
+}
+
+.home-page .news-content .meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-red);
+  font-weight: 500;
+}
+
+.home-page .news-content .meta-item svg {
+  flex-shrink: 0;
+}
+
+.home-page .news-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--color-gray-900);
+  line-height: 1.4;
+}
+
+.home-page .news-excerpt {
+  color: var(--color-gray-600);
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.home-page .news-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--color-gray-500);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.home-page .news-meta .meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-gray-600);
+}
+
+.home-page .news-meta .meta-item svg {
+  flex-shrink: 0;
+}
+
+.home-page .loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-gray-600);
+}
+
+/* Call to Action */
+.home-page .cta {
+  background: var(--color-red);
+  color: var(--color-white);
+  padding: 2.5rem 0;
+}
+
+.home-page .cta-content {
+  text-align: center;
+}
+
+.home-page .cta-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.home-page .cta-description {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .home-page .hero {
+    min-height: 60vh;
+  }
+  
+  .home-page .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .home-page .news-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .home-page .hero {
+    padding: 2rem 0;
+    min-height: auto;
+  }
+  
+  .home-page .hero-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .home-page .hero-title {
+    font-size: 2rem;
+  }
+
+  .home-page .hero-description {
+    font-size: 1rem;
+  }
+
+  .home-page .hero-buttons {
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .home-page .hero-buttons .btn {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .home-page .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .home-page .stats {
+    padding: 2rem 0;
+  }
+
+  .home-page .news-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .home-page .section-title {
+    font-size: 1.75rem;
+  }
+
+  .home-page .cta-title {
+    font-size: 1.75rem;
+  }
+
+  .home-page .cta-description {
+    font-size: 1rem;
+  }
+  
+  .home-page .featured-news {
+    padding: 1.5rem 0;
+  }
+  
+  .home-page .cta {
+    padding: 2rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-page .hero {
+    padding: 1.5rem 0;
+  }
+  
+  .home-page .hero-title {
+    font-size: 1.75rem;
+  }
+  
+  .home-page .hero-description {
+    font-size: 0.95rem;
+  }
+
+  .home-page .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .home-page .stat-item {
+    padding: 1.25rem;
+  }
+
+  .home-page .hero-buttons {
+    gap: 0.75rem;
+  }
+  
+  .home-page .hero-buttons .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+  }
+  
+  .home-page .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .home-page .news-card {
+    border-radius: 0.75rem;
+  }
+  
+  .home-page .news-content {
+    padding: 0.875rem;
+  }
+  
+  .home-page .news-title {
+    font-size: 1rem;
+  }
+  
+  .home-page .cta-title {
+    font-size: 1.5rem;
+  }
+  
+  .home-page .cta-description {
+    font-size: 0.95rem;
+  }
+}
+
+/* Sección general de cards */
+.home-page .cards-section {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+  padding: 3rem 1rem;
+}
+
+/* Estilo base de cada card */
+.home-page .card {
+  flex: 1 1 350px;
+  max-width: 420px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    0 1px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #fff !important;
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: translateY(0);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Hover effect - Elevación elegante */
+.home-page .card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.4),
+    0 5px 15px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Efecto de brillo en hover */
+.home-page .card:hover::after {
+  opacity: 0.15;
+}
+
+.home-page .card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Capa de overlay con blur para cada card */
+.home-page .card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+  backdrop-filter: blur(3px);
+  z-index: 0;
+  transition: backdrop-filter 0.4s ease;
+}
+
+/* Aumentar blur en hover */
+.home-page .card:hover::before {
+  backdrop-filter: blur(4px);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}
+
+/* Contenido de la card debe estar por encima del overlay */
+.home-page .card > * {
+  position: relative;
+  z-index: 3;
+}
+
+/* Card de Bandas Emergentes */
+.home-page .card-bandas {
+  background-image: url('/images/bandas.jpg') !important;
+}
+
+/* Card de Noticias/Suscripción */
+.home-page .card-noticias {
+  background-image: url('/images/noticias.webp') !important;
+}
+
+/* Card de Publicidad */
+.home-page .card-publicidad {
+  background-image: url('/images/publicidad.jpg') !important;
+}
+
+/* Forzar que las imágenes se mantengan en modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .home-page .card-bandas {
+    background-image: url('/images/bandas.jpg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+  }
+
+  .home-page .card-noticias {
+    background-image: url('/images/noticias.webp') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+  }
+
+  .home-page .card-publicidad {
+    background-image: url('/images/publicidad.jpg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+  }
+}
+
+/* Compatibilidad con clase .dark en html */
+html.dark .home-page .card-bandas {
+  background-image: url('/images/bandas.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+html.dark .home-page .card-noticias {
+  background-image: url('/images/noticias.webp') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+html.dark .home-page .card-publicidad {
+  background-image: url('/images/publicidad.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+.home-page .card .title,
+.home-page .card .description,
+.home-page .card .icon svg {
+  color: #fff !important;
+}
+
+/* Iconos dentro de la card */
+.home-page .card .icon {
+  margin-bottom: 1rem;
+}
+
+/* Títulos */
+.home-page .card .title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #fff;
+}
+
+/* Descripción */
+.home-page .card .description {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  color: #fff;
+}
+
+/* Botones blancos */
+.home-page .btn-white {
+  background-color: #fff;
+  color: #dc2626;
+  font-weight: 700;
+  padding: 0.75rem 1.75rem;
+  border-radius: 50px;
+  text-decoration: none;
+  text-align: center;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.home-page .btn-white:hover {
+  background-color: #f3f3f3;
+  color: #b91c1c;
+  transform: translateY(-3px) scale(1.05);
+}
+
+.home-page .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .home-page .cards-section {
+    gap: 1.5rem;
+  }
+  .home-page .card {
+    min-height: 380px;
+    max-width: 90%;
+  }
+}
+
+/* ============================================
+   DARK MODE STYLES - Home Page
+   ============================================ */
+
+/* Stats section background */
+html.dark .home-page .stats {
+  background: var(--bg-secondary);
+}
+
+/* Stat items */
+html.dark .home-page .stat-item {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+}
+
+html.dark .home-page .stat-number {
+  color: var(--text-primary);
+}
+
+html.dark .home-page .stat-label {
+  color: var(--text-secondary);
+}
+
+/* Section titles */
+html.dark .home-page .section-title {
+  color: var(--text-primary);
+}
+
+/* News cards */
+html.dark .home-page .news-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+}
+
+html.dark .home-page .news-title {
+  color: var(--text-primary);
+}
+
+html.dark .home-page .news-excerpt {
+  color: var(--text-secondary);
+}
+
+html.dark .home-page .news-meta {
+  color: var(--text-tertiary);
+}
+
+html.dark .home-page .loading {
+  color: var(--text-secondary);
+}

@@ -1,0 +1,182 @@
+.auth-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-white) 100%);
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+}
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+.auth-card {
+  background: var(--color-white);
+  border-radius: 1rem;
+  padding: 3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-gray-200);
+  width: 100%;
+  max-width: 500px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-icon {
+  color: var(--color-red);
+  margin-bottom: 1rem;
+  width: 48px;
+  height: 48px;
+}
+
+.auth-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-black);
+  margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+  color: var(--color-gray-600);
+  font-size: 1rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.password-input {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-gray-500);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: var(--color-red);
+}
+
+.auth-submit {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.auth-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.auth-footer p {
+  color: var(--color-gray-600);
+}
+
+.auth-link {
+  color: var(--color-red);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.auth-link:hover {
+  color: var(--color-red-dark);
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .auth-card {
+    padding: 2rem;
+    margin: 1rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-title {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 1.5rem;
+  }
+
+  .auth-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* ============================================
+   DARK MODE STYLES - Auth Pages
+   ============================================ */
+
+html.dark .auth-page {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+}
+
+html.dark .auth-card {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+html.dark .auth-title {
+  color: var(--text-primary);
+}
+
+html.dark .auth-subtitle {
+  color: var(--text-secondary);
+}
+
+html.dark .auth-footer {
+  border-top-color: var(--border-color);
+}
+
+html.dark .auth-footer p {
+  color: var(--text-secondary);
+}
+
+html.dark .password-toggle {
+  color: var(--text-tertiary);
+}
+
+html.dark .password-toggle:hover {
+  color: var(--color-red);
+}

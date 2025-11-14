@@ -1,0 +1,618 @@
+{% extends 'dashboard/base.html' %}
+{% block page_title %}Gestión de Usuarios{% endblock %}
+
+{% block content %}
+<style>
+  .user-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    background: var(--card-bg);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .user-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .user-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    padding: 24px;
+  }
+
+  .search-box {
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+    background: var(--card-bg);
+    color: var(--text-primary);
+  }
+
+  .search-box:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+    background: var(--card-bg);
+    color: var(--text-primary);
+  }
+
+  .input-group-text {
+    background: var(--card-bg) !important;
+    border: 2px solid var(--border-color) !important;
+    color: var(--text-secondary) !important;
+  }
+
+  .btn-add {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    color: white;
+  }
+
+  .user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+  }
+
+  .badge-role {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-superuser {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    color: white;
+  }
+
+  .badge-admin {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    color: white;
+  }
+
+  .badge-user {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+  }
+
+  .badge-status {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+
+  .badge-active {
+    background: #D1FAE5;
+    color: #065F46;
+  }
+
+  html.dark .badge-active {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6EE7B7;
+  }
+
+  .table-modern {
+    border-collapse: separate;
+    border-spacing: 0 8px;
+  }
+
+  .table-modern thead th {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    border: none;
+    padding: 12px 16px;
+  }
+
+  .table-modern tbody tr {
+    background: var(--card-bg);
+    transition: all 0.2s ease;
+  }
+
+  .table-modern tbody tr:hover {
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .table-modern tbody td {
+    border: none;
+    padding: 16px;
+    vertical-align: middle;
+    color: var(--text-primary);
+  }
+
+  .table-modern tbody tr td:first-child {
+    border-radius: 12px 0 0 12px;
+  }
+
+  .table-modern tbody tr td:last-child {
+    border-radius: 0 12px 12px 0;
+  }
+
+  .user-name {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .user-email {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .btn-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: all 0.2s ease;
+    margin: 0 4px;
+  }
+
+  .btn-action-edit {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366F1;
+  }
+
+  .btn-action-edit:hover {
+    background: #6366F1;
+    color: white;
+  }
+
+  .btn-action-delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #EF4444;
+  }
+
+  .btn-action-delete:hover {
+    background: #EF4444;
+    color: white;
+  }
+
+  .pagination {
+    gap: 8px;
+  }
+
+  .pagination .page-link {
+    border: none;
+    border-radius: 10px;
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    font-weight: 600;
+    padding: 10px 16px;
+    transition: all 0.2s ease;
+  }
+
+  .pagination .page-link:hover {
+    background: #667eea;
+    color: white;
+  }
+
+  .pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .pagination .page-item.disabled .page-link {
+    background: var(--bg-tertiary);
+    color: var(--text-tertiary);
+  }
+
+  .stats-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .stats-badge-info {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3B82F6;
+  }
+
+  html.dark .stats-badge-info {
+    background: rgba(59, 130, 246, 0.2);
+    color: #93C5FD;
+  }
+
+  .page-title {
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  .page-subtitle {
+    color: var(--text-secondary);
+  }
+</style>
+
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-2 page-title">
+        <i class="fas fa-users me-2" style="color: #667eea;"></i>
+        Gestión de Usuarios
+      </h2>
+      <p class="page-subtitle mb-0">
+        <span class="stats-badge stats-badge-info">
+          <i class="fas fa-users me-2"></i>Total: {{ paginator.count }} usuarios
+        </span>
+      </p>
+    </div>
+    <button type="button" class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addUserModal">
+      <i class="fas fa-plus me-2"></i>Agregar Usuario
+    </button>
+  </div>
+
+  <!-- Buscador -->
+  <div class="card user-card mb-4">
+    <div class="card-body p-4">
+      <form method="get" action="{% url 'dashboard_users' %}" class="row g-3">
+        <div class="col-md-10">
+          <div class="input-group">
+            <span class="input-group-text border-end-0" style="border-radius: 12px 0 0 12px; border-right: none;">
+              <i class="fas fa-search"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control search-box border-start-0 ps-0"
+              style="border-left: none; border-radius: 0 12px 12px 0;"
+              placeholder="Buscar por nombre de usuario, correo, nombre o apellido..."
+              name="search"
+              value="{{ search_query }}"
+            >
+          </div>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-add w-100">
+            <i class="fas fa-search me-2"></i>Buscar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tabla de usuarios -->
+  <div class="card user-card">
+    <div class="card-body p-0">
+      <div class="table-responsive p-3">
+        <table class="table table-modern mb-0">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Correo</th>
+              <th>Nombre Completo</th>
+              <th>Rol</th>
+              <th>Fecha Registro</th>
+              <th>Estado</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="user-avatar me-3" style="background: linear-gradient(135deg, #{{ user.id|stringformat:'03d'|slice:':2' }}a5fa 0%, #{{ user.id|stringformat:'03d'|slice:'1:3' }}82f6 100%);">
+                    {{ user.username|slice:":2" }}
+                  </div>
+                  <div>
+                    <strong class="user-name">{{ user.username }}</strong>
+                    {% if user.is_superuser %}
+                    <span class="badge bg-warning ms-2" style="font-size: 0.65rem;">
+                      <i class="fas fa-crown"></i>
+                    </span>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+              <td class="user-email">{{ user.email }}</td>
+              <td class="user-name">
+                {% if user.first_name or user.last_name %}
+                  {{ user.first_name }} {{ user.last_name }}
+                {% else %}
+                  <span class="user-email">Sin nombre</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if user.is_superuser %}
+                  <span class="badge-role badge-superuser">
+                    <i class="fas fa-crown me-1"></i>Superusuario
+                  </span>
+                {% elif user.is_staff %}
+                  <span class="badge-role badge-admin">
+                    <i class="fas fa-user-shield me-1"></i>Administrador
+                  </span>
+                {% else %}
+                  <span class="badge-role badge-user">
+                    <i class="fas fa-user me-1"></i>Usuario
+                  </span>
+                {% endif %}
+              </td>
+              <td class="user-email">
+                {{ user.fecha_creacion|date:"d/m/Y H:i" }}
+              </td>
+              <td>
+                {% if user.is_active %}
+                  <span class="badge-status badge-active">
+                    <i class="fas fa-check-circle me-1"></i>Activo
+                  </span>
+                {% else %}
+                  <span class="badge bg-danger" style="padding: 6px 12px; border-radius: 8px;">
+                    <i class="fas fa-times-circle me-1"></i>Inactivo
+                  </span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <button type="button" class="btn btn-action btn-action-edit"
+                        data-bs-toggle="modal" data-bs-target="#editUserModal"
+                        data-user-id="{{ user.id }}"
+                        data-user-nombre="{{ user.first_name }} {{ user.last_name }}"
+                        data-user-usuario="{{ user.username }}"
+                        data-user-correo="{{ user.email }}"
+                        data-user-staff="{{ user.is_staff }}"
+                        data-user-active="{{ user.is_active }}"
+                        title="Editar usuario">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="btn btn-action btn-action-delete"
+                        onclick="deleteItem('{% url 'delete_user' user.id %}', '{{ user.username|escapejs }}')"
+                        title="Eliminar usuario">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5">
+                <i class="fas fa-users fa-4x text-muted mb-3 d-block"></i>
+                <p class="text-muted mb-0">
+                  {% if search_query %}
+                    No se encontraron usuarios que coincidan con "{{ search_query }}"
+                  {% else %}
+                    No hay usuarios registrados
+                  {% endif %}
+                </p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      {% if users.paginator.num_pages > 1 %}
+      <div class="card-footer bg-white border-top-0">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-muted">
+            Mostrando {{ users.start_index }} - {{ users.end_index }} de {{ paginator.count }} usuarios
+          </div>
+          <nav>
+            <ul class="pagination mb-0">
+              {% if users.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">
+                    <i class="fas fa-angle-double-left"></i>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ users.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                    <i class="fas fa-angle-left"></i>
+                  </a>
+                </li>
+              {% endif %}
+
+              {% for num in users.paginator.page_range %}
+                {% if users.number == num %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                  </li>
+                {% elif num > users.number|add:'-3' and num < users.number|add:'3' %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+
+              {% if users.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ users.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                    <i class="fas fa-angle-right"></i>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                    <i class="fas fa-angle-double-right"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Modal para agregar usuario -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content" style="border-radius: 16px; border: none;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px 16px 0 0;">
+        <h5 class="modal-title">
+          <i class="fas fa-user-plus me-2"></i>Agregar Nuevo Usuario
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="post" action="{% url 'create_user' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label for="nombre" class="form-label fw-bold">
+              <i class="fas fa-id-card me-2 text-muted"></i>Nombre Completo
+            </label>
+            <input type="text" class="form-control search-box" name="nombre" required>
+          </div>
+          <div class="mb-3">
+            <label for="usuario" class="form-label fw-bold">
+              <i class="fas fa-user me-2 text-muted"></i>Usuario
+            </label>
+            <input type="text" class="form-control search-box" name="usuario" required>
+          </div>
+          <div class="mb-3">
+            <label for="correo" class="form-label fw-bold">
+              <i class="fas fa-envelope me-2 text-muted"></i>Correo Electrónico
+            </label>
+            <input type="email" class="form-control search-box" name="correo" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label fw-bold">
+              <i class="fas fa-lock me-2 text-muted"></i>Contraseña
+            </label>
+            <input type="password" class="form-control search-box" name="password" required>
+          </div>
+          <div class="form-check mb-3 p-3" style="background: #F3F4F6; border-radius: 12px;">
+            <input class="form-check-input" type="checkbox" name="is_staff" id="is_staff">
+            <label class="form-check-label fw-bold" for="is_staff">
+              <i class="fas fa-user-shield me-2"></i>Usuario Administrador
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-add">
+            <i class="fas fa-check me-2"></i>Crear Usuario
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar Usuario -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content" style="border-radius: 16px; border: none;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px 16px 0 0;">
+        <h5 class="modal-title">
+          <i class="fas fa-edit me-2"></i>Editar Usuario
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="post" id="editUserForm">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label for="edit-nombre" class="form-label fw-bold">
+              <i class="fas fa-id-card me-2 text-muted"></i>Nombre Completo
+            </label>
+            <input type="text" class="form-control search-box" name="nombre" id="edit-nombre" required>
+          </div>
+          <div class="mb-3">
+            <label for="edit-usuario" class="form-label fw-bold">
+              <i class="fas fa-user me-2 text-muted"></i>Usuario
+            </label>
+            <input type="text" class="form-control search-box" name="usuario" id="edit-usuario" required>
+          </div>
+          <div class="mb-3">
+            <label for="edit-correo" class="form-label fw-bold">
+              <i class="fas fa-envelope me-2 text-muted"></i>Correo Electrónico
+            </label>
+            <input type="email" class="form-control search-box" name="correo" id="edit-correo" required>
+          </div>
+          <div class="mb-3">
+            <label for="edit-password" class="form-label fw-bold">
+              <i class="fas fa-lock me-2 text-muted"></i>Nueva Contraseña (opcional)
+            </label>
+            <input type="password" class="form-control search-box" name="password" id="edit-password">
+            <small class="form-text text-muted">Dejar vacío para mantener la contraseña actual</small>
+          </div>
+          <div class="form-check mb-3 p-3" style="background: #F3F4F6; border-radius: 12px;">
+            <input class="form-check-input" type="checkbox" name="is_staff" id="edit-is_staff">
+            <label class="form-check-label fw-bold" for="edit-is_staff">
+              <i class="fas fa-user-shield me-2"></i>Usuario Administrador
+            </label>
+          </div>
+          <div class="form-check mb-3 p-3" style="background: #F3F4F6; border-radius: 12px;">
+            <input class="form-check-input" type="checkbox" name="is_active" id="edit-is_active">
+            <label class="form-check-label fw-bold" for="edit-is_active">
+              <i class="fas fa-check-circle me-2"></i>Usuario Activo
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-add">
+            <i class="fas fa-save me-2"></i>Actualizar Usuario
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Función para editar usuario
+document.addEventListener('DOMContentLoaded', function() {
+  // Manejar click en botones de editar
+  document.querySelectorAll('[data-bs-target="#editUserModal"]').forEach(button => {
+    button.addEventListener('click', function() {
+      const userId = this.getAttribute('data-user-id');
+      const nombre = this.getAttribute('data-user-nombre');
+      const usuario = this.getAttribute('data-user-usuario');
+      const correo = this.getAttribute('data-user-correo');
+      const isStaff = this.getAttribute('data-user-staff') === 'True';
+      const isActive = this.getAttribute('data-user-active') === 'True';
+
+      // Llenar el formulario
+      document.getElementById('edit-nombre').value = nombre;
+      document.getElementById('edit-usuario').value = usuario;
+      document.getElementById('edit-correo').value = correo;
+      document.getElementById('edit-is_staff').checked = isStaff;
+      document.getElementById('edit-is_active').checked = isActive;
+
+      // Actualizar la acción del formulario
+      document.getElementById('editUserForm').action = `/dashboard/users/edit/${userId}/`;
+    });
+  });
+});
+</script>
+{% endblock %}

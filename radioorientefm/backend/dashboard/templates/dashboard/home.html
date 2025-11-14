@@ -1,0 +1,940 @@
+{% extends 'dashboard/base.html' %}
+{% block page_title %} Dashboard Principal
+{%endblock %}
+
+{% block content %}
+<style>
+    /* Variables CSS para tema claro y oscuro */
+    :root {
+        --home-bg: #f8f9fa;
+        --home-card-bg: #ffffff;
+        --home-card-hover: #f8f9fa;
+        --home-border: #e0e0e0;
+        --home-shadow: rgba(0, 0, 0, 0.08);
+        --home-shadow-hover: rgba(0, 0, 0, 0.15);
+        --home-text-primary: #2c3e50;
+        --home-text-secondary: #6c757d;
+        --home-text-muted: #95a5a6;
+        --home-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --home-gradient-users: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --home-gradient-posts: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --home-gradient-programs: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --home-gradient-subs: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        --home-welcome-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --home-welcome-text: #ffffff;
+    }
+
+    html.dark {
+        --home-bg: #1a1a2e;
+        --home-card-bg: #2d2d3a;
+        --home-card-hover: #363647;
+        --home-border: #404052;
+        --home-shadow: rgba(0, 0, 0, 0.3);
+        --home-shadow-hover: rgba(0, 0, 0, 0.5);
+        --home-text-primary: #e8eaed;
+        --home-text-secondary: #9ca3af;
+        --home-text-muted: #6b7280;
+        --home-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --home-gradient-users: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --home-gradient-posts: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --home-gradient-programs: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --home-gradient-subs: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        --home-welcome-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --home-welcome-text: #ffffff;
+    }
+
+    #home-page {
+        color: var(--home-text-primary);
+    }
+
+    /* Welcome Section - Forzar estilos sobre base.html */
+    #home-page .welcome-card,
+    div#home-page .card.welcome-card {
+        background: var(--home-welcome-bg) !important;
+        background-color: transparent !important;
+        border: none !important;
+        border-radius: 16px !important;
+        box-shadow: 0 4px 15px var(--home-shadow) !important;
+        margin-bottom: 2rem !important;
+        overflow: hidden !important;
+        position: relative !important;
+    }
+
+    #home-page .welcome-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+    }
+
+    #home-page .welcome-card .card-body {
+        padding: 2rem !important;
+        position: relative;
+        z-index: 1;
+    }
+
+    #home-page .welcome-card h2,
+    div#home-page .card.welcome-card .card-body h2 {
+        font-size: 2rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 0.5rem !important;
+        color: #ffffff !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+        opacity: 1 !important;
+        padding: 0 !important;
+    }
+
+    #home-page .welcome-card p,
+    div#home-page .card.welcome-card .card-body p {
+        font-size: 1.1rem !important;
+        margin-bottom: 1.5rem !important;
+        color: #ffffff !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+        opacity: 1 !important;
+        padding: 0 !important;
+    }
+
+    #home-page .welcome-card .quick-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    #home-page .welcome-card .quick-action-btn {
+        background: rgba(255, 255, 255, 0.25) !important;
+        border: 2px solid rgba(255, 255, 255, 0.5) !important;
+        color: white !important;
+        padding: 0.6rem 1.2rem !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        backdrop-filter: blur(10px) !important;
+        text-decoration: none !important;
+    }
+
+    #home-page .welcome-card .quick-action-btn:hover {
+        background: rgba(255, 255, 255, 0.4) !important;
+        border-color: rgba(255, 255, 255, 0.7) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        color: white !important;
+    }
+
+    #home-page .welcome-card .quick-action-btn i {
+        color: white !important;
+    }
+
+    /* Stat Cards con diseño moderno y visual */
+    #home-page .stat-card {
+        background: var(--home-card-bg) !important;
+        border: none !important;
+        border-radius: 16px !important;
+        box-shadow: 0 4px 12px var(--home-shadow) !important;
+        transition: all 0.3s ease !important;
+        overflow: hidden !important;
+        position: relative !important;
+    }
+
+    #home-page .stat-card::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: var(--home-gradient-primary);
+    }
+
+    #home-page .stat-card.users {
+        border-left: 4px solid #667eea !important;
+    }
+
+    #home-page .stat-card.users::before {
+        background: var(--home-gradient-users);
+    }
+
+    #home-page .stat-card.posts {
+        border-left: 4px solid #f5576c !important;
+    }
+
+    #home-page .stat-card.posts::before {
+        background: var(--home-gradient-posts);
+    }
+
+    #home-page .stat-card.programs {
+        border-left: 4px solid #00f2fe !important;
+    }
+
+    #home-page .stat-card.programs::before {
+        background: var(--home-gradient-programs);
+    }
+
+    #home-page .stat-card.subs {
+        border-left: 4px solid #38f9d7 !important;
+    }
+
+    #home-page .stat-card.subs::before {
+        background: var(--home-gradient-subs);
+    }
+
+    #home-page .stat-card:hover {
+        transform: translateY(-8px) !important;
+        box-shadow: 0 12px 28px var(--home-shadow-hover) !important;
+    }
+
+    #home-page .stat-card .card-body {
+        padding: 1.75rem !important;
+    }
+
+    /* Iconos de estadísticas */
+    #home-page .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease !important;
+    }
+
+    #home-page .stat-card.users .stat-icon {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+        color: #667eea !important;
+    }
+
+    #home-page .stat-card.posts .stat-icon {
+        background: linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(245, 87, 108, 0.15) 100%);
+        color: #f5576c !important;
+    }
+
+    #home-page .stat-card.programs .stat-icon {
+        background: linear-gradient(135deg, rgba(79, 172, 254, 0.15) 0%, rgba(0, 242, 254, 0.15) 100%);
+        color: #00f2fe !important;
+    }
+
+    #home-page .stat-card.subs .stat-icon {
+        background: linear-gradient(135deg, rgba(67, 233, 123, 0.15) 0%, rgba(56, 249, 215, 0.15) 100%);
+        color: #38f9d7 !important;
+    }
+
+    #home-page .stat-card:hover .stat-icon {
+        transform: scale(1.1) rotate(-5deg) !important;
+    }
+
+    /* Badge de estadísticas */
+    #home-page .stat-badge .badge {
+        padding: 0.4rem 0.8rem !important;
+        border-radius: 20px !important;
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+    }
+
+    #home-page .stat-card.users .stat-badge .badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+    }
+
+    #home-page .stat-card.posts .stat-badge .badge {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+        color: white !important;
+    }
+
+    #home-page .stat-card.programs .stat-badge .badge {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+        color: white !important;
+    }
+
+    #home-page .stat-card.subs .stat-badge .badge {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+        color: white !important;
+    }
+
+    /* Labels y números */
+    #home-page .stat-label {
+        color: var(--home-text-secondary) !important;
+        font-size: 0.7rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        font-weight: 700 !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    #home-page .stat-number {
+        color: var(--home-text-primary) !important;
+        font-size: 2.25rem !important;
+        font-weight: 800 !important;
+        margin-bottom: 0.5rem !important;
+        line-height: 1 !important;
+    }
+
+    #home-page .stat-trend {
+        color: var(--home-text-muted) !important;
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    #home-page .stat-trend i {
+        font-size: 0.75rem !important;
+    }
+
+    /* Cards generales */
+    #home-page .card {
+        background: var(--home-card-bg) !important;
+        border: 1px solid var(--home-border) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 2px 8px var(--home-shadow) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    #home-page .card:hover {
+        box-shadow: 0 4px 12px var(--home-shadow-hover) !important;
+    }
+
+    #home-page .card-header {
+        background: transparent !important;
+        border-bottom: 1px solid var(--home-border) !important;
+        padding: 1.25rem 1.5rem !important;
+    }
+
+    #home-page .card-header.with-gradient {
+        background: var(--home-gradient-primary) !important;
+        color: white !important;
+        border-bottom: none !important;
+    }
+
+    #home-page .card-title {
+        color: var(--home-text-primary) !important;
+        font-weight: 600 !important;
+        font-size: 1.1rem !important;
+        margin: 0 !important;
+    }
+
+    #home-page .card-header.with-gradient .card-title {
+        color: white !important;
+    }
+
+    #home-page .card-body {
+        padding: 1.5rem !important;
+    }
+
+    /* Table elegante */
+    #home-page .table {
+        color: var(--home-text-primary) !important;
+        margin-bottom: 0 !important;
+    }
+
+    #home-page .table thead th {
+        background: transparent !important;
+        color: var(--home-text-secondary) !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        border-bottom: 2px solid var(--home-border) !important;
+        padding: 1rem !important;
+    }
+
+    #home-page .table tbody td {
+        padding: 1rem !important;
+        vertical-align: middle !important;
+        border-bottom: 1px solid var(--home-border) !important;
+        color: var(--home-text-primary) !important;
+    }
+
+    #home-page .table tbody tr {
+        transition: all 0.2s ease !important;
+    }
+
+    #home-page .table tbody tr:hover {
+        background: var(--home-card-hover) !important;
+    }
+
+    #home-page .table tbody tr:last-child td {
+        border-bottom: none !important;
+    }
+
+    /* Badges elegantes */
+    #home-page .badge {
+        padding: 0.4em 0.8em !important;
+        border-radius: 6px !important;
+        font-weight: 500 !important;
+        font-size: 0.75rem !important;
+    }
+
+    #home-page .badge.bg-success {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+    }
+
+    #home-page .badge.bg-warning {
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%) !important;
+        color: #333 !important;
+    }
+
+    #home-page .badge.bg-primary {
+        background: var(--home-gradient-users) !important;
+    }
+
+    /* Botones elegantes */
+    #home-page .btn {
+        border-radius: 8px !important;
+        padding: 0.6rem 1.2rem !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease !important;
+        border: none !important;
+    }
+
+    #home-page .btn-primary {
+        background: var(--home-gradient-users) !important;
+        color: white !important;
+    }
+
+    #home-page .btn-primary:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+    }
+
+    #home-page .btn-danger {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+        color: white !important;
+    }
+
+    #home-page .btn-danger:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4) !important;
+    }
+
+    #home-page .btn-outline-primary {
+        background: transparent !important;
+        border: 2px solid #667eea !important;
+        color: #667eea !important;
+    }
+
+    html.dark #home-page .btn-outline-primary {
+        color: #8b9aee !important;
+        border-color: #8b9aee !important;
+    }
+
+    #home-page .btn-outline-primary:hover {
+        background: var(--home-gradient-users) !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* Mensajes recientes */
+    #home-page .message-item {
+        padding: 1rem !important;
+        border-bottom: 1px solid var(--home-border) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    #home-page .message-item:last-child {
+        border-bottom: none !important;
+    }
+
+    #home-page .message-item:hover {
+        background: var(--home-card-hover) !important;
+        border-radius: 8px !important;
+    }
+
+    #home-page .message-avatar {
+        background: var(--home-gradient-users) !important;
+        width: 45px !important;
+        height: 45px !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: white !important;
+        font-weight: 600 !important;
+        font-size: 1.1rem !important;
+    }
+
+    #home-page .message-item h6 {
+        color: var(--home-text-primary) !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.25rem !important;
+    }
+
+    #home-page .message-item .small {
+        color: var(--home-text-secondary) !important;
+        font-size: 0.85rem !important;
+    }
+
+    #home-page .message-item small {
+        color: var(--home-text-muted) !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* Empty states */
+    #home-page .text-center.py-4 {
+        padding: 3rem 1.5rem !important;
+    }
+
+    #home-page .text-center i.fa-3x {
+        color: var(--home-text-muted) !important;
+        opacity: 0.5 !important;
+    }
+
+    #home-page .text-muted {
+        color: var(--home-text-muted) !important;
+    }
+
+    /* Calendar card especial */
+    #home-page .calendar-card {
+        background: var(--home-gradient-programs) !important;
+        border: none !important;
+        color: white !important;
+    }
+
+    #home-page .calendar-card .card-title {
+        color: white !important;
+    }
+
+    #home-page .calendar-card .card-text {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    #home-page .calendar-card .btn {
+        background: rgba(255, 255, 255, 0.2) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: white !important;
+        backdrop-filter: blur(10px) !important;
+    }
+
+    #home-page .calendar-card .btn:hover {
+        background: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        #home-page .welcome-card h2 {
+            font-size: 1.5rem !important;
+        }
+
+        #home-page .welcome-card p {
+            font-size: 1rem !important;
+        }
+
+        #home-page .quick-actions {
+            flex-direction: column !important;
+        }
+
+        #home-page .quick-action-btn {
+            width: 100% !important;
+        }
+    }
+</style>
+
+<div id="home-page">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card welcome-card">
+                <div class="card-body">
+                    <h2>¡Bienvenido de vuelta, {{ request.user.get_full_name|default:request.user.username }}! 👋</h2>
+                    <p>Aquí tienes un resumen de tu plataforma de Radio Oriente</p>
+                    <div class="quick-actions">
+                        <a href="{% url 'dashboard_articulos' %}" class="btn quick-action-btn">
+                            <i class="fas fa-plus-circle me-2"></i>Nuevo Artículo
+                        </a>
+                        <a href="{% url 'dashboard_radio' %}" class="btn quick-action-btn">
+                            <i class="fas fa-broadcast-tower me-2"></i>Ver Programas
+                        </a>
+                        <a href="{% url 'dashboard_calendario' %}" class="btn quick-action-btn">
+                            <i class="fas fa-calendar-alt me-2"></i>Calendario
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas principales con diseño mejorado -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card users">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="stat-icon">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                        <div class="stat-badge">
+                            <span class="badge">+{{ new_users_week }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="stat-label">USUARIOS TOTALES</div>
+                        <div class="stat-number">{{ total_users }}</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up me-1"></i>
+                            <span>{{ new_users_week }} nuevos esta semana</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card posts">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="stat-icon">
+                            <i class="fas fa-newspaper fa-2x"></i>
+                        </div>
+                        <div class="stat-badge">
+                            <span class="badge">+{{ new_posts_week }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="stat-label">ARTÍCULOS</div>
+                        <div class="stat-number">{{ total_posts }}</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up me-1"></i>
+                            <span>{{ new_posts_week }} nuevos esta semana</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card programs">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="stat-icon">
+                            <i class="fas fa-broadcast-tower fa-2x"></i>
+                        </div>
+                        <div class="stat-badge">
+                            <span class="badge">Activos</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="stat-label">PROGRAMAS DE RADIO</div>
+                        <div class="stat-number">{{ total_programs }}</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-check-circle me-1"></i>
+                            <span>En transmisión</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card subs">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="stat-icon">
+                            <i class="fas fa-envelope fa-2x"></i>
+                        </div>
+                        <div class="stat-badge">
+                            <span class="badge">+{{ new_messages_week }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="stat-label">SUSCRIPTORES</div>
+                        <div class="stat-number">{{ total_subscriptions }}</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up me-1"></i>
+                            <span>{{ new_messages_week }} mensajes nuevos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="row">
+  <!-- Artículos populares -->
+  <div class="col-lg-8 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-fire text-danger me-2"></i>
+          Artículos Más Populares
+        </h5>
+      </div>
+      <div class="card-body">
+        {% if popular_posts %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Comentarios</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for post in popular_posts %}
+              <tr>
+                <td>
+                  <strong>{{ post.titulo|truncatechars:50 }}</strong>
+                  {% if post.publicado %}
+                  <span class="badge bg-success ms-2">Publicado</span>
+                  {% else %}
+                  <span class="badge bg-warning ms-2">Borrador</span>
+                  {% endif %}
+                </td>
+                <td>{{ post.autor_nombre|default:"Sin autor" }}</td>
+                <td>
+                  <span class="badge bg-primary">{{ post.comment_count }}</span>
+                </td>
+                <td>{{ post.fecha_creacion|date:"d/m/Y" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+          <p class="text-muted">No hay artículos publicados aún</p>
+          <a href="{% url 'dashboard_articulos' %}" class="btn btn-primary">Crear Artículo</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card mt-4 calendar-card">
+      <div class="card-body text-center">
+        <h5 class="card-title mb-3">Calendario de Programación</h5>
+        <p class="card-text small">Revisa los eventos y programas agendados.</p>
+
+        <a href="{% url 'dashboard_calendario' %}" class="btn text-white">
+          <i class="fas fa-calendar-alt me-2"></i>Ir al Calendario
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Mensajes de contacto recientes -->
+  <div class="col-lg-4 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-envelope text-info me-2"></i>
+          Mensajes Recientes
+        </h5>
+      </div>
+      <div class="card-body">
+        {% if recent_contacts %} {% for contact in recent_contacts %}
+        <div class="message-item d-flex align-items-start">
+          <div class="flex-shrink-0">
+            <div class="message-avatar">
+              {{ contact.nombre|first|upper }}
+            </div>
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <h6 class="mb-1">{{ contact.nombre }}</h6>
+            <p class="mb-1 small">
+              {{ contact.mensaje|truncatechars:60 }}
+            </p>
+            <small>{{ contact.fecha_creacion|timesince }} ago</small>
+          </div>
+        </div>
+        {% endfor %}
+        <div class="text-center mt-3">
+          <a href="#" class="btn btn-outline-primary btn-sm">Ver Todos</a>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="fas fa-inbox fa-2x text-muted mb-3"></i>
+          <p class="text-muted">No hay mensajes recientes</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Gráfico de actividad -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="card-title mb-0">
+              <i class="fas fa-chart-line text-success me-2"></i>
+              Actividad Semanal
+            </h5>
+            <p class="text-muted small mb-0 mt-1">Resumen de actividad de los últimos 7 días</p>
+          </div>
+        </div>
+      </div>
+      <div class="card-body" style="height: 400px; padding: 1.5rem;">
+        <canvas id="activityChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Esperar a que todo esté cargado
+window.addEventListener('load', function() {
+  console.log('Iniciando carga del gráfico...');
+
+  // Función para detectar modo oscuro
+  function getChartColors() {
+    const isDark = document.documentElement.classList.contains('dark');
+    return {
+      textColor: isDark ? '#e8eaed' : '#64748b',
+      gridColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+      tooltipBg: isDark ? 'rgba(45, 45, 58, 0.95)' : 'rgba(0, 0, 0, 0.8)'
+    };
+  }
+
+  // Verificar que Chart.js esté disponible
+  if (typeof Chart === 'undefined') {
+    console.error('Chart.js no está cargado');
+    return;
+  }
+
+  // Gráfico de actividad
+  const canvas = document.getElementById("activityChart");
+  if (!canvas) {
+    console.error("No se encontró el canvas activityChart");
+    return;
+  }
+
+  console.log('Canvas encontrado, creando gráfico...');
+  const ctx = canvas.getContext("2d");
+  const colors = getChartColors();
+
+  const activityChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+      datasets: [
+        {
+          label: "Usuarios Nuevos",
+          data: [12, 19, 15, 22, 18, 14, 16],
+          borderColor: "#667eea",
+          backgroundColor: "rgba(102, 126, 234, 0.1)",
+          tension: 0.4,
+          fill: true,
+          borderWidth: 3,
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          pointBackgroundColor: "#667eea",
+          pointBorderColor: "#fff",
+          pointBorderWidth: 2,
+        },
+        {
+          label: "Artículos Publicados",
+          data: [5, 8, 6, 10, 7, 4, 6],
+          borderColor: "#f5576c",
+          backgroundColor: "rgba(245, 87, 108, 0.1)",
+          tension: 0.4,
+          fill: true,
+          borderWidth: 3,
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          pointBackgroundColor: "#f5576c",
+          pointBorderColor: "#fff",
+          pointBorderWidth: 2,
+        },
+        {
+          label: "Mensajes Recibidos",
+          data: [28, 35, 32, 40, 38, 30, 33],
+          borderColor: "#43e97b",
+          backgroundColor: "rgba(67, 233, 123, 0.1)",
+          tension: 0.4,
+          fill: true,
+          borderWidth: 3,
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          pointBackgroundColor: "#43e97b",
+          pointBorderColor: "#fff",
+          pointBorderWidth: 2,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "top",
+          labels: {
+            color: colors.textColor,
+            font: {
+              size: 12,
+              weight: 500
+            },
+            padding: 15
+          }
+        },
+        tooltip: {
+          backgroundColor: colors.tooltipBg,
+          titleColor: '#ffffff',
+          bodyColor: '#ffffff',
+          borderWidth: 1,
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+          padding: 12,
+          cornerRadius: 8
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: colors.gridColor,
+            drawBorder: false
+          },
+          ticks: {
+            color: colors.textColor,
+            font: {
+              size: 11
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: colors.textColor,
+            font: {
+              size: 11
+            }
+          }
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      }
+    },
+  });
+
+  console.log('Gráfico creado exitosamente:', activityChart);
+
+  // Actualizar estadísticas cada 30 segundos
+  setInterval(function () {
+    fetch('{% url "api_dashboard_stats" %}')
+      .then((response) => response.json())
+      .then((data) => {
+        // Actualizar las tarjetas de estadísticas si es necesario
+        console.log("Stats updated:", data);
+      });
+  }, 30000);
+});
+</script>
+{% endblock %}

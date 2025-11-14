@@ -1,0 +1,629 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Ubicaciones de Publicidad - Dashboard{% endblock %}
+{% block page_title %}Ubicaciones de Publicidad{% endblock %}
+
+{% block content %}
+<style>
+    /* Variables CSS para tema claro y oscuro */
+    :root {
+        --ubic-card-bg: #ffffff;
+        --ubic-card-hover: #f8f9fa;
+        --ubic-border: #e0e0e0;
+        --ubic-shadow: rgba(0, 0, 0, 0.05);
+        --ubic-shadow-hover: rgba(0, 0, 0, 0.1);
+        --ubic-text: #2c3e50;
+        --ubic-text-muted: #6c757d;
+    }
+
+    html.dark {
+        --ubic-card-bg: #2d2d3a;
+        --ubic-card-hover: #363647;
+        --ubic-border: #404052;
+        --ubic-shadow: rgba(0, 0, 0, 0.3);
+        --ubic-shadow-hover: rgba(0, 0, 0, 0.5);
+        --ubic-text: #e8eaed;
+        --ubic-text-muted: #9ca3af;
+    }
+
+    /* Cards y tablas con diseño elegante */
+    #ubicaciones-page .card {
+        background: var(--ubic-card-bg) !important;
+        border: 1px solid var(--ubic-border) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 2px 8px var(--ubic-shadow) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    #ubicaciones-page .card:hover {
+        box-shadow: 0 4px 16px var(--ubic-shadow-hover) !important;
+    }
+
+    #ubicaciones-page .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border-bottom: none !important;
+        border-radius: 12px 12px 0 0 !important;
+        padding: 1rem 1.5rem !important;
+    }
+
+    #ubicaciones-page .card-header h5 {
+        color: white !important;
+        font-weight: 600 !important;
+        margin: 0 !important;
+    }
+
+    #ubicaciones-page .card-body {
+        padding: 1.5rem !important;
+    }
+
+    /* Botones principales */
+    #ubicaciones-page .btn-primary,
+    #ubicaciones-page button.btn-primary {
+        background: #667eea !important;
+        border-color: #667eea !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1.2rem !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease !important;
+    }
+
+    #ubicaciones-page .btn-primary:hover,
+    #ubicaciones-page button.btn-primary:hover {
+        background: #5568d3 !important;
+        border-color: #5568d3 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+    }
+
+    #ubicaciones-page .btn-secondary {
+        background: #6c757d !important;
+        border-color: #6c757d !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1.2rem !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease !important;
+    }
+
+    #ubicaciones-page .btn-secondary:hover {
+        background: #5a6268 !important;
+        border-color: #5a6268 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3) !important;
+    }
+
+    /* Tablas */
+    #ubicaciones-page .table {
+        color: var(--ubic-text) !important;
+        margin-bottom: 0 !important;
+    }
+
+    #ubicaciones-page .table thead th {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+        color: #495057 !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        font-size: 0.85rem !important;
+        letter-spacing: 0.5px !important;
+        padding: 1rem !important;
+        border: none !important;
+    }
+
+    html.dark #ubicaciones-page .table thead th {
+        background: linear-gradient(135deg, #363647 0%, #2d2d3a 100%) !important;
+        color: #e8eaed !important;
+    }
+
+    #ubicaciones-page .table tbody tr {
+        transition: all 0.2s ease !important;
+        border-bottom: 1px solid var(--ubic-border) !important;
+    }
+
+    #ubicaciones-page .table tbody tr:hover {
+        background: var(--ubic-card-hover) !important;
+        transform: scale(1.01) !important;
+    }
+
+    #ubicaciones-page .table tbody td {
+        padding: 1rem !important;
+        vertical-align: middle !important;
+        color: var(--ubic-text) !important;
+    }
+
+    /* Badges */
+    #ubicaciones-page .badge {
+        padding: 0.4rem 0.8rem !important;
+        border-radius: 6px !important;
+        font-weight: 500 !important;
+        font-size: 0.85rem !important;
+    }
+
+    #ubicaciones-page .badge.bg-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    }
+
+    #ubicaciones-page .badge.bg-secondary {
+        background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+    }
+
+    /* Botones de acción en tabla */
+    #ubicaciones-page .btn-sm {
+        padding: 0.4rem 0.8rem !important;
+        border-radius: 6px !important;
+        font-size: 0.875rem !important;
+        transition: all 0.2s ease !important;
+    }
+
+    #ubicaciones-page .btn-outline-primary {
+        color: #667eea !important;
+        border-color: #667eea !important;
+    }
+
+    #ubicaciones-page .btn-outline-primary:hover {
+        background: #667eea !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+    }
+
+    #ubicaciones-page .btn-outline-secondary {
+        color: #6c757d !important;
+        border-color: #6c757d !important;
+    }
+
+    #ubicaciones-page .btn-outline-secondary:hover {
+        background: #6c757d !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+    }
+
+    #ubicaciones-page .btn-outline-danger {
+        color: #ef4444 !important;
+        border-color: #ef4444 !important;
+    }
+
+    #ubicaciones-page .btn-outline-danger:hover {
+        background: #ef4444 !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* Paginación */
+    #ubicaciones-page .pagination {
+        margin: 0 !important;
+    }
+
+    #ubicaciones-page .page-link {
+        color: #667eea !important;
+        border: 1px solid var(--ubic-border) !important;
+        background: var(--ubic-card-bg) !important;
+        padding: 0.5rem 0.75rem !important;
+        margin: 0 0.25rem !important;
+        border-radius: 6px !important;
+        transition: all 0.2s ease !important;
+    }
+
+    #ubicaciones-page .page-link:hover {
+        background: #667eea !important;
+        color: white !important;
+        border-color: #667eea !important;
+        transform: translateY(-2px) !important;
+    }
+
+    #ubicaciones-page .page-item.active .page-link {
+        background: #667eea !important;
+        border-color: #667eea !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+
+    #ubicaciones-page .page-item.disabled .page-link {
+        opacity: 0.5 !important;
+        cursor: not-allowed !important;
+    }
+
+    /* Card footer para paginación */
+    #ubicaciones-page .card-footer {
+        background: var(--ubic-card-bg) !important;
+        border-top: 1px solid var(--ubic-border) !important;
+        border-radius: 0 0 12px 12px !important;
+        padding: 1rem 1.5rem !important;
+    }
+
+    /* Texto muted */
+    #ubicaciones-page .text-muted {
+        color: var(--ubic-text-muted) !important;
+    }
+
+    /* Code elements */
+    #ubicaciones-page code {
+        background: #f1f5f9 !important;
+        color: #667eea !important;
+        padding: 0.2rem 0.5rem !important;
+        border-radius: 4px !important;
+        font-size: 0.9rem !important;
+    }
+
+    html.dark #ubicaciones-page code {
+        background: #1e1e2e !important;
+        color: #a5b4fc !important;
+    }
+</style>
+
+<div id="ubicaciones-page">
+<div class="container-fluid">
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Ubicaciones de Publicidad</h5>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ubicacionModal">
+                        <i class="fas fa-plus me-2"></i>Nueva Ubicación
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Tipo</th>
+                                    <th>Dimensiones</th>
+                                    <th>Precio Mensual</th>
+                                    <th>Estado</th>
+                                    <th>Orden</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ubicacion in ubicaciones %}
+                                <tr>
+                                    <td>#{{ ubicacion.id }}</td>
+                                    <td>{{ ubicacion.nombre }}</td>
+                                    <td>{{ ubicacion.tipo.nombre }}</td>
+                                    <td>{{ ubicacion.dimensiones }}</td>
+                                    <td>${{ ubicacion.precio_mensual|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge {% if ubicacion.activo %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {{ ubicacion.activo|yesno:"Activo,Inactivo" }}
+                                        </span>
+                                    </td>
+                                    <td>{{ ubicacion.orden }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" 
+                                                onclick="editarUbicacion({{ ubicacion.id }}, '{{ ubicacion.nombre|escapejs }}', 
+                                                         {{ ubicacion.tipo.id }}, '{{ ubicacion.tipo.nombre|escapejs }}', '{{ ubicacion.descripcion|escapejs }}',
+                                                         '{{ ubicacion.dimensiones|escapejs }}', {{ ubicacion.precio_mensual }},
+                                                         {{ ubicacion.orden }}, {{ ubicacion.activo|lower }});">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <form method="post" style="display:inline-block; margin-left:6px;" onsubmit="return confirm('¿Eliminar esta ubicación?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="form_type" value="delete_ubicacion">
+                                            <input type="hidden" name="ubicacion_id" value="{{ ubicacion.id }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" {% if ubicacion.items_count > 0 %}disabled title="No se puede eliminar: tiene elementos asociados"{% endif %}>
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted">
+                                        No hay ubicaciones de publicidad configuradas.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Paginación Ubicaciones -->
+                {% if ubicaciones.has_other_pages %}
+                <div class="card-footer">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0">
+                            {% if ubicaciones.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?ubicaciones_page={{ ubicaciones.previous_page_number }}{% if request.GET.tipos_page %}&tipos_page={{ request.GET.tipos_page }}{% endif %}">Anterior</a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in ubicaciones.paginator.page_range %}
+                                {% if ubicaciones.number == num %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% elif num > ubicaciones.number|add:'-3' and num < ubicaciones.number|add:'3' %}
+                                    <li class="page-item"><a class="page-link" href="?ubicaciones_page={{ num }}{% if request.GET.tipos_page %}&tipos_page={{ request.GET.tipos_page }}{% endif %}">{{ num }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if ubicaciones.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?ubicaciones_page={{ ubicaciones.next_page_number }}{% if request.GET.tipos_page %}&tipos_page={{ request.GET.tipos_page }}{% endif %}">Siguiente</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt-4">
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Tipos de Ubicación</h5>
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#tipoModal" id="nuevoTipoBtn">
+                        <i class="fas fa-plus me-2"></i>Nuevo Tipo
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for t in tipos_ubicacion_all %}
+                                <tr>
+                                    <td>#{{ t.id }}</td>
+                                    <td><code>{{ t.codigo }}</code></td>
+                                    <td>{{ t.nombre }}</td>
+                                    <td>
+                                        <span class="badge {% if t.activo %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {{ t.activo|yesno:"Activo,Inactivo" }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-secondary" 
+                                            onclick="editarTipo({{ t.id }}, '{{ t.nombre|escapejs }}', '{{ t.codigo|escapejs }}', '{{ t.descripcion|escapejs }}', {{ t.activo|lower }})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <form method="post" style="display:inline-block; margin-left:6px;" onsubmit="return confirm('¿Eliminar este tipo de ubicación?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="form_type" value="delete_tipo">
+                                            <input type="hidden" name="tipo_id" value="{{ t.id }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" {% if t.ubicaciones_count > 0 %}disabled title="No se puede eliminar: tiene ubicaciones asociadas"{% endif %}>
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No hay tipos de ubicación. Crea uno nuevo.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Paginación Tipos de Ubicación -->
+                {% if tipos_ubicacion_all.has_other_pages %}
+                <div class="card-footer">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0">
+                            {% if tipos_ubicacion_all.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?tipos_page={{ tipos_ubicacion_all.previous_page_number }}{% if request.GET.ubicaciones_page %}&ubicaciones_page={{ request.GET.ubicaciones_page }}{% endif %}">Anterior</a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in tipos_ubicacion_all.paginator.page_range %}
+                                {% if tipos_ubicacion_all.number == num %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% elif num > tipos_ubicacion_all.number|add:'-3' and num < tipos_ubicacion_all.number|add:'3' %}
+                                    <li class="page-item"><a class="page-link" href="?tipos_page={{ num }}{% if request.GET.ubicaciones_page %}&ubicaciones_page={{ request.GET.ubicaciones_page }}{% endif %}">{{ num }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if tipos_ubicacion_all.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?tipos_page={{ tipos_ubicacion_all.next_page_number }}{% if request.GET.ubicaciones_page %}&ubicaciones_page={{ request.GET.ubicaciones_page }}{% endif %}">Siguiente</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear/editar ubicación -->
+<div class="modal fade" id="ubicacionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="ubicacionForm" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="ubicacion_id" id="ubicacionId">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Nueva Ubicación de Publicidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tipo" class="form-label">Tipo de Ubicación</label>
+                        <select class="form-select" id="tipo" name="tipo" required>
+                            <option value="">Seleccione un tipo...</option>
+                            {% for tipo in tipos_ubicacion %}
+                            <option value="{{ tipo.id }}">{{ tipo.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="2"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="dimensiones" class="form-label">Dimensiones (ej: 728x90)</label>
+                            <input type="text" class="form-control" id="dimensiones" name="dimensiones" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="precio_mensual" class="form-label">Precio Mensual</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="precio_mensual" 
+                                       name="precio_mensual" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="orden" class="form-label">Orden</label>
+                            <input type="number" class="form-control" id="orden" name="orden" min="0" value="0">
+                        </div>
+                        <div class="col-md-6 mb-3 d-flex align-items-end">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="activo" name="activo" checked>
+                                <label class="form-check-label" for="activo">Activo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear/editar Tipo de Ubicación -->
+<div class="modal fade" id="tipoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="tipoForm" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="tipo">
+                <input type="hidden" name="tipo_id" id="tipoId">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tipoModalTitle">Nuevo Tipo de Ubicación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="tipo_nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="tipo_nombre" name="tipo_nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tipo_codigo" class="form-label">Código</label>
+                        <input type="text" class="form-control" id="tipo_codigo" name="tipo_codigo" placeholder="ej: banner_principal" required>
+                        <div class="form-text">Minúsculas, sin espacios; usa guiones bajos.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tipo_descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="tipo_descripcion" name="tipo_descripcion" rows="2"></textarea>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="tipo_activo" name="tipo_activo" checked>
+                        <label class="form-check-label" for="tipo_activo">Activo</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div><!-- Close ubicaciones-page wrapper -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Función para abrir el modal de edición
+function editarUbicacion(id, nombre, tipoId, tipoNombre, descripcion, dimensiones, precioMensual, orden, activo) {
+    const modal = new bootstrap.Modal(document.getElementById('ubicacionModal'));
+    const form = document.getElementById('ubicacionForm');
+    
+    // Actualizar el título del modal
+    document.getElementById('modalTitle').textContent = 'Editar Ubicación de Publicidad';
+    
+    // Llenar el formulario con los datos de la ubicación
+    document.getElementById('ubicacionId').value = id;
+    document.getElementById('nombre').value = nombre || '';
+    document.getElementById('tipo').value = tipoId || '';
+    document.getElementById('descripcion').value = descripcion || '';
+    document.getElementById('dimensiones').value = dimensiones || '';
+    document.getElementById('precio_mensual').value = precioMensual || '0';
+    document.getElementById('orden').value = orden || '0';
+    document.getElementById('activo').checked = activo;
+    
+    // Mostrar el modal
+    modal.show();
+}
+
+// Manejar el envío del formulario
+document.getElementById('ubicacionForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    this.submit();
+});
+
+// Configurar el modal para nuevo registro
+document.querySelector('[data-bs-target="#ubicacionModal"]').addEventListener('click', function() {
+    // Resetear el formulario
+    document.getElementById('ubicacionForm').reset();
+    document.getElementById('modalTitle').textContent = 'Nueva Ubicación de Publicidad';
+    document.getElementById('ubicacionId').value = '';
+    document.getElementById('activo').checked = true;
+    document.getElementById('orden').value = '0';
+    
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('ubicacionModal'));
+    modal.show();
+});
+
+// Función para abrir el modal de Tipo en modo edición
+function editarTipo(id, nombre, codigo, descripcion, activo) {
+    const modal = new bootstrap.Modal(document.getElementById('tipoModal'));
+    document.getElementById('tipoModalTitle').textContent = 'Editar Tipo de Ubicación';
+    document.getElementById('tipoId').value = id;
+    document.getElementById('tipo_nombre').value = nombre || '';
+    document.getElementById('tipo_codigo').value = codigo || '';
+    document.getElementById('tipo_codigo').readOnly = true; // mantener inmutable al editar
+    document.getElementById('tipo_descripcion').value = descripcion || '';
+    document.getElementById('tipo_activo').checked = !!activo;
+    modal.show();
+}
+
+// Configurar el modal de Tipo para nuevo registro
+document.getElementById('nuevoTipoBtn').addEventListener('click', function() {
+    document.getElementById('tipoForm').reset();
+    document.getElementById('tipoModalTitle').textContent = 'Nuevo Tipo de Ubicación';
+    document.getElementById('tipoId').value = '';
+    document.getElementById('tipo_codigo').readOnly = false;
+    document.getElementById('tipo_activo').checked = true;
+});
+
+// Submit del formulario de tipo (directo)
+document.getElementById('tipoForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    this.submit();
+});
+</script>
+{% endblock %}

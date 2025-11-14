@@ -1,0 +1,51 @@
+.contenedor-barra-progreso {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 9998;
+  overflow: hidden;
+}
+
+.barra-progreso {
+  height: 100%;
+  background: #ff0000;
+  box-shadow:
+    0 0 5px #ff0000,
+    0 0 10px #ff0000,
+    0 0 15px #ff0000,
+    0 0 20px #ff0000,
+    0 0 35px #ff0000,
+    0 0 40px #ff0000,
+    0 0 50px #ff0000,
+    0 0 75px #ff0000;
+  animation: resplandorNeon 1.5s ease-in-out infinite alternate;
+  transition: width 0.1s ease-out;
+}
+
+@keyframes resplandorNeon {
+  from {
+    box-shadow:
+      0 0 2px #ff0000,
+      0 0 4px #ff0000,
+      0 0 6px #ff0000,
+      0 0 8px #ff0000,
+      0 0 10px #ff0000,
+      0 0 12px #ff0000,
+      0 0 14px #ff0000,
+      0 0 16px #ff0000;
+  }
+  to {
+    box-shadow:
+      0 0 3px #ff0000,
+      0 0 6px #ff0000,
+      0 0 9px #ff0000,
+      0 0 12px #ff0000,
+      0 0 15px #ff0000,
+      0 0 18px #ff0000,
+      0 0 21px #ff0000,
+      0 0 24px #ff0000;
+  }
+}
