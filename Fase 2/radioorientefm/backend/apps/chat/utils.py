@@ -1,40 +1,42 @@
-"""
-Utilidades para análisis de contenido con Machine Learning
-"""
+"""utilidades para analisis de contenido con machine learning"""
+import os
 import re
 from typing import Dict, Tuple
-from detoxify import Detoxify
 from .models import ContentFilterConfig, PalabraProhibida, InfraccionUsuario
 
 
 class ContentAnalyzer:
-    """
-    Analizador de contenido con ML para detectar mensajes ofensivos
-    """
+    """analizador de contenido con ml para detectar mensajes ofensivos"""
 
     def __init__(self):
-        """Inicializar modelo ML de detoxify para español"""
-        try:
-            # Usar modelo multilingüe que incluye español
-            self.model = Detoxify('multilingual')
-        except Exception as e:
-            print(f"Error al cargar modelo Detoxify: {e}")
+        """inicializar modelo ml de detoxify para español"""
+        #detectar si esta en Render
+        disable_detoxify = os.getenv('DISABLE_DETOXIFY', 'false').lower() == 'true'
+        is_render = os.getenv('RENDER', 'false').lower() == 'true'
+        
+        #desactivar Detoxify en Render automáticamente o si está configurado
+        if disable_detoxify or is_render:
+            print("Detoxify desactivado (Render o configuración manual)")
             self.model = None
+            self.disabled = True
+        else:
+            #solo cargar en localhost
+            try:
+                from detoxify import Detoxify
+                print("Cargando modelo Detoxify para análisis de toxicidad...")
+                self.model = Detoxify('multilingual')
+                self.disabled = False
+                print("Detoxify cargado exitosamente")
+            except Exception as e:
+                print(f"Error al cargar modelo Detoxify: {e}")
+                self.model = None
+                self.disabled = True
 
     def analyze_message(self, contenido: str, id_usuario: int, usuario_nombre: str) -> Dict:
-        """
-        Analizar mensaje y determinar si debe ser bloqueado
-
-        Returns:
-            dict con:
-                - allowed: bool - si el mensaje puede publicarse
-                - reason: str - razón del bloqueo (si aplica)
-                - score: float - score de toxicidad (0.0 - 1.0)
-                - infraction_type: str - tipo de infracción
-        """
+        """analizar mensaje y determinar si debe ser bloqueado returns: dict con: - allowed: bool - si el mensaje puede publicarse - reason: str - razón del bloqueo (si aplica) - score: float - score de toxicidad (0.0 - 1.0) - infraction_type: str - tipo de infracción"""
         config = ContentFilterConfig.get_config()
 
-        # Si el filtro está desactivado, permitir todo
+        #si el filtro está desactivado, permitir todo
         if not config.activo:
             return {
                 'allowed': True,
@@ -43,7 +45,7 @@ class ContentAnalyzer:
                 'infraction_type': None
             }
 
-        # 1. Verificar enlaces (si está activado)
+        #1. verificar enlaces (si está activado)
         if config.bloquear_enlaces:
             if self._contains_links(contenido):
                 self._register_infraction(
@@ -57,7 +59,7 @@ class ContentAnalyzer:
                     'infraction_type': 'enlace_prohibido'
                 }
 
-        # 2. Verificar palabras prohibidas personalizadas
+        #2. verificar palabras prohibidas personalizadas
         palabra_encontrada = self._check_prohibited_words(contenido)
         if palabra_encontrada:
             self._register_infraction(
@@ -71,7 +73,7 @@ class ContentAnalyzer:
                 'infraction_type': 'palabra_prohibida'
             }
 
-        # 3. Análisis ML de toxicidad
+        #3. analisis ml de toxicidad
         toxicity_score = self._analyze_toxicity(contenido)
 
         if toxicity_score >= config.umbral_toxicidad:
@@ -80,7 +82,7 @@ class ContentAnalyzer:
                 'toxicidad_ml', toxicity_score, config.modo_accion
             )
 
-            # Verificar si debe bloquearse automáticamente
+            #verificar si debe bloquearse automáticamente
             if self._should_auto_block(id_usuario, config):
                 return {
                     'allowed': False,
@@ -106,7 +108,7 @@ class ContentAnalyzer:
                     'warning': f'Advertencia: Tu mensaje ha sido marcado como potencialmente ofensivo (score: {toxicity_score:.2f})'
                 }
 
-        # Mensaje limpio
+        #mensaje limpio
         return {
             'allowed': True,
             'reason': None,
@@ -115,7 +117,7 @@ class ContentAnalyzer:
         }
 
     def _contains_links(self, text: str) -> bool:
-        """Detectar si el texto contiene URLs"""
+        """detectar si el texto contiene urls"""
         url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
         www_pattern = r'www\.[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
 
@@ -123,12 +125,12 @@ class ContentAnalyzer:
                    re.search(www_pattern, text, re.IGNORECASE))
 
     def _check_prohibited_words(self, text: str) -> bool:
-        """Verificar si el texto contiene palabras prohibidas"""
+        """verificar si el texto contiene palabras prohibidas"""
         palabras = PalabraProhibida.objects.filter(activa=True)
         text_lower = text.lower()
 
         for palabra_obj in palabras:
-            # Buscar palabra completa (no como substring)
+            #buscar palabra completa (no como substring)
             pattern = r'\b' + re.escape(palabra_obj.palabra.lower()) + r'\b'
             if re.search(pattern, text_lower):
                 return True
@@ -136,21 +138,16 @@ class ContentAnalyzer:
         return False
 
     def _analyze_toxicity(self, text: str) -> float:
-        """
-        Analizar toxicidad del texto usando modelo ML
-
-        Returns:
-            float: Score de toxicidad (0.0 - 1.0)
-        """
+        """analizar toxicidad del texto usando modelo ml returns: float: score de toxicidad (0.0 - 1.0)"""
         if not self.model:
             return 0.0
 
         try:
             results = self.model.predict(text)
 
-            # Detoxify devuelve múltiples categorías:
-            # toxicity, severe_toxicity, obscene, threat, insult, identity_attack
-            # Usamos el máximo score de todas las categorías
+            #detoxify devuelve múltiples categorias
+            #toxicity, severe_toxicity, obscene, threat, insult, identity_attack
+            #usamos el máximo score de todas las categorias
             max_score = max([
                 results.get('toxicity', 0),
                 results.get('severe_toxicity', 0),
@@ -168,7 +165,7 @@ class ContentAnalyzer:
 
     def _register_infraction(self, id_usuario: int, usuario_nombre: str,
                            mensaje: str, tipo: str, score: float, accion: str):
-        """Registrar infracción en la base de datos"""
+        """registrar infracción en la base de datos"""
         try:
             InfraccionUsuario.objects.create(
                 usuario_id=id_usuario,
@@ -182,16 +179,13 @@ class ContentAnalyzer:
             print(f"Error al registrar infracción: {e}")
 
     def _should_auto_block(self, id_usuario: int, config: ContentFilterConfig) -> bool:
-        """
-        Verificar si el usuario debe ser bloqueado automáticamente
-        por acumular demasiadas infracciones
-        """
+        """verificar si el usuario debe ser bloqueado automáticamente por acumular demasiadas infracciones"""
         infracciones_count = InfraccionUsuario.objects.filter(
             usuario_id=id_usuario
         ).count()
 
         if infracciones_count >= config.strikes_para_bloqueo:
-            # Bloquear usuario automáticamente
+            #bloquear usuario automáticamente
             try:
                 from django.conf import settings
                 from django.apps import apps
@@ -207,5 +201,5 @@ class ContentAnalyzer:
         return False
 
 
-# Instancia global del analizador
+#instancia global del analizador
 content_analyzer = ContentAnalyzer()

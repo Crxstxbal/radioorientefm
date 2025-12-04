@@ -7,46 +7,47 @@ from .serializers import PaisSerializer, CiudadSerializer, ComunaSerializer, Com
 import requests
 from django.db import transaction
 
-# Helpers para consultar API externa DIVPA con fallback
+#helpers para consultar api externa divpa con fallback
 DIVPA_BASE = "https://apis.digital.gob.cl/dpa"
 
 def _fetch_divpa_regiones():
-    """Obtiene regiones desde API DIVPA. Lanza excepción si falla."""
+    """obtiene regiones desde api divpa"""
     url = f"{DIVPA_BASE}/regiones" 
-    # NOTA: Se elimina verify=False para mayor seguridad en producción.
+    #se elimina verify=false para mayor seguridad en producción
     resp = requests.get(url, timeout=15)
     resp.raise_for_status()
     return resp.json()
 
 def _fetch_divpa_comunas_por_region(codigo_region):
-    """Obtiene comunas por código de región desde API DIVPA. Lanza excepción si falla."""
+    """obtiene comunas por codigo de region desde api divpa"""
     url = f"{DIVPA_BASE}/regiones/{codigo_region}/comunas"
-    # NOTA: Se elimina verify=False para mayor seguridad en producción.
+    #se elimina verify=false para mayor seguridad en producción
     resp = requests.get(url, timeout=15)
     resp.raise_for_status()
     return resp.json()
 
 class PaisViewSet(viewsets.ModelViewSet):
-    """ViewSet para países"""
+    """viewset para países"""
     queryset = Pais.objects.all()
     serializer_class = PaisSerializer
     permission_classes = [permissions.AllowAny]
     
     @action(detail=False, methods=['post'])
     def reiniciar_datos_chile(self, request):
-        """Limpia y recarga todos los datos de Chile desde la API externa DIVPA."""
+        """limpia y recarga todos los datos de chile desde la api externa divpa"""
         try:
             with transaction.atomic():
-                # Eliminar datos de ubicación existentes para Chile
-                Pais.objects.filter(nombre='Chile').delete() # Esto eliminará en cascada Ciudades y Comunas
+                #eliminar datos de ubicacion existentes para chile y recrear
+                #esto eliminará en cascada ciudades y comunas
+                Pais.objects.filter(nombre='Chile').delete()
                 
-                # Crear Chile
+                #crear chile
                 chile = Pais.objects.create(nombre='Chile')
                 
                 regiones_creadas = 0
                 comunas_creadas = 0
                 
-                # Cargar regiones desde la API
+                #cargar regiones desde la api
                 regiones_data = _fetch_divpa_regiones()
                 
                 for region_data in regiones_data:
@@ -56,7 +57,7 @@ class PaisViewSet(viewsets.ModelViewSet):
                     if not nombre_region or not codigo_region:
                         continue
 
-                    # Crear región como Ciudad
+                    #crear región como ciudad
                     ciudad, created = Ciudad.objects.get_or_create(
                         nombre=nombre_region,
                         pais=chile
@@ -64,7 +65,7 @@ class PaisViewSet(viewsets.ModelViewSet):
                     if created:
                         regiones_creadas += 1
                     
-                    # Cargar comunas para esta región desde la API
+                    #cargar comunas para esta región desde la api
                     comunas_data = _fetch_divpa_comunas_por_region(codigo_region)
                     for comuna_data in comunas_data:
                         nombre_comuna = comuna_data.get('nombre')
@@ -94,14 +95,14 @@ class PaisViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CiudadViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet para ciudades (solo lectura)"""
+    """viewset para ciudades (solo lectura)"""
     queryset = Ciudad.objects.select_related('pais').all()
     serializer_class = CiudadSerializer
-    permission_classes = [permissions.AllowAny] # Permite que cualquiera consulte las ciudades
+    permission_classes = [permissions.AllowAny]  #permite que cualquiera consulte las ciudades
     
     @action(detail=False, methods=['get'])
     def por_pais(self, request):
-        """Obtener ciudades por país directamente desde la base de datos."""
+        """obtener ciudades por país directamente desde la base de datos"""
         pais_id = request.query_params.get('pais_id')
         if pais_id:
             ciudades = self.queryset.filter(pais_id=pais_id)
@@ -111,16 +112,16 @@ class CiudadViewSet(viewsets.ReadOnlyModelViewSet):
     
     @action(detail=False, methods=['post'])
     def cargar_desde_api(self, request):
-        """Cargar regiones de Chile desde API externa y guardar en BD"""
+        """cargar regiones de chile desde api externa y guardar en bd"""
         try:
-            # API pública de regiones de Chile
+            #api pública de regiones de chile
             api_url = "https://apis.digital.gob.cl/dpa/regiones"
             response = requests.get(api_url, timeout=10)
             response.raise_for_status()
             
             regiones_data = response.json()
             
-            # Obtener o crear Chile
+            #obtener o crear chile
             chile, _ = Pais.objects.get_or_create(nombre='Chile')
             
             ciudades_creadas = 0
@@ -150,14 +151,14 @@ class CiudadViewSet(viewsets.ReadOnlyModelViewSet):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ComunaViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet para comunas (solo lectura)"""
+    """viewset para comunas (solo lectura)"""
     queryset = Comuna.objects.select_related('ciudad__pais').all()
     serializer_class = ComunaSerializer
     permission_classes = [permissions.AllowAny]
     
     @action(detail=False, methods=['get'])
     def por_ciudad(self, request):
-        """Obtener comunas por ciudad directamente desde la base de datos."""
+        """obtener comunas por ciudad directamente desde la base de datos"""
         ciudad_id = request.query_params.get('ciudad_id')
         if ciudad_id:
             comunas = self.queryset.filter(ciudad_id=ciudad_id)
@@ -167,16 +168,16 @@ class ComunaViewSet(viewsets.ReadOnlyModelViewSet):
     
     @action(detail=False, methods=['post'])
     def cargar_desde_api(self, request):
-        """Cargar comunas de Chile desde API externa y guardar en BD"""
+        """cargar comunas de chile desde api externa y guardar en bd"""
         try:
-            # API pública de regiones de Chile
+            #api pública de regiones de chile
             api_url = "https://apis.digital.gob.cl/dpa/regiones"
             response = requests.get(api_url, timeout=10)
             response.raise_for_status()
             
             regiones_data = response.json()
             
-            # Obtener Chile
+            #obtener chile
             chile = Pais.objects.get(nombre='Chile')
             
             comunas_creadas = 0
@@ -190,13 +191,13 @@ class ComunaViewSet(viewsets.ReadOnlyModelViewSet):
                     if not codigo_region or not nombre_region:
                         continue
                     
-                    # Obtener o crear la región como ciudad
+                    #obtener o crear la región como ciudad
                     ciudad, _ = Ciudad.objects.get_or_create(
                         nombre=nombre_region,
                         pais=chile
                     )
                     
-                    # Obtener comunas de esta región
+                    #obtener comunas de esta región
                     comunas_url = f"https://apis.digital.gob.cl/dpa/regiones/{codigo_region}/comunas"
                     comunas_response = requests.get(comunas_url, timeout=10)
                     comunas_response.raise_for_status()

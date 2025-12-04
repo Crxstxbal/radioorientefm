@@ -2,10 +2,13 @@ from django.db import models
 from django.conf import settings
 
 class EstacionRadio(models.Model):
-    """Estación de radio normalizada"""
+    """estación de radio normalizada"""
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
     stream_url = models.URLField(max_length=500, blank=True, null=True)
+    live_stream_url = models.URLField(max_length=500, blank=True, null=True, 
+                                    verbose_name='URL de transmisión en vivo',
+                                    help_text='URL de YouTube, Facebook Live u otra plataforma para transmisión en vivo')
     telefono = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(max_length=254, blank=True, null=True)
     direccion = models.TextField(blank=True, null=True)
@@ -22,7 +25,7 @@ class EstacionRadio(models.Model):
         return self.nombre
 
 class GeneroMusical(models.Model):
-    """Géneros musicales normalizados"""
+    """géneros musicales normalizados"""
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.TextField(blank=True, null=True)
     
@@ -35,7 +38,7 @@ class GeneroMusical(models.Model):
         return self.nombre
 
 class Conductor(models.Model):
-    """Conductores de programas"""
+    """conductores de programas"""
     nombre = models.CharField(max_length=150)
     apellido = models.CharField(max_length=150)
     apodo = models.CharField(max_length=150, blank=True, null=True)
@@ -56,13 +59,16 @@ class Conductor(models.Model):
         return f"{self.nombre} {self.apellido}"
 
 class Programa(models.Model):
-    """Programas de radio normalizados"""
+    """programas de radio normalizados"""
     estacion = models.ForeignKey(
-        EstacionRadio, 
-        on_delete=models.SET_NULL,  # No eliminar programas si se elimina la estación
+        EstacionRadio,
+        on_delete=models.SET_NULL,
+        #no eliminar programas si se elimina la estación
         related_name='programas',
-        null=True,                  # Permite valores nulos temporalmente
-        blank=True,                 # Permite que el campo esté en blanco en formularios
+                  #permite valores nulos temporalmente
+        null=True,
+                 #permite que el campo esté en blanco en formularios
+        blank=True,
         help_text='Este campo se completará automáticamente con la estación de radio existente.'
     )
     nombre = models.CharField(max_length=100)
@@ -71,7 +77,7 @@ class Programa(models.Model):
     activo = models.BooleanField(default=True)
     
     def save(self, *args, **kwargs):
-        # Si no hay una estación asignada, asigna la primera estación disponible
+        #si no hay una estación asignada, asigna la primera estación disponible
         if not self.estacion_id:
             estacion = EstacionRadio.objects.first()
             if estacion:
@@ -87,7 +93,7 @@ class Programa(models.Model):
         return self.nombre
 
     def get_dias_display(self):
-        """Retorna los días de la semana en formato legible"""
+        """retorna los días de la semana en formato legible"""
         dias_map = {
             0: 'Dom', 1: 'Lun', 2: 'Mar', 3: 'Mié',
             4: 'Jue', 5: 'Vie', 6: 'Sáb'
@@ -99,14 +105,14 @@ class Programa(models.Model):
         return ", ".join(dias)
 
     def get_horario_display(self):
-        """Retorna el horario en formato legible"""
+        """retorna el horario en formato legible"""
         horarios = self.horarios.filter(activo=True).first()
         if not horarios:
             return "Sin horario"
         return f"{horarios.hora_inicio.strftime('%H:%M')} - {horarios.hora_fin.strftime('%H:%M')}"
 
 class ProgramaConductor(models.Model):
-    """Relación muchos a muchos entre programas y conductores"""
+    """relación muchos a muchos entre programas y conductores"""
     programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name='conductores')
     conductor = models.ForeignKey(Conductor, on_delete=models.CASCADE, related_name='programas')
     
@@ -120,7 +126,7 @@ class ProgramaConductor(models.Model):
         return f"{self.programa.nombre} - {self.conductor}"
 
 class HorarioPrograma(models.Model):
-    """Horarios de programas"""
+    """horarios de programas"""
     programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name='horarios')
     dia_semana = models.IntegerField(
         choices=[
@@ -144,7 +150,7 @@ class HorarioPrograma(models.Model):
         return f"{self.programa.nombre} - {day_name} {self.hora_inicio}-{self.hora_fin}"
 
 class ReproduccionRadio(models.Model):
-    """Seguimiento de reproducciones únicas de la radio"""
+    """seguimiento de reproducciones únicas de la radio"""
     estacion = models.ForeignKey(EstacionRadio, on_delete=models.CASCADE, related_name='reproducciones')
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reproducciones_radio')
     fecha_reproduccion = models.DateTimeField(auto_now_add=True)

@@ -26,18 +26,18 @@ const Pagination = ({
 
   const pageSizeOptions = [10, 20, 50, 100];
 
-  // Generar array de números de página a mostrar
+  //generar array de números de página a mostrar
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
 
     if (totalPages <= maxPagesToShow) {
-      // Mostrar todas las páginas si son pocas
+      //mostrar todas las páginas si son pocas
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Mostrar páginas con ellipsis
+      //mostrar páginas con ellipsis
       const leftSiblingIndex = Math.max(currentPage - 1, 1);
       const rightSiblingIndex = Math.min(currentPage + 1, totalPages);
 
@@ -45,21 +45,21 @@ const Pagination = ({
       const shouldShowRightDots = rightSiblingIndex < totalPages - 1;
 
       if (!shouldShowLeftDots && shouldShowRightDots) {
-        // Mostrar: 1 2 3 4 5 ... 10
+        //mostrar: 1 2 3 4 5 ... 10
         for (let i = 1; i <= 5; i++) {
           pages.push(i);
         }
         pages.push('...');
         pages.push(totalPages);
       } else if (shouldShowLeftDots && !shouldShowRightDots) {
-        // Mostrar: 1 ... 6 7 8 9 10
+        //mostrar: 1 ... 6 7 8 9 10
         pages.push(1);
         pages.push('...');
         for (let i = totalPages - 4; i <= totalPages; i++) {
           pages.push(i);
         }
       } else {
-        // Mostrar: 1 ... 4 5 6 ... 10
+        //mostrar: 1 ... 4 5 6 ... 10
         pages.push(1);
         if (shouldShowLeftDots) pages.push('...');
 
@@ -81,7 +81,7 @@ const Pagination = ({
     if (onPageSizeChange) {
       const newSize = parseInt(e.target.value, 10);
       onPageSizeChange(newSize);
-      // Volver a la primera página al cambiar el tamaño
+      //volver a la primera página al cambiar el tamaño
       onPageChange(1);
     }
   };
@@ -102,7 +102,7 @@ const Pagination = ({
       </div>
 
       <div className="pagination-controls">
-        {/* Selector de tamaño de página */}
+        {/*selector de tamaño de página*/}
         {showPageSize && onPageSizeChange && (
           <div className="page-size-selector">
             <label htmlFor="pageSize">Mostrar:</label>
@@ -122,9 +122,9 @@ const Pagination = ({
           </div>
         )}
 
-        {/* Botones de paginación */}
+        {/*botones de paginación*/}
         <div className="pagination-buttons">
-          {/* Primera página */}
+          {/*primera página*/}
           <button
             onClick={() => onPageChange(1)}
             disabled={currentPage === 1}
@@ -134,7 +134,7 @@ const Pagination = ({
             <ChevronsLeft size={18} />
           </button>
 
-          {/* Página anterior */}
+          {/*página anterior*/}
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -144,7 +144,7 @@ const Pagination = ({
             <ChevronLeft size={18} />
           </button>
 
-          {/* Números de página */}
+          {/*números de página*/}
           {pageNumbers.map((page, index) => (
             page === '...' ? (
               <span key={`ellipsis-${index}`} className="pagination-ellipsis">
@@ -165,7 +165,7 @@ const Pagination = ({
             )
           ))}
 
-          {/* Página siguiente */}
+          {/*página siguiente*/}
           <button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
@@ -175,7 +175,7 @@ const Pagination = ({
             <ChevronRight size={18} />
           </button>
 
-          {/* Última página */}
+          {/*última página*/}
           <button
             onClick={() => onPageChange(totalPages)}
             disabled={currentPage === totalPages}

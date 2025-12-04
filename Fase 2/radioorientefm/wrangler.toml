@@ -1,0 +1,11 @@
+name = "radio-oriente-fm"
+
+[site]
+bucket = "./frontend/build"
+
+[build]
+command = "cd frontend && npm install && npm run build"
+cwd = "."
+
+[build.upload]
+format = "service-worker"

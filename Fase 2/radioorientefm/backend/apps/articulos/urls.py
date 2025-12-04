@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from rest_framework.routers import DefaultRouter
 from . import views
 
-# Router para los ViewSets normalizados
+#router para los viewsets normalizados
 router = DefaultRouter()
 router.register(r'categorias', views.CategoriaViewSet)
 router.register(r'articulos', views.ArticuloViewSet)
@@ -20,7 +20,7 @@ def articulos_info(request):
             'mas_vistos': '/api/articulos/articulos/mas_vistos/',
             'comentarios': '/api/articulos/articulos/{slug}/comentarios/',
             'comentar': '/api/articulos/articulos/{slug}/comentar/',
-            # Endpoints legacy
+            #endpoints legacy
             'posts_legacy': '/api/articulos/posts/',
             'post_detail_legacy': '/api/articulos/posts/{id}/',
         }
@@ -28,9 +28,9 @@ def articulos_info(request):
 
 urlpatterns = [
     path('', articulos_info, name='articulos-info'),
-    # APIs normalizadas
+    #apis normalizadas
     path('api/', include(router.urls)),
-    # APIs de compatibilidad para el frontend existente
+    #apis de compatibilidad para el frontend existente
     path('posts/', views.BlogPostListView.as_view(), name='blog-posts'),
     path('posts/<int:pk>/', views.BlogPostDetailView.as_view(), name='blog-post-detail'),
 ]

@@ -382,7 +382,7 @@ let currentSolicitudId = null;
 document.addEventListener('DOMContentLoaded', function() {
     detallesCampaniaModal = new bootstrap.Modal(document.getElementById('detallesCampaniaModal'));
     detallesSolicitudModal = new bootstrap.Modal(document.getElementById('detallesSolicitudModal'));
-    
+
     // Configurar el modal para que se cierre correctamente
     document.getElementById('detallesSolicitudModal').addEventListener('hidden.bs.modal', function () {
         // Limpiar el contenido al cerrar
@@ -391,6 +391,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Cargar información de ubicación para todas las campañas
     cargarUbicacionesCampanias();
+
+    // Configurar el botón de confirmar eliminación del modal global
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', async function() {
+            if (campaniaIdPendiente !== null) {
+                await eliminarCampania(campaniaIdPendiente);
+                campaniaIdPendiente = null;
+                closeDeleteModal();
+            } else if (solicitudIdPendiente !== null) {
+                await eliminarSolicitud(solicitudIdPendiente);
+                solicitudIdPendiente = null;
+                closeDeleteModal();
+            }
+        });
+    }
 });
 
 // Función para cargar la información de ubicación de las campañas
@@ -582,23 +598,22 @@ async function verDetallesSolicitud(solicitudId) {
                             <strong>Imágenes:</strong>
                             <div class="d-flex flex-wrap gap-2 mt-1">
                                 ${item.imagenes.map(img => {
-                                    // Manejar diferentes estructuras de objeto de imagen
-                                    const imagePath = img.imagen || img.archivo || img.url || img;
+                                    // La API devuelve la propiedad 'url' que ya es la URL correcta
+                                    let imageUrl = img.url;
                                     
-                                    if (!imagePath) {
-                                        console.warn('Objeto de imagen sin ruta válida:', img);
+                                    if (!imageUrl) {
+                                        console.warn('Imagen sin URL válida:', img);
                                         return '';
                                     }
                                     
-                                    // Asegurar que la URL de la imagen sea absoluta
-                                    const isFullUrl = /^https?:\/\//.test(imagePath);
-                                    const isAbsolutePath = imagePath.startsWith('/');
+                                    // Si la URL no es absoluta, construirla correctamente
+                                    if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
+                                        imageUrl = '/media/' + imageUrl;
+                                    }
                                     
-                                    let imageUrl = imagePath;
-                                    if (!isFullUrl) {
-                                        imageUrl = isAbsolutePath ? 
-                                            window.location.origin + imagePath : 
-                                            window.location.origin + '/media/' + imagePath;
+                                    // Asegurar que sea una URL completa
+                                    if (imageUrl.startsWith('/')) {
+                                        imageUrl = window.location.origin + imageUrl;
                                     }
                                     
                                     return `
@@ -607,7 +622,7 @@ async function verDetallesSolicitud(solicitudId) {
                                             class="img-fluid h-100 w-100 object-fit-cover border rounded bg-light" 
                                             alt="Imagen de publicidad"
                                             style="object-fit: cover;"
-                                            onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
+                                            onerror="this.onerror=null; this.src='${window.location.origin}/static/img/placeholder.jpg';">
                                     </a>`;
                                 }).join('')}
                             </div>
@@ -782,13 +797,13 @@ async function verDetallesCampania(campaniaId) {
           <h5 class="mb-3">Vista Previa</h5>
           ${campania.web_config?.archivo_media ? 
             `<div class="text-center mb-3">
-              <img src="${campania.web_config.archivo_media}" 
+              <img src="${campania.web_config.archivo_media.startsWith('http') ? campania.web_config.archivo_media : (campania.web_config.archivo_media.startsWith('/') ? window.location.origin + campania.web_config.archivo_media : window.location.origin + '/media/' + campania.web_config.archivo_media)}" 
                    class="img-fluid rounded border" 
                    style="max-height: 200px;" 
                    alt="Vista previa" 
-                   onerror="this.src='/static/img/placeholder-banner.png'" />
+                   onerror="this.src='${window.location.origin}/static/img/placeholder-banner.png'" />
               <div class="mt-2">
-                <a href="${campania.web_config.archivo_media}" 
+                <a href="${campania.web_config.archivo_media.startsWith('http') ? campania.web_config.archivo_media : (campania.web_config.archivo_media.startsWith('/') ? window.location.origin + campania.web_config.archivo_media : window.location.origin + '/media/' + campania.web_config.archivo_media)}" 
                    target="_blank" 
                    class="btn btn-sm btn-outline-primary">
                   <i class="fas fa-external-link-alt me-1"></i> Ver imagen completa
@@ -885,7 +900,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Manejar errores de carga de imagen
         imagenPrevia.onerror = function() {
-          imagenPrevia.src = '/static/img/placeholder-banner.png';
+          imagenPrevia.src = window.location.origin + '/static/img/placeholder-banner.png';
         };
       } else {
         vistaPrevia.style.display = 'none';
@@ -897,21 +912,104 @@ document.addEventListener('DOMContentLoaded', function() {
   const btnSubirImagen = document.getElementById('btnSubirImagen');
   if (btnSubirImagen) {
     btnSubirImagen.addEventListener('click', function() {
-      alert('Función de subida de imágenes no implementada. Por ahora, ingresa manualmente la URL de la imagen.');
+      // Crear un input de archivo temporal
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/*';
+      fileInput.style.display = 'none';
+      
+      fileInput.addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // Validar que sea una imagen
+        if (!file.type.startsWith('image/')) {
+          alert('Por favor selecciona un archivo de imagen válido.');
+          return;
+        }
+        
+        // Validar tamaño (máximo 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          alert('El archivo es demasiado grande. Máximo 5MB.');
+          return;
+        }
+        
+        try {
+          // Crear FormData para enviar el archivo
+          const formData = new FormData();
+          formData.append('imagen', file);
+          
+          // Mostrar indicador de carga
+          btnSubirImagen.disabled = true;
+          btnSubirImagen.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+          
+          // Enviar archivo al servidor
+          const response = await fetch('/dashboard/api/publicidad/subir-imagen/', {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: formData
+          });
+          
+          if (!response.ok) {
+            throw new Error('Error al subir la imagen');
+          }
+          
+          const result = await response.json();
+          
+          // Actualizar el campo de URL con la imagen subida
+          document.getElementById('archivoMedia').value = result.url;
+          
+          // Actualizar vista previa si existe
+          const imagenPrevia = document.getElementById('imagenPrevia');
+          if (imagenPrevia) {
+            imagenPrevia.src = result.url;
+            document.getElementById('vistaPreviaImagen').style.display = 'block';
+          }
+          
+          alert('Imagen subida correctamente');
+          
+        } catch (error) {
+          console.error('Error al subir imagen:', error);
+          alert('Error al subir la imagen: ' + error.message);
+        } finally {
+          // Restaurar botón
+          btnSubirImagen.disabled = false;
+          btnSubirImagen.innerHTML = '<i class="fas fa-upload"></i>';
+        }
+      });
+      
+      // Simular click en el input de archivo
+      document.body.appendChild(fileInput);
+      fileInput.click();
+      document.body.removeChild(fileInput);
     });
   }
 });
 
+// Variables globales para el modal de eliminación
+let campaniaIdPendiente = null;
+let solicitudIdPendiente = null;
+
+// Función para mostrar modal de eliminación de campaña
+function mostrarModalEliminarCampania(campaniaId, nombreCampania) {
+    campaniaIdPendiente = campaniaId;
+    showDeleteModal(nombreCampania, null, 1);
+}
+
+// Función para mostrar modal de eliminación de solicitud
+function mostrarModalEliminarSolicitud(solicitudId, nombreSolicitud) {
+    solicitudIdPendiente = solicitudId;
+    showDeleteModal(nombreSolicitud, null, 1);
+}
+
 // Función para eliminar una campaña
 async function eliminarCampania(campaniaId) {
-    if (!confirm('¿Está seguro de eliminar esta campaña? Esta acción no se puede deshacer.')) {
-        return;
-    }
-    
     try {
         const url = `/dashboard/api/publicidad/campanias-web/${campaniaId}/`;
         console.log('Enviando solicitud DELETE a:', url);
-        
+
         const response = await fetch(url, {
             method: 'DELETE',
             headers: {
@@ -921,9 +1019,9 @@ async function eliminarCampania(campaniaId) {
             },
             credentials: 'same-origin'
         });
-        
+
         console.log('Respuesta recibida. Estado:', response.status, response.statusText);
-        
+
         let responseData = {};
         try {
             const responseText = await response.text();
@@ -932,18 +1030,18 @@ async function eliminarCampania(campaniaId) {
         } catch (parseError) {
             console.warn('No se pudo analizar la respuesta como JSON:', parseError);
         }
-        
+
         if (response.ok) {
             // Mostrar notificación de éxito
             const toast = new bootstrap.Toast(document.getElementById('toastExito'));
             document.getElementById('toastMensaje').textContent = responseData.message || 'Campaña eliminada correctamente';
             toast.show();
-            
+
             // Recargar la página después de un breve retraso
             setTimeout(() => location.reload(), 1000);
         } else {
-            const errorMessage = responseData.error || 
-                               responseData.message || 
+            const errorMessage = responseData.error ||
+                               responseData.message ||
                                `Error ${response.status}: ${response.statusText}`;
             throw new Error(errorMessage);
         }
@@ -968,7 +1066,7 @@ async function guardarEdicionCampania() {
   }
   
   try {
-    const response = await fetch(`/dashboard/api/publicidad/campanias/${id}/actualizar/`, {
+    const response = await fetch(`/dashboard/api/publicidad/campanias-web/${id}/actualizar_web/`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -982,8 +1080,15 @@ async function guardarEdicionCampania() {
     });
     
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Error al actualizar la campaña');
+      let errorMessage = 'Error al actualizar la campaña';
+      try {
+        const error = await response.json();
+        errorMessage = error.message || errorMessage;
+      } catch (e) {
+        // Si no es JSON válido, usar el status text
+        errorMessage = `Error ${response.status}: ${response.statusText}`;
+      }
+      throw new Error(errorMessage);
     }
     
     // Mostrar notificación de éxito
@@ -1075,7 +1180,7 @@ if (!document.getElementById('toastExito')) {
                             <i class="fas fa-hourglass-half"></i> En revisión
                           </button>
                         {% endif %}
-                        <button class="btn btn-sm btn-outline-danger ms-1" onclick="eliminarSolicitud({{ s.id }}); return false;" title="Eliminar solicitud">
+                        <button class="btn btn-sm btn-outline-danger ms-1" onclick="mostrarModalEliminarSolicitud({{ s.id }}, 'Solicitud #{{ s.id }} - {{ s.usuario.username|default:'Usuario'|escapejs }}'); return false;" title="Eliminar solicitud">
                           <i class="fas fa-trash"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" onclick="rechazarSolicitud({{ s.id }})">
@@ -1085,9 +1190,24 @@ if (!document.getElementById('toastExito')) {
                           <i class="fas fa-check"></i> Aprobar
                         </button>
                       {% else %}
-                        {% if s.publicacion_id %}
-                          <a href="#camp-{{ s.publicacion_id }}" class="btn btn-sm btn-outline-primary">Ver campaña</a>
-                        {% endif %}
+                        {% with s.campanias_web.all as campanias_relacionadas %}
+                          {% if campanias_relacionadas %}
+                            <div class="btn-group ms-1 dropup" role="group">
+                              <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Campañas ({{ campanias_relacionadas|length }})
+                              </button>
+                              <ul class="dropdown-menu dropdown-menu-end">
+                                {% for c in campanias_relacionadas %}
+                                  <li>
+                                    <a class="dropdown-item" href="#" onclick="verDetallesCampania({{ c.id }}); return false;">
+                                      Ver campaña #{{ c.id }}
+                                    </a>
+                                  </li>
+                                {% endfor %}
+                              </ul>
+                            </div>
+                          {% endif %}
+                        {% endwith %}
                       {% endif %}
                     </div>
                   </td>
@@ -1192,7 +1312,7 @@ if (!document.getElementById('toastExito')) {
                       <button class="btn btn-sm btn-outline-secondary" onclick="editarCampania({{ c.id }}, '{{ c.web_config.url_destino|default:''|escapejs }}', '{{ c.web_config.formato|default:''|escapejs }}', '{{ c.web_config.archivo_media|default:''|escapejs }}')" title="Editar">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="btn btn-sm btn-outline-danger" onclick="eliminarCampania({{ c.id }}); return false;" title="Eliminar">
+                      <button class="btn btn-sm btn-outline-danger" onclick="mostrarModalEliminarCampania({{ c.id }}, 'Campaña #{{ c.id }} - {{ c.nombre_cliente|escapejs }}'); return false;" title="Eliminar">
                         <i class="fas fa-trash"></i>
                       </button>
                     </div>
@@ -1506,13 +1626,13 @@ async function verDetallesCampania(campaniaId) {
           <h5 class="mb-3">Vista Previa</h5>
           ${campania.web_config?.archivo_media ? 
             `<div class="text-center mb-3">
-              <img src="${campania.web_config.archivo_media}" 
+              <img src="${campania.web_config.archivo_media.startsWith('http') ? campania.web_config.archivo_media : (campania.web_config.archivo_media.startsWith('/') ? window.location.origin + campania.web_config.archivo_media : window.location.origin + '/media/' + campania.web_config.archivo_media)}" 
                    class="img-fluid rounded border" 
                    style="max-height: 200px;" 
                    alt="Vista previa" 
-                   onerror="this.src='/static/img/placeholder-banner.png'" />
+                   onerror="this.src='${window.location.origin}/static/img/placeholder-banner.png'" />
               <div class="mt-2">
-                <a href="${campania.web_config.archivo_media}" 
+                <a href="${campania.web_config.archivo_media.startsWith('http') ? campania.web_config.archivo_media : (campania.web_config.archivo_media.startsWith('/') ? window.location.origin + campania.web_config.archivo_media : window.location.origin + '/media/' + campania.web_config.archivo_media)}" 
                    target="_blank" 
                    class="btn btn-sm btn-outline-primary">
                   <i class="fas fa-external-link-alt me-1"></i> Ver imagen completa
@@ -1599,19 +1719,14 @@ document.getElementById('archivoMedia').addEventListener('change', function() {
     
     // Manejar errores de carga de imagen
     imagenPrevia.onerror = function() {
-      imagenPrevia.src = '/static/img/placeholder-banner.png';
+      imagenPrevia.src = window.location.origin + '/static/img/placeholder-banner.png';
     };
   } else {
     vistaPrevia.style.display = 'none';
   }
 });
 
-// Manejar la subida de imágenes
-// Nota: Necesitarás implementar el backend para manejar la subida de archivos
-document.getElementById('btnSubirImagen').addEventListener('click', function() {
-  alert('Función de subida de imágenes no implementada. Por ahora, ingresa manualmente la URL de la imagen.');
-  // Aquí iría el código para manejar la subida de archivos
-});
+// Código de subida de imágenes ya implementado arriba
 
 async function guardarEdicionCampania() {
   const id = document.getElementById('campaniaId').value;
@@ -1626,7 +1741,7 @@ async function guardarEdicionCampania() {
   }
   
   try {
-    const response = await fetch(`/dashboard/api/publicidad/campanias/${id}/actualizar/`, {
+    const response = await fetch(`/dashboard/api/publicidad/campanias-web/${id}/actualizar_web/`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -1640,8 +1755,15 @@ async function guardarEdicionCampania() {
     });
     
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Error al actualizar la campaña');
+      let errorMessage = 'Error al actualizar la campaña';
+      try {
+        const error = await response.json();
+        errorMessage = error.message || errorMessage;
+      } catch (e) {
+        // Si no es JSON válido, usar el status text
+        errorMessage = `Error ${response.status}: ${response.statusText}`;
+      }
+      throw new Error(errorMessage);
     }
     
     // Mostrar notificación de éxito
@@ -1808,7 +1930,7 @@ async function verDetallesSolicitud(solicitudId) {
                                                class="img-thumbnail" 
                                                style="width: 100%; height: 100%; object-fit: cover;" 
                                                alt="${imagen.descripcion || 'Imagen'}" 
-                                               onerror="this.src='/static/img/placeholder-banner.png'" />
+                                               onerror="this.src='${window.location.origin}/static/img/placeholder-banner.png'" />
                                           <a href="${imagen.url}" 
                                              target="_blank" 
                                              class="position-absolute top-0 end-0 m-1 btn btn-sm btn-light" 
@@ -1873,10 +1995,6 @@ async function verDetallesSolicitud(solicitudId) {
 
 // Función para eliminar una solicitud
 async function eliminarSolicitud(solicitudId) {
-  if (!confirm('¿Estás seguro de que deseas eliminar esta solicitud? Esta acción no se puede deshacer.')) {
-    return;
-  }
-  
   try {
     const csrftoken = getCookie('csrftoken');
     const response = await fetch(`/dashboard/api/publicidad/solicitudes/${solicitudId}/eliminar/`, {
@@ -1891,7 +2009,7 @@ async function eliminarSolicitud(solicitudId) {
     if (!response.ok) {
       const errorText = await response.text();
       let errorMessage = `Error ${response.status}: ${response.statusText}`;
-      
+
       try {
         const errorData = JSON.parse(errorText);
         errorMessage = errorData.message || errorData.error || errorMessage;
@@ -1901,10 +2019,10 @@ async function eliminarSolicitud(solicitudId) {
           errorMessage = errorText;
         }
       }
-      
+
       throw new Error(errorMessage);
     }
-    
+
     // Si llegamos aquí, la eliminación fue exitosa
     location.reload();
   } catch (error) {

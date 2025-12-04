@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'images/logo.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/logo.png' %}">
     <title>{% block title %}Radio Oriente FM - Dashboard{% endblock %}</title>
     
     <!-- Bootstrap CSS -->
@@ -74,7 +77,7 @@
             background: linear-gradient(180deg, #8E0E00, #3A0C00, #1F1C18, #3A0C00, #8E0E00);
             background-size: 400% 400%;
             animation: gradientWave 10s ease-in-out infinite;
-            min-height: 100vh;
+            height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
@@ -83,13 +86,33 @@
             transition: all 0.3s ease;
             box-shadow: 2px 0 15px rgba(0, 0, 0, 0.25);
             color: #f5f5f5;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar personalizado para el sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
         }
 
 
 
 
 
-        /* Overlay para cerrar sidebar en móvil */
+        /* Overlay para cerrar sidebar en móvil - SOLO responsive */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -98,7 +121,8 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 3400; /* Entre el navbar (3000) y el sidebar (3500) */
+            z-index: 2500; /* Debajo del navbar */
+            pointer-events: none; /* No interfiere en desktop */
         }
 
         .sidebar .nav-link {
@@ -256,8 +280,12 @@
         }
 
         .navbar-brand {
-            font-weight: bold;
-            color: var(--primary-color) !important;
+            font-weight: 700 !important;
+            color: var(--text-primary) !important;
+            font-size: 1.125rem !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1.5 !important;
         }
 
         .btn-primary {
@@ -274,122 +302,198 @@
             background-color: rgba(220, 38, 38, 0.05);
         }
 
-        /* Navbar premium styles */
+        /* Navbar - Diseño Premium y Moderno */
         .navbar {
-            border: 1px solid var(--border-color) !important;
-            backdrop-filter: blur(20px) !important;
+            background: var(--navbar-bg) !important;
+            border: none !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            backdrop-filter: blur(12px);
             position: sticky;
             top: 0;
-            z-index: 3000; /* Asegura que quede por encima del contenido */
+            z-index: 3000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
+            padding: 0 !important;
+            margin-bottom: 2rem !important;
+            border-radius: 0 !important;
         }
 
-        /* Notification Button - Modern Design */
-        .notification-btn-new {
-            position: relative;
-            background: transparent;
-            border: 2px solid var(--border-color);
-            color: var(--text-primary);
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
+        .navbar .container-fluid {
+            max-width: 100%;
+            padding: 1.25rem 2rem !important;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.125rem;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            flex: 0 0 auto;
+        }
+
+        .navbar-center {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-right {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.75rem !important;
+            flex: 0 0 auto;
+        }
+
+        .navbar-toggler {
+            display: none !important; /* Oculto en desktop */
+        }
+
+        /* Notification Button - Diseño Premium */
+        .notification-btn-new {
+            position: relative;
+            background: linear-gradient(135deg, rgba(190, 65, 65, 0.08), rgba(239, 68, 68, 0.08));
+            border: none;
+            color: var(--text-primary);
+            width: 44px !important;
+            height: 44px !important;
+            min-width: 44px !important;
+            min-height: 44px !important;
+            border-radius: 12px;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 1.15rem;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
         .notification-btn-new:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(190, 65, 65, 0.15), rgba(239, 68, 68, 0.12));
             color: var(--primary-color);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(190, 65, 65, 0.2);
         }
 
-        /* Theme Toggle Button - Premium Design */
+        .notification-btn-new:active {
+            transform: translateY(0);
+        }
+
+        /* Theme Toggle Button - Diseño Elegante Premium */
         .theme-toggle-btn-new {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-color);
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.625rem;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: none;
             color: var(--text-primary);
-            padding: 0.625rem 1.125rem;
-            border-radius: 10px;
+            padding: 0.625rem 1rem !important;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
             font-size: 0.875rem;
             white-space: nowrap;
+            height: 44px !important;
+            min-height: 44px !important;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
         .theme-toggle-btn-new:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(190, 65, 65, 0.12), rgba(239, 68, 68, 0.08));
             color: var(--primary-color);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(190, 65, 65, 0.15);
+        }
+
+        .theme-toggle-btn-new:active {
+            transform: translateY(0);
         }
 
         .theme-toggle-btn-new i {
-            transition: transform 0.3s ease;
-            font-size: 1rem;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-size: 1.05rem;
         }
 
         .theme-toggle-btn-new:hover i {
-            transform: rotate(20deg);
+            transform: rotate(25deg) scale(1.1);
         }
 
-        /* User Dropdown Button - Professional Design */
+        /* User Dropdown Button - Diseño Profesional Premium */
         .user-dropdown-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-color);
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.75rem !important;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: none;
             color: var(--text-primary);
-            padding: 0.625rem 1.125rem;
-            border-radius: 10px;
+            padding: 0.5rem 1rem !important;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
             font-size: 0.875rem;
-            height: 42px;
+            height: 44px !important;
+            min-height: 44px !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
         .user-dropdown-btn:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(190, 65, 65, 0.12), rgba(239, 68, 68, 0.08));
+            color: var(--primary-color);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(190, 65, 65, 0.15);
+        }
+
+        .user-dropdown-btn:active {
+            transform: translateY(0);
         }
 
         .user-avatar {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+            min-height: 34px !important;
+            border-radius: 50% !important;
             background: linear-gradient(135deg, #be4141 0%, #ef4444 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 0.75rem;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+            box-shadow: 0 3px 12px rgba(190, 65, 65, 0.35);
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown-btn:hover .user-avatar {
+            box-shadow: 0 4px 16px rgba(190, 65, 65, 0.5);
+            transform: scale(1.05);
         }
 
         .user-name {
-            max-width: 150px;
+            max-width: 140px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            font-weight: 500;
+            letter-spacing: 0.01em;
         }
 
         .user-chevron {
             font-size: 0.75rem;
-            opacity: 0.7;
-            transition: transform 0.2s ease;
+            opacity: 0.6;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            margin-left: 0.125rem;
+        }
+
+        .user-dropdown-btn:hover .user-chevron {
+            opacity: 1;
         }
 
         .user-dropdown-btn[aria-expanded="true"] .user-chevron {
@@ -424,16 +528,32 @@
 
         .notification-badge {
             position: absolute;
-            top: 0;
-            right: 0;
-            background: var(--danger-color);
+            top: -6px;
+            right: -6px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
             border-radius: 50%;
-            padding: 0.15rem 0.4rem;
-            font-size: 0.65rem;
-            font-weight: bold;
-            min-width: 18px;
+            padding: 0;
+            font-size: 0.625rem;
+            font-weight: 700;
+            min-width: 20px;
+            height: 20px;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
+            border: 2.5px solid var(--navbar-bg);
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
         }
 
         .notification-dropdown {
@@ -797,6 +917,7 @@
             
             .sidebar.show ~ .sidebar-overlay {
                 display: block;
+                pointer-events: auto; /* Activar en móvil */
             }
             
             .main-content {
@@ -804,61 +925,127 @@
                 padding: 1rem;
             }
             
-            .navbar {
-                padding: 0.75rem 1rem;
-            }
-            
-            .navbar-brand {
-                font-size: 1.1rem;
-            }
-            
+            /* General responsive styles */
             .card {
                 margin-bottom: 1rem;
             }
-            
+
             .card-body {
                 padding: 1rem;
             }
-            
+
             .table-responsive {
                 font-size: 0.9rem;
             }
-            
+
             .btn {
                 padding: 0.5rem 1rem;
                 font-size: 0.9rem;
             }
-            
-            /* Navbar responsive */
+
+            /* Navbar responsive SOLO para tablets */
+            .navbar .container-fluid {
+                padding: 1rem 1.5rem !important;
+                gap: 1rem;
+            }
+
+            .navbar-brand {
+                font-size: 1.0625rem !important;
+            }
+
+            .navbar-right {
+                gap: 0.625rem !important;
+            }
+
+            /* Mostrar toggler en tablets */
+            .navbar-toggler {
+                display: flex !important;
+                background: rgba(190, 65, 65, 0.08) !important;
+                border: none !important;
+                padding: 0.5rem !important;
+                border-radius: 10px !important;
+                width: 40px !important;
+                height: 40px !important;
+                align-items: center !important;
+                justify-content: center !important;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .navbar-toggler::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                border-radius: 50%;
+                background: rgba(190, 65, 65, 0.15);
+                transform: translate(-50%, -50%);
+                transition: width 0.3s ease, height 0.3s ease;
+            }
+
+            .navbar-toggler:hover::before {
+                width: 100%;
+                height: 100%;
+            }
+
+            .navbar-toggler:hover {
+                background: rgba(190, 65, 65, 0.12) !important;
+                transform: scale(1.05);
+            }
+
+            .navbar-toggler:active {
+                transform: scale(0.95);
+            }
+
+            .navbar-toggler:focus {
+                box-shadow: 0 0 0 3px rgba(190, 65, 65, 0.12) !important;
+                outline: none !important;
+            }
+
+            .navbar-toggler-icon {
+                width: 20px;
+                height: 20px;
+                position: relative;
+                z-index: 1;
+            }
+
             .notification-btn-new {
-                width: 38px;
-                height: 38px;
-                font-size: 1rem;
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                min-height: 40px !important;
+                font-size: 1.0625rem;
             }
 
             .theme-toggle-btn-new {
-                padding: 0.5rem 0.875rem;
+                padding: 0.5rem 0.875rem !important;
                 font-size: 0.8125rem;
-            }
-
-            .theme-toggle-text {
-                display: inline;
+                height: 40px !important;
+                min-height: 40px !important;
             }
 
             .user-dropdown-btn {
-                padding: 0.4rem 0.675rem;
+                padding: 0.5rem 0.875rem !important;
                 font-size: 0.8125rem;
-                min-height: 28px;
+                height: 40px !important;
+                min-height: 40px !important;
+                gap: 0.625rem !important;
             }
 
             .user-avatar {
-                width: 28px;
-                height: 28px;
+                width: 32px !important;
+                height: 32px !important;
+                min-width: 32px !important;
+                min-height: 32px !important;
                 font-size: 0.8125rem;
             }
 
             .user-name {
-                max-width: 120px;
+                max-width: 110px;
+                font-size: 0.8125rem;
             }
 
             .stat-card .card-body {
@@ -900,43 +1087,85 @@
                 font-size: 0.85rem;
             }
 
-            /* Navbar very small screens */
+            /* Navbar SOLO para móviles pequeños */
+            .navbar .container-fluid {
+                padding: 0.875rem 1.25rem !important;
+                gap: 0.75rem;
+            }
+
+            .navbar-brand {
+                font-size: 0.9375rem !important;
+            }
+
+            .navbar-right {
+                gap: 0.5rem !important;
+            }
+
+            .navbar-left {
+                margin-right: 0.375rem;
+            }
+
             .notification-btn-new {
-                width: 36px;
-                height: 36px;
-                font-size: 0.9375rem;
-                border-width: 1.5px;
+                width: 38px !important;
+                height: 38px !important;
+                min-width: 38px !important;
+                min-height: 38px !important;
+                font-size: 1rem;
+                border-radius: 10px;
             }
 
             .theme-toggle-btn-new {
-                padding: 0.4rem 0.75rem;
-                font-size: 0.75rem;
-                border-width: 1.5px;
+                padding: 0 !important;
+                width: 38px !important;
+                height: 38px !important;
+                min-height: 38px !important;
+                border-radius: 10px;
             }
 
             .theme-toggle-text {
-                display: none;
+                display: none !important;
+            }
+
+            .theme-toggle-btn-new i {
+                margin: 0 !important;
             }
 
             .user-dropdown-btn {
-                padding: 0.375rem 0.55rem;
+                padding: 0.375rem 0.625rem !important;
                 font-size: 0.75rem;
-                min-height: 26px;
-                border-width: 1.5px;
+                height: 38px !important;
+                min-height: 38px !important;
+                gap: 0.5rem !important;
+                border-radius: 10px;
             }
 
             .user-avatar {
-                width: 26px;
-                height: 26px;
+                width: 28px !important;
+                height: 28px !important;
+                min-width: 28px !important;
+                min-height: 28px !important;
                 font-size: 0.75rem;
             }
 
             .user-name {
-                max-width: 80px;
+                max-width: 70px;
+                font-size: 0.75rem;
             }
 
             .user-chevron {
-                display: none;
+                display: none !important;
+            }
+
+            .navbar-toggler {
+                display: flex !important;
+                width: 38px !important;
+                height: 38px !important;
+                border-radius: 10px;
+            }
+
+            .navbar-toggler-icon {
+                width: 18px;
+                height: 18px;
             }
             
             .table {
@@ -952,6 +1181,270 @@
             h3 { font-size: 1.25rem; }
             h4 { font-size: 1.1rem; }
             h5 { font-size: 1rem; }
+        }
+
+        /* =============================================
+           MODAL DE CONFIRMACIÓN ELEGANTE
+        ============================================= */
+        .delete-confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .delete-confirm-modal.show {
+            display: flex;
+        }
+
+        .delete-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.2s ease;
+        }
+
+        .delete-modal-content {
+            position: relative;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 420px;
+            width: 100%;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .delete-modal-header {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            padding: 2rem 2rem 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .delete-modal-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .delete-modal-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .delete-modal-header h3 {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .delete-modal-body {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .delete-item-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            word-break: break-word;
+        }
+
+        .delete-count-badge {
+            display: none;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            margin-left: 0.5rem;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-warning {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .delete-modal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .delete-modal-actions button {
+            flex: 1;
+            padding: 0.875rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-cancel-delete {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-cancel-delete:hover {
+            background: var(--border-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-confirm-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-confirm-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+        }
+
+        .btn-confirm-delete:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* =============================================
+           BARRA DE ACCIONES MASIVAS
+        ============================================= */
+        .bulk-actions-bar {
+            position: fixed;
+            bottom: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            z-index: 1000;
+            transition: bottom 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .bulk-actions-bar.show {
+            bottom: 2rem;
+        }
+
+        .bulk-actions-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .bulk-actions-info .count {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 700;
+            padding: 0.375rem 0.75rem;
+            border-radius: 50px;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        .bulk-actions-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .bulk-btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bulk-btn-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .bulk-btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .bulk-btn-cancel {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .bulk-btn-cancel:hover {
+            background: var(--border-color);
+        }
+
+        /* Checkbox personalizado */
+        .row-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .select-all-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
         }
     </style>
 </head>
@@ -1071,15 +1564,22 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Top Navigation -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 rounded shadow-sm" style="padding: 1rem 1.5rem;">
+        <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container-fluid">
-                <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarCollapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                <!-- Left Section -->
+                <div class="navbar-left">
+                    <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
 
-                <span class="navbar-brand mb-0 h1" style="font-weight: 700; font-size: 1.25rem;">{% block page_title %}Dashboard{% endblock %}</span>
+                <!-- Center Section -->
+                <div class="navbar-center">
+                    <span class="navbar-brand mb-0 h1">{% block page_title %}Dashboard{% endblock %}</span>
+                </div>
 
-                <div class="d-flex align-items-center gap-2 ms-auto">
+                <!-- Right Section -->
+                <div class="navbar-right">
                     <!-- Notifications -->
                     <div class="position-relative">
                         <button class="notification-btn-new" id="notificationBtn" onclick="toggleNotifications()">
@@ -1161,22 +1661,146 @@
         }
         const csrftoken = getCookie('csrftoken');
 
-        // Generic delete function
-        function deleteItem(url, itemName) {
-            if (confirm(`¿Estás seguro de que quieres eliminar ${itemName}?`)) {
+        // =============================================
+        // SISTEMA DE MODAL DE CONFIRMACIÓN ELEGANTE
+        // =============================================
+
+        let deleteModalCallback = null;
+        let deleteModalUrls = [];
+        let deleteModalMode = 'single'; // 'single' o 'multiple'
+
+        // Función para mostrar el modal de confirmación
+        function showDeleteModal(itemName, url, count = 1) {
+            const modal = document.getElementById('deleteConfirmModal');
+            const itemNameEl = document.getElementById('deleteItemName');
+            const countBadge = document.getElementById('deleteCountBadge');
+            const warningText = document.getElementById('deleteWarningText');
+
+            deleteModalUrls = Array.isArray(url) ? url : [url];
+            deleteModalMode = count > 1 ? 'multiple' : 'single';
+
+            if (count > 1) {
+                itemNameEl.textContent = `${count} elementos seleccionados`;
+                countBadge.textContent = count;
+                countBadge.style.display = 'inline-flex';
+                warningText.textContent = 'Esta acción eliminará permanentemente todos los elementos seleccionados.';
+            } else {
+                itemNameEl.textContent = itemName;
+                countBadge.style.display = 'none';
+                warningText.textContent = 'Esta acción no se puede deshacer.';
+            }
+
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Función para cerrar el modal
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteConfirmModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            deleteModalUrls = [];
+            deleteModalCallback = null;
+        }
+
+        // Función para confirmar la eliminación
+        function confirmDelete() {
+            if (deleteModalUrls.length === 0) return;
+
+            const btn = document.getElementById('confirmDeleteBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Eliminando...';
+            btn.disabled = true;
+
+            if (deleteModalMode === 'multiple' && deleteModalUrls.length > 1) {
+                // Eliminación múltiple
+                Promise.all(deleteModalUrls.map(url =>
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                )).then(() => {
+                    closeDeleteModal();
+                    window.location.reload();
+                }).catch(error => {
+                    console.error('Error:', error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+            } else {
+                // Eliminación simple
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = url;
-                
+                form.action = deleteModalUrls[0];
+
                 const csrfInput = document.createElement('input');
                 csrfInput.type = 'hidden';
                 csrfInput.name = 'csrfmiddlewaretoken';
                 csrfInput.value = csrftoken;
                 form.appendChild(csrfInput);
-                
+
                 document.body.appendChild(form);
                 form.submit();
             }
+        }
+
+        // Función legacy para compatibilidad - ahora usa el modal
+        function deleteItem(url, itemName) {
+            showDeleteModal(itemName, url, 1);
+        }
+
+        // Cerrar modal con Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeleteModal();
+            }
+        });
+
+        // =============================================
+        // SISTEMA DE SELECCIÓN MÚLTIPLE
+        // =============================================
+
+        function toggleSelectAll(checkbox, tableId) {
+            const table = document.getElementById(tableId) || checkbox.closest('table');
+            const checkboxes = table.querySelectorAll('tbody .row-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+            updateBulkActions(tableId);
+        }
+
+        function updateBulkActions(tableId) {
+            const table = document.getElementById(tableId) || document.querySelector('table');
+            const checkboxes = table.querySelectorAll('tbody .row-checkbox:checked');
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCount = document.getElementById('selectedCount');
+
+            if (bulkActions) {
+                if (checkboxes.length > 0) {
+                    bulkActions.classList.add('show');
+                    selectedCount.textContent = checkboxes.length;
+                } else {
+                    bulkActions.classList.remove('show');
+                }
+            }
+        }
+
+        function deleteSelected(urlPattern) {
+            const checkboxes = document.querySelectorAll('tbody .row-checkbox:checked');
+            if (checkboxes.length === 0) return;
+
+            const urls = Array.from(checkboxes).map(cb => {
+                return urlPattern.replace('__ID__', cb.dataset.id);
+            });
+
+            const itemName = checkboxes.length === 1
+                ? checkboxes[0].dataset.name
+                : `${checkboxes.length} elementos`;
+
+            showDeleteModal(itemName, urls, checkboxes.length);
         }
 
         // Edit item function (populate modal with data)
@@ -1472,7 +2096,63 @@
             updateBadge();
         }
     </script>
-    
+
+    <!-- Modal de Confirmación de Eliminación -->
+    <div id="deleteConfirmModal" class="delete-confirm-modal">
+        <div class="delete-modal-overlay" onclick="closeDeleteModal()"></div>
+        <div class="delete-modal-content">
+            <div class="delete-modal-header">
+                <div class="delete-modal-icon">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <h3>Confirmar Eliminación</h3>
+            </div>
+            <div class="delete-modal-body">
+                <div class="delete-item-name">
+                    <span id="deleteItemName"></span>
+                    <span id="deleteCountBadge" class="delete-count-badge"></span>
+                </div>
+                <p class="delete-warning" id="deleteWarningText">Esta acción no se puede deshacer.</p>
+                <div class="delete-modal-actions">
+                    <button type="button" class="btn-cancel-delete" onclick="closeDeleteModal()">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="button" id="confirmDeleteBtn" class="btn-confirm-delete" onclick="confirmDelete()">
+                        <i class="fas fa-trash-alt me-2"></i>Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra de Acciones Masivas -->
+    <div id="bulkActions" class="bulk-actions-bar">
+        <div class="bulk-actions-info">
+            <span class="count" id="selectedCount">0</span>
+            <span>elementos seleccionados</span>
+        </div>
+        <div class="bulk-actions-buttons">
+            <button type="button" class="bulk-btn bulk-btn-cancel" onclick="clearSelection()">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </button>
+            <button type="button" class="bulk-btn bulk-btn-delete" id="bulkDeleteBtn">
+                <i class="fas fa-trash-alt"></i>
+                Eliminar seleccionados
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Función para limpiar la selección
+        function clearSelection() {
+            const checkboxes = document.querySelectorAll('.row-checkbox, .select-all-checkbox');
+            checkboxes.forEach(cb => cb.checked = false);
+            const bulkActions = document.getElementById('bulkActions');
+            if (bulkActions) bulkActions.classList.remove('show');
+        }
+    </script>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

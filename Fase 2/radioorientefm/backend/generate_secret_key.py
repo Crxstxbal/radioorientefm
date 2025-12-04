@@ -1,10 +1,4 @@
-"""
-Script para generar una SECRET_KEY segura para Django.
-Ejecuta este script y copia el resultado a tu archivo .env
-
-Uso:
-    python generate_secret_key.py
-"""
+"""script para generar una secret_key segura para django. ejecuta este script y copia el resultado a tu archivo .env uso: python generate_secret_key.py"""
 
 from django.core.management.utils import get_random_secret_key
 

@@ -16,7 +16,7 @@ const BarraProgresoLectura = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Estilo para la barra de progreso con efecto neón
+  //estilo para la barra de progreso con efecto neón
   const progressStyle = {
     width: `${scrollPercentage}%`,
     height: '3px',

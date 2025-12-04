@@ -1,6 +1,4 @@
-/* ===========================
-   Wrapper principal
-=========================== */
+/*=========================== wrapper principal ===========================*/
 .radio-player-wrapper {
   position: fixed;
   bottom: 0;
@@ -13,23 +11,21 @@
   transition: all 0.3s ease;
 }
 
-/* Reproductor colapsado */
+/*reproductor colapsado*/
 .radio-player-wrapper.collapsed .radio-player {
   transform: translateY(calc(100% - 1px));
   opacity: 0;
   pointer-events: none;
 }
 
-/* Estado de expansión */
+/*estado de expansión*/
 .radio-player-wrapper.expanding .radio-player {
   transform: scale(1.05);
   opacity: 0.9;
   transition: all 0.3s ease;
 }
 
-/* ===========================
-   Reproductor
-=========================== */
+/*=========================== reproductor ===========================*/
 .radio-player {
   position: relative;
   width: 100%;
@@ -49,15 +45,13 @@
   z-index: 50;
 }
 
-/* ===========================
-   Botón de colapso
-=========================== */
+/*=========================== botón de colapso ===========================*/
 .collapse-btn-wrapper {
   position: absolute;
   bottom: 104%;
   left: 50%;
   transform: translateX(-50%) translateY(0);
-  z-index: 999;
+  z-index: 9999;
   pointer-events: auto;
   transition: transform 0.3s ease;
 }
@@ -82,12 +76,10 @@
 }
 
 .collapse-btn:hover {
-  background-color: #e57373;
+  background-color: #f02222;
 }
 
-/* ===========================
-   Estados de color del volumen
-=========================== */
+/*=========================== estados de color del volumen ===========================*/
 .radio-player.playing .volume-progress {
   background-color: #10b981;
 }
@@ -97,16 +89,14 @@
 }
 
 .radio-player.paused .volume-progress {
-  background-color: #e57373;
+  background-color: #f32a2a;
 }
 
 .radio-player.paused .volume-slider-container:hover .volume-progress {
-  background-color: #ef9a9a;
+  background-color: #d62323;
 }
 
-/* ===========================
-   Gradientes
-=========================== */
+/*=========================== gradientes ===========================*/
 .gradient-left,
 .gradient-right {
   position: absolute;
@@ -126,9 +116,7 @@
   background: linear-gradient(to left, rgba(0,0,0,0.8), rgba(0,0,0,0.5), transparent);
 }
 
-/* ===========================
-   Información de radio
-=========================== */
+/*=========================== informacion de radio ===========================*/
 .radio-info {
   display: flex;
   align-items: center;
@@ -151,7 +139,7 @@
 }
 
 .status-indicator.paused {
-  background-color: #e57373;
+  background-color: #ec1010;
 }
 
 .radio-details {
@@ -169,9 +157,7 @@
   opacity: 0.8; 
 }
 
-/* ===========================
-   Controles centrales
-=========================== */
+/*=========================== controles centrales ===========================*/
 .player-controls {
   flex-grow: 1;
   display: flex;
@@ -283,9 +269,7 @@
   box-shadow: 0 0 0 2px rgba(255,255,255,0.5); 
 }
 
-/* ===========================
-   Controles de volumen
-=========================== */
+/*=========================== controles de volumen ===========================*/
 .volume-controls {
   display: flex;
   align-items: center;
@@ -310,7 +294,9 @@
   left: 0; 
   height: 100%;
   background-color: #dc2626;
-  transition: width 0.1s ease, background-color 0.2s ease;
+  border-radius: 9999px; /*bordes redondeados al inicio y fin*/
+  transition: background-color 0.2s ease;
+  z-index: 1;
 }
 
 .volume-thumb {
@@ -321,11 +307,12 @@
   height: 0.875rem;
   border-radius: 50%;
   background-color: #fff;
-  border: 2px solid #fff;
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  border: 2px solid #dc2626; /*destaca sobre la barra*/
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
   opacity: 0;
   transition: opacity 0.2s ease, transform 0.2s ease;
   pointer-events: none;
+  z-index: 5; /*por encima del input y del progress*/
 }
 
 .volume-slider-container:hover .volume-thumb { 
@@ -344,25 +331,28 @@
   -webkit-appearance: none; 
   appearance: none;
   background: transparent;
+  z-index: 3; /*debajo de la perilla custom, sobre el progress*/
 }
 
 .volume-range::-webkit-slider-thumb { 
   -webkit-appearance: none; 
-  width: 1rem; 
-  height: 1rem; 
+  width: 0; 
+  height: 0; 
+  background: transparent;
+  border: none;
+  opacity: 0;
 }
 
 .volume-range::-moz-range-thumb { 
-  width: 1rem; 
-  height: 1rem; 
+  width: 0; 
+  height: 0; 
   border: none; 
   border-radius: 0; 
   background: transparent; 
+  opacity: 0;
 }
 
-/* ===========================
-   Animación de expansión
-=========================== */
+/*=========================== animación de expansión ===========================*/
 .expand-animation-overlay {
   pointer-events: none;
   display: flex;
@@ -386,17 +376,13 @@
   100% { transform: rotate(360deg); }
 }
 
-/* ===========================
-   Animations
-=========================== */
+/*=========================== animations ===========================*/
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
 
-/* ===========================
-   Responsive
-=========================== */
+/*=========================== responsivo ===========================*/
 @media(max-width: 768px) {
   .radio-player { 
     max-width: 100%; 
@@ -434,50 +420,60 @@
     padding: 0.625rem 0.75rem;
     flex-wrap: nowrap;
   }
-  
+
   .radio-info {
     min-width: 0;
     flex: 0 1 auto;
   }
-  
+
   .radio-name {
-    font-size: 0.875rem;
+    font-size: 1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   .radio-frequency {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
   }
-  
-  .volume-controls { 
-    width: 6rem;
-    gap: 0.375rem;
+
+  .volume-controls {
+    width: 8rem;
+    gap: 0.5rem;
   }
-  
+
   .volume-slider-container {
-    width: 4.5rem;
+    width: 6.5rem;
   }
-  
+
   .control-buttons {
-    gap: 0.375rem;
+    gap: 0.5rem;
   }
-  
+
   .control-icon {
-    width: 2rem;
-    height: 2rem;
+    width: 2.6rem;
+    height: 2.6rem;
   }
-  
+
   .expand-btn {
-    width: 1.875rem;
-    height: 1.875rem;
+    width: 2.2rem;
+    height: 2.2rem;
   }
-  
+
   .current-time {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
   }
-  
+
+  .volume-range::-webkit-slider-thumb { 
+    width: 1.1rem; 
+    height: 1.1rem; 
+  }
+
+  .volume-range::-moz-range-thumb { 
+    width: 1.1rem; 
+    height: 1.1rem; 
+  }
+
   .collapse-btn {
     width: 2.25rem;
     height: 2.25rem;

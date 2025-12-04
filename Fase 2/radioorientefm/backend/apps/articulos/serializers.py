@@ -66,12 +66,14 @@ class ArticuloSerializer(serializers.ModelSerializer):
         return None
 
 class ArticuloListSerializer(serializers.ModelSerializer):
-    """Serializer simplificado para listas"""
+    """serializer simplificado para listas"""
     autor_nombre = serializers.CharField(source='autor.full_name', read_only=True)
     categoria_nombre = serializers.CharField(source='categoria.nombre', read_only=True)
     imagen_destacada = serializers.SerializerMethodField()
     imagen_portada = serializers.SerializerMethodField()
     imagen_thumbnail = serializers.SerializerMethodField()
+    imagen_portada_url = serializers.SerializerMethodField()
+    imagen_thumbnail_url = serializers.SerializerMethodField()
     archivo_adjunto = serializers.SerializerMethodField()
     tiene_multimedia = serializers.BooleanField(read_only=True)
     categoria = serializers.SerializerMethodField()
@@ -80,7 +82,7 @@ class ArticuloListSerializer(serializers.ModelSerializer):
         model = Articulo
         fields = [
             'id', 'titulo', 'slug', 'resumen', 'contenido',
-            'imagen_portada', 'imagen_thumbnail', 'imagen_url', 'imagen_destacada',
+            'imagen_portada', 'imagen_thumbnail', 'imagen_portada_url', 'imagen_thumbnail_url', 'imagen_url', 'imagen_destacada',
             'video_url', 'archivo_adjunto',
             'autor_nombre', 'categoria', 'categoria_nombre', 
             'publicado', 'destacado',
@@ -104,6 +106,18 @@ class ArticuloListSerializer(serializers.ModelSerializer):
         if obj.imagen_thumbnail and request:
             return request.build_absolute_uri(obj.imagen_thumbnail.url)
         return None
+
+    def get_imagen_portada_url(self, obj):
+        request = self.context.get('request')
+        if obj.imagen_portada and request:
+            return request.build_absolute_uri(obj.imagen_portada.url)
+        return None
+
+    def get_imagen_thumbnail_url(self, obj):
+        request = self.context.get('request')
+        if obj.imagen_thumbnail and request:
+            return request.build_absolute_uri(obj.imagen_thumbnail.url)
+        return None
     
     def get_archivo_adjunto(self, obj):
         request = self.context.get('request')
@@ -120,7 +134,7 @@ class ArticuloListSerializer(serializers.ModelSerializer):
         return None
 
 class ArticuloCreateSerializer(serializers.ModelSerializer):
-    """Serializer para crear artículos"""
+    """serializer para crear articulos"""
     
     class Meta:
         model = Articulo
@@ -134,9 +148,9 @@ class ArticuloCreateSerializer(serializers.ModelSerializer):
         validated_data['autor'] = self.context['request'].user
         return super().create(validated_data)
 
-# Serializers de compatibilidad para el frontend existente
+#serializers de compatibilidad para el frontend existente
 class BlogPostLegacySerializer(serializers.ModelSerializer):
-    """Serializer para mantener compatibilidad con el frontend existente"""
+    """serializer para mantener compatibilidad con el frontend existente"""
     autor_id = serializers.IntegerField(source='autor.id', read_only=True)
     autor_nombre = serializers.CharField(source='autor.full_name', read_only=True)
     categoria = serializers.CharField(source='categoria.nombre', read_only=True)

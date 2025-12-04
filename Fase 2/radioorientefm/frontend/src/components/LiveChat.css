@@ -14,7 +14,7 @@
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(198, 40, 40, 0.25);
   transition: all 0.3s ease;
-  z-index: 1500;
+  z-index: 1200;
   font-weight: 600;
   font-size: 1rem;
 }
@@ -56,7 +56,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  z-index: 1500;
+  z-index: 1200;
   border: 1px solid var(--color-gray-200);
   overflow: hidden;
   opacity: 0;
@@ -341,7 +341,7 @@
   cursor: not-allowed;
 }
 
-/* Scrollbar Styles */
+/*scrollbar estilos*/
 .messages-list::-webkit-scrollbar {
   width: 4px;
 }
@@ -359,7 +359,7 @@
   background: var(--color-gray-500);
 }
 
-/* Responsive Design */
+/*responsivo design*/
 @media (max-width: 768px) {
   .chat-toggle {
     bottom: 90px;
@@ -391,10 +391,26 @@
 
 @media (max-width: 480px) {
   .chat-toggle {
-    bottom: 85px;
-    right: 0.75rem;
-    padding: 0.625rem 1rem;
-    font-size: 0.875rem;
+    bottom: 90px;
+    right: 1rem;
+    padding: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    font-size: 0;
+    transition: bottom 0.3s ease;
+  }
+
+  .chat-toggle.player-collapsed {
+    bottom: 1rem;
+  }
+
+  .chat-toggle span {
+    display: none;
+  }
+
+  .chat-toggle svg {
+    margin: 0;
   }
 
   .chat-window {
@@ -413,9 +429,7 @@
   }
 }
 
-/* ============================================
-   DARK MODE STYLES - LiveChat
-   ============================================ */
+/*============================================ dark mode estilos - livechat ============================================*/
 
 html.dark .chat-window {
   background: var(--card-bg);
@@ -485,7 +499,7 @@ html.dark .message-input::placeholder {
   opacity: 0.7;
 }
 
-/* Scrollbar en dark mode */
+/*scrollbar en dark mode*/
 html.dark .messages-list::-webkit-scrollbar-track {
   background: var(--bg-tertiary);
 }
@@ -498,7 +512,7 @@ html.dark .messages-list::-webkit-scrollbar-thumb:hover {
   background: var(--text-tertiary);
 }
 
-/* Animaciones */
+/*animaciones*/
 @keyframes pulse {
   0% {
     transform: scale(1);

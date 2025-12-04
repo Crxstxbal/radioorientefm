@@ -5,7 +5,7 @@ from apps.ubicacion.models import Pais, Ciudad, Comuna
 from apps.radio.models import Conductor
 
 class BandaEmergenteForm(ModelForm):
-    """Formulario para crear y editar bandas emergentes"""
+    """formulario para crear y editar bandas emergentes"""
     pais = forms.ModelChoiceField(
         queryset=Pais.objects.all(),
         label='País',
@@ -37,7 +37,7 @@ class BandaEmergenteForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Si la instancia ya tiene una comuna, establecer la ciudad y país correspondientes
+        #si la instancia ya tiene una comuna, establecer la ciudad y país correspondientes
         if 'comuna' in self.data:
             try:
                 comuna_id = int(self.data.get('comuna'))
@@ -55,18 +55,18 @@ class BandaEmergenteForm(ModelForm):
             self.fields['ciudad'].initial = comuna.ciudad
             self.fields['pais'].initial = comuna.ciudad.pais
         
-        # Establecer clases CSS para los campos
+        #establecer clases css para los campos
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
             
-        # Hacer que el campo de mensaje sea un textarea
+        #hacer que el campo de mensaje sea un textarea
         self.fields['mensaje'].widget = forms.Textarea(attrs={'rows': 3, 'class': 'form-control'})
         
-        # Hacer que el campo de género sea requerido
+        #hacer que el campo de género sea requerido
         self.fields['genero'].required = True
         self.fields['genero'].empty_label = 'Seleccione un género'
         
-        # Hacer que los campos de ubicación sean requeridos en cascada
+        #hacer que los campos de ubicacion sean requeridos en cascada
         if 'pais' in self.data and self.data['pais']:
             self.fields['ciudad'].required = True
             if 'ciudad' in self.data and self.data['ciudad']:
@@ -75,10 +75,10 @@ class BandaEmergenteForm(ModelForm):
 class ConductorForm(forms.ModelForm):
     class Meta:
         model = Conductor
-        # Definimos los campos que queremos en el formulario
+        #definimos los campos que queremos en el formulario
         fields = ['nombre', 'apellido', 'apodo', 'foto', 'email', 'telefono', 'activo']
 
-        # Añadimos clases de Bootstrap a los campos para que se vean bien
+        #añadimos clases de bootstrap a los campos para que se vean bien
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'apellido': forms.TextInput(attrs={'class': 'form-control'}),

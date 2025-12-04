@@ -3,7 +3,7 @@ from django.conf import settings
 import uuid
 
 class TipoAsunto(models.Model):
-    """Tipos de asunto para contactos"""
+    """tipos de asunto para contactos"""
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.TextField(blank=True, null=True)
     
@@ -16,7 +16,7 @@ class TipoAsunto(models.Model):
         return self.nombre
 
 class Estado(models.Model):
-    """Estados para contactos y bandas"""
+    """estados para contactos y bandas"""
     TIPO_ENTIDAD_CHOICES = [
         ('contacto', 'Contacto'),
         ('banda', 'Banda'),
@@ -35,7 +35,7 @@ class Estado(models.Model):
         return f"{self.nombre} ({self.get_tipo_entidad_display()})"
 
 class Contacto(models.Model):
-    """Mensajes de contacto normalizados"""
+    """mensajes de contacto normalizados"""
     nombre = models.CharField(max_length=100)
     email = models.EmailField(max_length=254)
     telefono = models.CharField(max_length=20, blank=True, null=True)
@@ -68,7 +68,7 @@ class Contacto(models.Model):
         return f"{self.nombre} - {self.tipo_asunto.nombre}"
 
 class Suscripcion(models.Model):
-    """Suscripciones normalizadas"""
+    """suscripciones normalizadas"""
     email = models.EmailField(max_length=254, unique=True)
     nombre = models.CharField(max_length=100)
     activa = models.BooleanField(default=True)

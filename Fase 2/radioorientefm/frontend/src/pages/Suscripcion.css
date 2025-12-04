@@ -1,0 +1,756 @@
+/*============================================ página de suscripcion moderna ============================================*/
+
+.subscription-page {
+  min-height: calc(100vh - 80px);
+  padding: 3rem 0;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+}
+
+/*============================================ header de la página ============================================*/
+
+.page-header-subscription {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem 1rem;
+}
+
+.page-icon-subscription {
+  width: 70px;
+  height: 70px;
+  color: #10b981;
+  margin: 0 auto 1.5rem;
+  filter: drop-shadow(0 4px 20px rgba(16, 185, 129, 0.3));
+  animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.page-title-subscription {
+  font-size: 3rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  letter-spacing: -0.5px;
+}
+
+.page-subtitle-subscription {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/*============================================ sección de métricas hero - arriba ============================================*/
+
+.stats-section-hero {
+  margin-bottom: 4rem;
+  padding: 2rem 1rem;
+}
+
+.stats-grid-modern {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.stat-card-modern {
+  background: var(--card-bg);
+  border: 2px solid transparent;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+/*colores diferentes para cada tarjeta*/
+.stat-card-modern:nth-child(1) {
+  border-color: #0ea5e9;
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(14, 165, 233, 0.05) 100%);
+}
+
+.stat-card-modern:nth-child(2) {
+  border-color: #10b981;
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(16, 185, 129, 0.05) 100%);
+}
+
+.stat-card-modern:nth-child(3) {
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(245, 158, 11, 0.05) 100%);
+}
+
+.stat-card-modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+.stat-card-modern:nth-child(1)::before {
+  background: linear-gradient(90deg, #0ea5e9 0%, #06b6d4 50%, #0ea5e9 100%);
+}
+
+.stat-card-modern:nth-child(2)::before {
+  background: linear-gradient(90deg, #10b981 0%, #059669 50%, #10b981 100%);
+}
+
+.stat-card-modern:nth-child(3)::before {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 50%, #f59e0b 100%);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.stat-card-modern:hover {
+  transform: translateY(-5px);
+}
+
+.stat-card-modern:nth-child(1):hover {
+  box-shadow:
+    0 12px 40px rgba(14, 165, 233, 0.25),
+    0 0 0 1px rgba(14, 165, 233, 0.1);
+}
+
+.stat-card-modern:nth-child(2):hover {
+  box-shadow:
+    0 12px 40px rgba(16, 185, 129, 0.25),
+    0 0 0 1px rgba(16, 185, 129, 0.1);
+}
+
+.stat-card-modern:nth-child(3):hover {
+  box-shadow:
+    0 12px 40px rgba(245, 158, 11, 0.25),
+    0 0 0 1px rgba(245, 158, 11, 0.1);
+}
+
+.subscription-page .stat-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.subscription-page .stat-card-modern:nth-child(1) .stat-icon {
+  background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+  box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+}
+
+.subscription-page .stat-card-modern:nth-child(2) .stat-icon {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+.subscription-page .stat-card-modern:nth-child(3) .stat-icon {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+}
+
+.subscription-page .stat-card-modern:hover .stat-icon {
+  transform: rotate(360deg) scale(1.1);
+}
+
+.subscription-page .stat-card-modern:nth-child(1):hover .stat-icon {
+  box-shadow: 0 12px 35px rgba(14, 165, 233, 0.5);
+}
+
+.subscription-page .stat-card-modern:nth-child(2):hover .stat-icon {
+  box-shadow: 0 12px 35px rgba(16, 185, 129, 0.5);
+}
+
+.subscription-page .stat-card-modern:nth-child(3):hover .stat-icon {
+  box-shadow: 0 12px 35px rgba(245, 158, 11, 0.5);
+}
+
+.stat-number-modern {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.stat-card-modern:nth-child(1) .stat-number-modern {
+  color: #0ea5e9;
+}
+
+.stat-card-modern:nth-child(2) .stat-number-modern {
+  color: #10b981;
+}
+
+.stat-card-modern:nth-child(3) .stat-number-modern {
+  color: #f59e0b;
+}
+
+.stat-label-modern {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/*============================================ contenido principal ============================================*/
+
+.subscription-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/*============================================ sección de beneficios ============================================*/
+
+.subscription-info {
+  padding: 1rem;
+}
+
+.section-title-modern {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.section-title-modern::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #06b6d4 0%, transparent 100%);
+  border-radius: 2px;
+}
+
+.benefits-grid-modern {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.benefit-card-modern {
+  background: var(--card-bg);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 2rem;
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.benefit-card-modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+/*colores diferentes para cada beneficio*/
+.benefit-card-modern:nth-child(1)::before {
+  background: linear-gradient(135deg, transparent 0%, rgba(139, 92, 246, 0.03) 100%);
+}
+
+.benefit-card-modern:nth-child(2)::before {
+  background: linear-gradient(135deg, transparent 0%, rgba(236, 72, 153, 0.03) 100%);
+}
+
+.benefit-card-modern:nth-child(3)::before {
+  background: linear-gradient(135deg, transparent 0%, rgba(59, 130, 246, 0.03) 100%);
+}
+
+.benefit-card-modern:nth-child(4)::before {
+  background: linear-gradient(135deg, transparent 0%, rgba(16, 185, 129, 0.03) 100%);
+}
+
+.benefit-card-modern:hover::before {
+  opacity: 1;
+}
+
+.benefit-card-modern:hover {
+  transform: translateY(-8px);
+}
+
+.benefit-card-modern:nth-child(1):hover {
+  border-color: #8b5cf6;
+}
+
+.benefit-card-modern:nth-child(2):hover {
+  border-color: #ec4899;
+}
+
+.benefit-card-modern:nth-child(3):hover {
+  border-color: #3b82f6;
+}
+
+.benefit-card-modern:nth-child(4):hover {
+  border-color: #10b981;
+}
+
+.benefit-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.benefit-card-modern:nth-child(1) .benefit-icon-wrapper {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+}
+
+.benefit-card-modern:nth-child(2) .benefit-icon-wrapper {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(236, 72, 153, 0.05) 100%);
+}
+
+.benefit-card-modern:nth-child(3) .benefit-icon-wrapper {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+}
+
+.benefit-card-modern:nth-child(4) .benefit-icon-wrapper {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+}
+
+.benefit-card-modern:nth-child(1):hover .benefit-icon-wrapper {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  transform: scale(1.1) rotate(5deg);
+}
+
+.benefit-card-modern:nth-child(2):hover .benefit-icon-wrapper {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  transform: scale(1.1) rotate(5deg);
+}
+
+.benefit-card-modern:nth-child(3):hover .benefit-icon-wrapper {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  transform: scale(1.1) rotate(5deg);
+}
+
+.benefit-card-modern:nth-child(4):hover .benefit-icon-wrapper {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  transform: scale(1.1) rotate(5deg);
+}
+
+.benefit-icon-wrapper .benefit-icon {
+  width: 32px;
+  height: 32px;
+  transition: color 0.3s ease;
+}
+
+.benefit-card-modern:nth-child(1) .benefit-icon-wrapper .benefit-icon {
+  color: #8b5cf6;
+}
+
+.benefit-card-modern:nth-child(2) .benefit-icon-wrapper .benefit-icon {
+  color: #ec4899;
+}
+
+.benefit-card-modern:nth-child(3) .benefit-icon-wrapper .benefit-icon {
+  color: #3b82f6;
+}
+
+.benefit-card-modern:nth-child(4) .benefit-icon-wrapper .benefit-icon {
+  color: #10b981;
+}
+
+.benefit-card-modern:hover .benefit-icon-wrapper .benefit-icon {
+  color: white;
+}
+
+.benefit-title-modern {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.benefit-description-modern {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/*============================================ formulario de suscripcion moderno ============================================*/
+
+.subscription-form-container-modern {
+  background: var(--card-bg);
+  border: 2px solid rgba(14, 165, 233, 0.15);
+  border-radius: 24px;
+  padding: 3rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+}
+
+.form-title-modern {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.form-description-modern {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+.subscription-form-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.form-group-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.form-label-modern {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-left: 0.5rem;
+}
+
+.form-input-modern {
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--input-border);
+  border-radius: 12px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.form-input-modern::placeholder {
+  color: var(--text-tertiary);
+}
+
+.form-input-modern:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+  background: var(--input-bg);
+}
+
+.form-input-modern:hover:not(:focus) {
+  border-color: rgba(14, 165, 233, 0.4);
+}
+
+.subscribe-btn-modern {
+  margin-top: 0.5rem;
+  padding: 1.25rem 2rem;
+  font-size: 1.125rem;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.subscribe-btn-modern::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.subscribe-btn-modern:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.subscribe-btn-modern:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.privacy-note-modern {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+
+/*============================================ mensaje de éxito ============================================*/
+
+.success-message-modern {
+  text-align: center;
+  padding: 2rem;
+}
+
+.success-icon-wrapper {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: successPulse 2s ease-in-out infinite;
+}
+
+@keyframes successPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 20px rgba(34, 197, 94, 0);
+  }
+}
+
+.success-icon-modern {
+  color: #22c55e;
+}
+
+.success-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.success-text {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.btn-outline-modern {
+  padding: 0.875rem 2rem;
+  border: 2px solid #10b981;
+  background: transparent;
+  color: #10b981;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-modern:hover {
+  background: #10b981;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+/*============================================ dark mode ============================================*/
+
+html.dark .stat-card-modern:nth-child(1) {
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(14, 165, 233, 0.05) 100%);
+  border-color: #0ea5e9;
+}
+
+html.dark .stat-card-modern:nth-child(2) {
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(16, 185, 129, 0.05) 100%);
+  border-color: #10b981;
+}
+
+html.dark .stat-card-modern:nth-child(3) {
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(245, 158, 11, 0.05) 100%);
+  border-color: #f59e0b;
+}
+
+html.dark .stat-card-modern:nth-child(1):hover {
+  box-shadow:
+    0 12px 40px rgba(14, 165, 233, 0.3),
+    0 0 0 1px rgba(14, 165, 233, 0.2);
+}
+
+html.dark .stat-card-modern:nth-child(2):hover {
+  box-shadow:
+    0 12px 40px rgba(16, 185, 129, 0.3),
+    0 0 0 1px rgba(16, 185, 129, 0.2);
+}
+
+html.dark .stat-card-modern:nth-child(3):hover {
+  box-shadow:
+    0 12px 40px rgba(245, 158, 11, 0.3),
+    0 0 0 1px rgba(245, 158, 11, 0.2);
+}
+
+html.dark .benefit-card-modern {
+  background: var(--card-bg);
+}
+
+html.dark .subscription-form-container-modern {
+  background: var(--card-bg);
+  border-color: rgba(14, 165, 233, 0.2);
+}
+
+html.dark .form-input-modern {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-primary);
+}
+
+html.dark .form-input-modern:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+}
+
+/*============================================ responsivo design ============================================*/
+
+@media (max-width: 1024px) {
+  .subscription-content {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .subscription-form-container-modern {
+    position: static;
+  }
+
+  .stats-grid-modern {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-title-subscription {
+    font-size: 2.25rem;
+  }
+
+  .page-subtitle-subscription {
+    font-size: 1.125rem;
+  }
+
+  .page-icon-subscription {
+    width: 60px;
+    height: 60px;
+  }
+
+  .stats-grid-modern {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .stat-card-modern {
+    padding: 2rem 1.5rem;
+  }
+
+  .stat-number-modern {
+    font-size: 3rem;
+  }
+
+  .subscription-page .stat-icon {
+    width: 70px;
+    height: 70px;
+  }
+
+  .section-title-modern {
+    font-size: 1.75rem;
+  }
+
+  .subscription-form-container-modern {
+    padding: 2rem 1.5rem;
+  }
+
+  .form-title-modern {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .subscription-page {
+    padding: 2rem 0;
+  }
+
+  .page-header-subscription {
+    padding: 1.5rem 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .page-title-subscription {
+    font-size: 1.875rem;
+  }
+
+  .page-subtitle-subscription {
+    font-size: 1rem;
+  }
+
+  .stats-section-hero {
+    padding: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .stat-card-modern {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .stat-number-modern {
+    font-size: 2.5rem;
+  }
+
+  .stat-label-modern {
+    font-size: 1rem;
+  }
+
+  .subscription-form-container-modern {
+    padding: 2rem 1.25rem;
+    border-radius: 20px;
+  }
+
+  .benefit-card-modern {
+    padding: 1.5rem;
+  }
+
+  .subscribe-btn-modern {
+    padding: 1.125rem 1.75rem;
+    font-size: 1rem;
+  }
+}

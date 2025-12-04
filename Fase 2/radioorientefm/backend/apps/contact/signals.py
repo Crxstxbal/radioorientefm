@@ -9,44 +9,41 @@ from .models import Suscripcion
 
 @receiver(post_save, sender=Suscripcion)
 def enviar_email_bienvenida(sender, instance, created, **kwargs):
-    """
-    Envía un email de bienvenida cuando se crea una nueva suscripción.
-    Solo se envía si es una suscripción nueva Y está activa.
-    """
-    # Solo enviar si:
-    # 1. Es una suscripción nueva (created=True)
-    # 2. La suscripción está activa (activa=True)
+    """envía un email de bienvenida cuando se crea una nueva suscripcion. solo se envía si es una suscripcion nueva y está activa"""
+    #solo enviar si
+    #1. es una suscripcion nueva (created=true)
+    #2. la suscripcion está activa (activa=true)
     if not created or not instance.activa:
         return
 
     try:
-        # Preparar el contexto para el email
+        #preparar el contexto para el email
         context = {
             'site_url': settings.FRONTEND_URL or 'http://localhost:3000',
             'radio_name': 'Radio Oriente',
             'nombre': instance.nombre,
         }
 
-        # Renderizar el template HTML
+        #renderizar el template html
         html_message = render_to_string('emails/bienvenida_suscripcion.html', context)
-        plain_message = strip_tags(html_message)  # Versión texto plano como fallback
+  #versión texto plano como fallback
 
-        # Preparar el asunto
+        #preparar el asunto
         subject = f'¡Bienvenido a Radio Oriente! 🎉'
         from_email = settings.DEFAULT_FROM_EMAIL
 
-        # Crear email con soporte HTML
+        #crear email con soporte html
         email = EmailMultiAlternatives(
             subject=subject,
-            body=plain_message,  # Versión texto plano
+  #versión texto plano
             from_email=from_email,
             to=[instance.email]
         )
 
-        # Adjuntar versión HTML
+        #adjuntar versión html
         email.attach_alternative(html_message, "text/html")
 
-        # Agregar headers para el botón de desuscripción de Gmail
+        #agregar headers para el botón de desuscripcion de gmail
         backend_url = getattr(settings, 'BACKEND_URL', 'http://localhost:8000')
         unsubscribe_url = f"{backend_url}/api/contact/unsubscribe-token/?token={instance.token_unsuscribe}"
         email.extra_headers = {
@@ -54,7 +51,7 @@ def enviar_email_bienvenida(sender, instance, created, **kwargs):
             'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
         }
 
-        # Enviar
+        #enviar
         email.send()
 
         print(f"Email de bienvenida enviado a: {instance.email}")

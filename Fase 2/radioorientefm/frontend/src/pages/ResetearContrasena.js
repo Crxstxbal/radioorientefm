@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 import toast from 'react-hot-toast';
 import './Auth.css';
 
@@ -40,7 +40,7 @@ const ResetearContrasena = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/password-reset-confirm/', {
+      const response = await api.post('/api/auth/password-reset-confirm/', {
         uid: uid,
         token: token,
         new_password: formData.new_password,
@@ -50,7 +50,7 @@ const ResetearContrasena = () => {
       toast.success(response.data.message || 'Contraseña actualizada exitosamente');
       setSuccess(true);
 
-      // Redirigir al login después de 3 segundos
+      //se redirige al login después de 3 segundos
       setTimeout(() => {
         navigate('/iniciar-sesion');
       }, 3000);
@@ -96,7 +96,7 @@ const ResetearContrasena = () => {
   return (
     <div className="auth-page">
       <div className="container">
-        <div className="auth-container">
+        <div className="auth-container auth-container-center">
           <div className="auth-card">
             <div className="auth-header">
               <Lock className="auth-icon" />

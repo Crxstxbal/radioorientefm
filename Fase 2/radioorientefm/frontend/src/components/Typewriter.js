@@ -1,8 +1,8 @@
-// frontend/src/components/Typewriter.js
+//frontend/src/componentes/typewriter.js
 
 import React, { useState, useEffect } from 'react';
 
-// Lista de textos para animar
+//lista de textos para animar
 const animatedTexts = [
   "Radio Oriente FM",
   "La Mejor de Peñalolén"
@@ -21,19 +21,19 @@ const Typewriter = () => {
 
     const timeout = setTimeout(() => {
       if (!isDeleting) {
-        // Escribiendo
+        //escribiendo
         if (displayedText.length < currentFullText.length) {
           setDisplayedText(currentFullText.substring(0, displayedText.length + 1));
         } else {
-          // Terminó de escribir, esperar y luego borrar
+          //terminó de escribir, esperar y luego borrar
           setTimeout(() => setIsDeleting(true), pauseAfterComplete);
         }
       } else {
-        // Borrando
+        //borrando
         if (displayedText.length > 0) {
           setDisplayedText(currentFullText.substring(0, displayedText.length - 1));
         } else {
-          // Terminó de borrar, cambiar al siguiente texto
+          //terminó de borrar, cambiar al siguiente texto
           setIsDeleting(false);
           setTextIndex((prev) => (prev + 1) % animatedTexts.length);
           setTimeout(() => {}, pauseAfterDelete);

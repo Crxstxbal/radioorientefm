@@ -16,11 +16,6 @@
         --radio-text-primary: #24292e;
         --radio-text-secondary: #586069;
         --radio-text-muted: #959da5;
-        --radio-gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        --radio-gradient-danger: linear-gradient(135deg, #ec4899 0%, #ef4444 100%);
-        --radio-gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        --radio-gradient-info: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
-        --radio-gradient-warning: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
         --radio-accent: #6366f1;
         --radio-accent-hover: #4f46e5;
     }
@@ -83,15 +78,7 @@
         backdrop-filter: blur(10px) !important;
     }
 
-    #radio-page .card-header h5 {
-        color: var(--radio-text-primary) !important;
-        font-weight: 700 !important;
-        font-size: 1.125rem !important;
-        margin: 0 !important;
-        letter-spacing: -0.25px !important;
-    }
-
-    #radio-page .card-title {
+    #radio-page .card-header h5, #radio-page .card-header h6 {
         color: var(--radio-text-primary) !important;
         font-weight: 700 !important;
         font-size: 1.125rem !important;
@@ -110,12 +97,12 @@
         padding: 1.25rem 2rem !important;
     }
 
-    /* Tablas con diseño profesional */
+    /* TABLAS MODERNAS SIN BORDES TIPO EXCEL */
     #radio-page .table {
         color: var(--radio-text-primary) !important;
         margin-bottom: 0 !important;
         border-collapse: separate !important;
-        border-spacing: 0 !important;
+        border-spacing: 0 0.5rem !important;
     }
 
     #radio-page .table thead {
@@ -125,41 +112,50 @@
     }
 
     #radio-page .table thead th {
-        background: var(--radio-card-bg) !important;
+        background: transparent !important;
         color: var(--radio-text-secondary) !important;
         font-weight: 700 !important;
         font-size: 0.75rem !important;
         text-transform: uppercase !important;
         letter-spacing: 1px !important;
-        border-bottom: 2px solid var(--radio-border) !important;
-        padding: 1.25rem 1.5rem !important;
+        border: none !important;
+        padding: 0.75rem 1.25rem !important;
         white-space: nowrap !important;
     }
 
     #radio-page .table tbody td {
-        padding: 1.25rem 1.5rem !important;
+        padding: 1.25rem !important;
         vertical-align: middle !important;
-        border-bottom: 1px solid var(--radio-border) !important;
+        border: none !important;
         color: var(--radio-text-primary) !important;
         font-size: 0.9375rem !important;
+        background: var(--radio-card-hover) !important;
     }
 
-    #radio-page .table tbody td strong {
-        font-weight: 600 !important;
-        color: var(--radio-text-primary) !important;
+    #radio-page .table tbody td:first-child {
+        border-top-left-radius: 12px !important;
+        border-bottom-left-radius: 12px !important;
+        padding-left: 1.5rem !important;
+    }
+
+    #radio-page .table tbody td:last-child {
+        border-top-right-radius: 12px !important;
+        border-bottom-right-radius: 12px !important;
+        padding-right: 1.5rem !important;
     }
 
     #radio-page .table tbody tr {
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
     }
 
     #radio-page .table tbody tr:hover {
-        background: var(--radio-card-hover) !important;
-        transform: scale(1.002) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        transform: translateY(-2px) !important;
     }
 
-    #radio-page .table tbody tr:last-child td {
-        border-bottom: none !important;
+    #radio-page .table tbody tr:hover td {
+        background: var(--radio-card-bg) !important;
     }
 
     /* Table responsive wrapper */
@@ -167,6 +163,7 @@
         border-radius: 0 !important;
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
+        padding: 0 !important;
     }
 
     /* Badges con diseño moderno */
@@ -209,6 +206,18 @@
     }
 
     #radio-page .btn i {
+        font-size: 0.875rem !important;
+    }
+
+    /* Botones circulares para acciones */
+    #radio-page .btn-circle {
+        width: 36px !important;
+        height: 36px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
         font-size: 0.875rem !important;
     }
 
@@ -262,24 +271,12 @@
         color: var(--radio-text-muted) !important;
     }
 
-    #radio-page h2,
-    #radio-page h5,
-    #radio-page h6 {
+    #radio-page h2, #radio-page h5, #radio-page h6 {
         color: var(--radio-text-primary) !important;
     }
 
     #radio-page small {
         color: var(--radio-text-secondary) !important;
-    }
-
-    /* Header bg-white override */
-    #radio-page .card-header.bg-white,
-    #radio-page .card-header {
-        background: transparent !important;
-    }
-
-    #radio-page .table-light thead tr th {
-        background: transparent !important;
     }
 
     /* Botones de acciones por tamaño */
@@ -336,15 +333,23 @@
     }
 
     /* Botones outline */
-    #radio-page .btn-outline-success,
-    #radio-page .btn-outline-danger {
+    #radio-page .btn-outline-primary {
         background: transparent !important;
-        border: 2px solid currentColor !important;
+        border: 2px solid #6366f1 !important;
+        color: #6366f1 !important;
         font-weight: 600 !important;
     }
 
+    #radio-page .btn-outline-primary:hover {
+        background: #6366f1 !important;
+        color: white !important;
+    }
+
     #radio-page .btn-outline-success {
+        background: transparent !important;
+        border: 2px solid #10b981 !important;
         color: #10b981 !important;
+        font-weight: 600 !important;
     }
 
     #radio-page .btn-outline-success:hover {
@@ -353,7 +358,10 @@
     }
 
     #radio-page .btn-outline-danger {
+        background: transparent !important;
+        border: 2px solid #ef4444 !important;
         color: #ef4444 !important;
+        font-weight: 600 !important;
     }
 
     #radio-page .btn-outline-danger:hover {
@@ -389,75 +397,6 @@
         font-weight: 700 !important;
     }
 
-    /* Artículos recientes con mejor diseño */
-    #radio-page .list-group-item {
-        background: transparent !important;
-        border: none !important;
-        border-bottom: 1px solid var(--radio-border) !important;
-        padding: 1.25rem 0 !important;
-        color: var(--radio-text-primary) !important;
-        transition: all 0.2s ease !important;
-    }
-
-    #radio-page .list-group-item:hover {
-        padding-left: 0.75rem !important;
-        border-left: 3px solid var(--radio-accent) !important;
-    }
-
-    #radio-page .list-group-item:last-child {
-        border-bottom: none !important;
-    }
-
-    #radio-page .list-group-item strong {
-        color: var(--radio-text-primary) !important;
-        display: block !important;
-        margin-bottom: 0.375rem !important;
-        font-weight: 600 !important;
-        font-size: 0.9375rem !important;
-    }
-
-    #radio-page .list-group-item .text-muted,
-    #radio-page .list-group-item small {
-        color: var(--radio-text-secondary) !important;
-        font-size: 0.8125rem !important;
-        line-height: 1.5 !important;
-    }
-
-    /* Colores de texto */
-    #radio-page .text-success {
-        color: #10b981 !important;
-        font-weight: 600 !important;
-    }
-
-    #radio-page .text-danger {
-        color: #ef4444 !important;
-        font-weight: 600 !important;
-    }
-
-    #radio-page .text-info {
-        color: #0ea5e9 !important;
-        font-weight: 600 !important;
-    }
-
-    #radio-page .text-warning {
-        color: #f59e0b !important;
-        font-weight: 600 !important;
-    }
-
-    #radio-page .text-primary {
-        color: var(--radio-accent) !important;
-    }
-
-    /* Iconos con mejor visualización */
-    #radio-page .fa-broadcast-tower,
-    #radio-page .fa-microphone,
-    #radio-page .fa-calendar-alt,
-    #radio-page .fa-newspaper,
-    #radio-page .fa-radio {
-        opacity: 0.95 !important;
-        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1)) !important;
-    }
-
     /* Badges de estado con colores profesionales */
     #radio-page .badge.bg-success {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
@@ -477,6 +416,18 @@
     #radio-page .badge.bg-warning {
         background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
         box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25) !important;
+        color: white !important;
+    }
+
+    #radio-page .badge.bg-secondary {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+        box-shadow: 0 2px 8px rgba(107, 114, 128, 0.25) !important;
+        color: white !important;
+    }
+
+    #radio-page .badge.bg-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25) !important;
         color: white !important;
     }
 
@@ -516,8 +467,7 @@
         background: linear-gradient(to bottom, var(--radio-card-bg), transparent) !important;
     }
 
-    #radio-page .modal-header h5,
-    #radio-page .modal-title {
+    #radio-page .modal-header h5, #radio-page .modal-title {
         font-weight: 700 !important;
         color: var(--radio-text-primary) !important;
         font-size: 1.25rem !important;
@@ -541,8 +491,7 @@
         margin-bottom: 0.5rem !important;
     }
 
-    #radio-page .form-control,
-    #radio-page .form-select {
+    #radio-page .form-control, #radio-page .form-select {
         background: var(--radio-card-bg) !important;
         color: var(--radio-text-primary) !important;
         border: 1px solid var(--radio-border) !important;
@@ -552,20 +501,17 @@
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
-    html.dark #radio-page .form-control,
-    html.dark #radio-page .form-select {
+    html.dark #radio-page .form-control, html.dark #radio-page .form-select {
         background: #0d1117 !important;
     }
 
-    #radio-page .form-control:focus,
-    #radio-page .form-select:focus {
+    #radio-page .form-control:focus, #radio-page .form-select:focus {
         border-color: var(--radio-accent) !important;
         box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
         background: var(--radio-card-bg) !important;
     }
 
-    html.dark #radio-page .form-control:focus,
-    html.dark #radio-page .form-select:focus {
+    html.dark #radio-page .form-control:focus, html.dark #radio-page .form-select:focus {
         background: #0d1117 !important;
         box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
     }
@@ -577,15 +523,6 @@
 
     #radio-page .text-center.py-4 i {
         opacity: 0.5 !important;
-    }
-
-    /* Spacing mejorado */
-    #radio-page .mb-3 {
-        margin-bottom: 1.25rem !important;
-    }
-
-    #radio-page .mb-4 {
-        margin-bottom: 2rem !important;
     }
 
     /* Responsive design */
@@ -603,6 +540,13 @@
         #radio-page>.d-flex:first-child {
             flex-direction: column !important;
             gap: 1rem !important;
+            align-items: stretch !important;
+        }
+
+        #radio-page>.d-flex:first-child > div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         #radio-page>.d-flex h2 {
@@ -633,26 +577,42 @@
         }
 
         #radio-page .table thead th {
-            padding: 1rem !important;
+            padding: 0.75rem !important;
             font-size: 0.6875rem !important;
         }
 
         #radio-page .table tbody td {
-            padding: 1rem !important;
+            padding: 0.875rem !important;
+        }
+
+        #radio-page .table tbody td:first-child {
+            padding-left: 1rem !important;
+        }
+
+        #radio-page .table tbody td:last-child {
+            padding-right: 1rem !important;
         }
 
         #radio-page .badge {
             font-size: 0.6875rem !important;
             padding: 0.375rem 0.75rem !important;
         }
+
+        #radio-page .btn-circle {
+            width: 32px !important;
+            height: 32px !important;
+        }
     }
 
     @media (max-width: 576px) {
-
         #radio-page .modal-body,
         #radio-page .modal-header,
         #radio-page .modal-footer {
             padding: 1.25rem !important;
+        }
+
+        #radio-page .table-responsive {
+            font-size: 0.8125rem !important;
         }
     }
 </style>
@@ -679,7 +639,7 @@
     <div class="row mb-4">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header bg-white">
+                <div class="card-header">
                     <h5 class="mb-0">
                         <i class="fas fa-radio text-danger me-2"></i>
                         Estado de la Estación
@@ -691,13 +651,10 @@
                         <div class="col-md-6">
                             <div class="d-flex align-items-center mb-2">
                                 <h6 id="station-name" class="mb-0 me-3">{{ station.nombre }}</h6>
-                                <form method="post" action="{% url 'toggle_station_status' %}" class="d-inline"
-                                    id="toggle-status-form">
+                                <form method="post" action="{% url 'toggle_station_status' %}" class="d-inline" id="toggle-status-form">
                                     {% csrf_token %}
-                                    <button type="submit"
-                                        class="btn btn-sm {% if station.activo %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
-                                        <i
-                                            class="fas {% if station.activo %}fa-pause{% else %}fa-play{% endif %} me-1"></i>
+                                    <button type="submit" class="btn btn-sm {% if station.activo %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
+                                        <i class="fas {% if station.activo %}fa-pause{% else %}fa-play{% endif %} me-1"></i>
                                         {% if station.activo %}Pausar Transmisión{% else %}Iniciar Transmisión{% endif%}
                                     </button>
                                 </form>
@@ -706,6 +663,16 @@
                             <p class="mb-0">
                                 <strong>Stream URL:</strong>
                                 <code id="station-url">{{ station.stream_url|default:"No configurado" }}</code>
+                            </p>
+                            <p class="mb-0">
+                                <strong>URL Transmisión en Vivo:</strong>
+                                <code id="live-stream-url">
+                                    {% if station.live_stream_url %}
+                                        <a href="{{ station.live_stream_url }}" target="_blank" class="text-primary">{{ station.live_stream_url|truncatechars:40 }}</a>
+                                    {% else %}
+                                        No configurado
+                                    {% endif %}
+                                </code>
                             </p>
                         </div>
                         <div class="col-md-6 text-end">
@@ -740,7 +707,7 @@
         <!-- Estadísticas de la radio -->
         <div class="col-md-4">
             <div class="card">
-                <div class="card-header bg-white">
+                <div class="card-header">
                     <h5 class="mb-0">Estadísticas</h5>
                 </div>
                 <div class="card-body">
@@ -768,9 +735,9 @@
     <!-- Programación -->
     <div class="row">
         <!-- Tabla de Programas -->
-        <div class="col-md-8">
+        <div class="col-md-12 mb-4">
             <div class="card">
-                <div class="card-header bg-white">
+                <div class="card-header">
                     <h5 class="mb-0">
                         <i class="fas fa-calendar-alt text-info me-2"></i>
                         Programación
@@ -778,8 +745,8 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
+                        <table class="table mb-0">
+                            <thead>
                                 <tr>
                                     <th>Programa</th>
                                     <th>Conductores</th>
@@ -808,7 +775,10 @@
                                         {% endfor %}
                                     </td>
                                     <td>
-                                        <span class="badge bg-info">{{ program.get_dias_display }}</span>
+                                        <span class="badge bg-info">{{ program.get_horario_display }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">{{ program.get_dias_display }}</span>
                                     </td>
                                     <td>
                                         {% if program.activo %}
@@ -842,11 +812,10 @@
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="5" class="text-center py-4">
+                                    <td colspan="6" class="text-center py-4">
                                         <i class="fas fa-calendar fa-3x text-muted mb-3"></i>
                                         <p class="text-muted">No hay programas configurados</p>
-                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#addProgramModal">
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProgramModal">
                                             Crear Primer Programa
                                         </button>
                                     </td>
@@ -861,35 +830,29 @@
                             <ul class="pagination pagination-sm justify-content-center mb-0">
                                 {% if programs.has_previous %}
                                 <li class="page-item">
-                                    <a class="page-link"
-                                        href="?programs_page=1{% if conductores.number %}&conductores_page={{ conductores.number }}{% endif %}">Primera</a>
+                                    <a class="page-link" href="?programs_page=1{% if conductores.number %}&conductores_page={{ conductores.number }}{% endif %}">Primera</a>
                                 </li>
                                 <li class="page-item">
-                                    <a class="page-link"
-                                        href="?programs_page={{ programs.previous_page_number }}{% if conductores.number %}&conductores_page={{ conductores.number }}{% endif %}">Anterior</a>
+                                    <a class="page-link" href="?programs_page={{ programs.previous_page_number }}{% if conductores.number %}&conductores_page={{ conductores.number }}{% endif %}">Anterior</a>
                                 </li>
                                 {% endif %}
 
                                 {% for num in programs.paginator.page_range %}
                                 {% if programs.number == num %}
                                 <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                                {% elif num > programs.number|add:'-3' and num < programs.number|add:'3' %} <li
-                                    class="page-item"><a class="page-link"
-                                        href="?programs_page={{ num }}{% if conductores.number %}&conductores_page={{ conductores.number }}{% endif %}">{{
-                                        num }}</a></li>
-                                    {% endif %}
-                                    {% endfor %}
+                                {% elif num > programs.number|add:'-3' and num < programs.number|add:'3' %}
+                                <li class="page-item"><a class="page-link" href="?programs_page={{ num }}{% if conductores.number %}&conductores_page={{ conductores.number }}{% endif %}">{{ num }}</a></li>
+                                {% endif %}
+                                {% endfor %}
 
-                                    {% if programs.has_next %}
-                                    <li class="page-item">
-                                        <a class="page-link"
-                                            href="?programs_page={{ programs.next_page_number }}{% if conductores.number %}&conductores_page={{ conductores.number }}{% endif %}">Siguiente</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link"
-                                            href="?programs_page={{ programs.paginator.num_pages }}{% if conductores.number %}&conductores_page={{ conductores.number }}{% endif %}">Última</a>
-                                    </li>
-                                    {% endif %}
+                                {% if programs.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?programs_page={{ programs.next_page_number }}{% if conductores.number %}&conductores_page={{ conductores.number }}{% endif %}">Siguiente</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?programs_page={{ programs.paginator.num_pages }}{% if conductores.number %}&conductores_page={{ conductores.number }}{% endif %}">Última</a>
+                                </li>
+                                {% endif %}
                             </ul>
                         </nav>
                     </div>
@@ -898,526 +861,446 @@
             </div>
         </div>
 
-
-        <!-- Artículos Recientes -->
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-newspaper text-warning me-2"></i>
-                        Artículos Recientes
-                    </h5>
-                    <span class="badge bg-primary">
-                        <i class="fas fa-file-alt me-1"></i>
-                        {{ total_articulos }} total
-                    </span>
-                </div>
-                <div class="card-body">
-                    {% for articulo in articulos_recientes %}
-                    <div class="d-flex mb-3">
-                        {% if articulo.imagen_thumbnail %}
-                        <img src="{{ articulo.imagen_thumbnail.url }}" class="rounded me-3" alt="{{ articulo.titulo }}"
-                            style="width: 60px; height: 60px; object-fit: cover;">
-                        {% elif articulo.imagen_portada %}
-                        <img src="{{ articulo.imagen_portada.url }}" class="rounded me-3" alt="{{ articulo.titulo }}"
-                            style="width: 60px; height: 60px; object-fit: cover;">
-                        {% elif articulo.imagen_url %}
-                        <img src="{{ articulo.imagen_url }}" class="rounded me-3" alt="{{ articulo.titulo }}"
-                            style="width: 60px; height: 60px; object-fit: cover;">
-                        {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center me-3"
-                            style="width: 60px; height: 60px;">
-                            <i class="fas fa-image text-muted"></i>
-                        </div>
-                        {% endif %}
-                        <div class="flex-grow-1">
-                            <h6 class="mb-0" style="font-size: 0.9rem;">
-                                <a href="/api/articulos/articulos/{{ articulo.slug }}/"
-                                    class="text-dark text-decoration-none">{{ articulo.titulo|truncatechars:50 }}</a>
-                            </h6>
-                            {% if articulo.categoria %}
-                            <span class="badge bg-light text-dark border mb-1"
-                                style="font-size: 0.7rem; font-weight: normal;">
-                                {{ articulo.categoria.nombre }}
-                            </span>
-                            {% endif %}
-                            <div class="small text-muted">
-                                {{ articulo.fecha_publicacion|date:"d M Y"|default:articulo.fecha_creacion|date:"d M Y" }}
-                            </div>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-newspaper fa-2x text-muted mb-3"></i>
-                        <p class="text-muted">No hay artículos recientes</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
         <!-- Gestión de conductores -->
-
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Gestión de Conductores</h6>
-                <a href="{% url 'crear_conductor' %}" class="btn btn-success btn-icon-split btn-sm">
-                    <span class="icon text-white-50">
-                        <i class="fas fa-plus"></i>
-                    </span>
-                    <span class="text">Nuevo Conductor</span>
-                </a>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered" id="dataTableConductores" width="100%" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th>Foto</th>
-                                <th>Nombre</th>
-                                <th>Apodo</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for conductor in conductores %}
-                            <tr>
-                                <td class="text-center">
-                                    {% if conductor.foto %}
-                                    <img src="{{ conductor.foto.url }}" alt="{{ conductor.nombre }}"
-                                        class="img-fluid rounded-circle"
-                                        style="width: 40px; height: 40px; object-fit: cover;">
-                                    {% else %}
-                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center"
-                                        style="width: 40px; height: 40px;">
-                                        <i class="fas fa-user text-muted"></i>
-                                    </div>
-                                    {% endif %}
-                                </td>
-                                <td>{{ conductor.nombre }} {{ conductor.apellido }}</td>
-                                <td>{{ conductor.apodo|default:"-" }}</td>
-                                <td>
-                                    {% if conductor.activo %}
-                                    <span class="badge bg-success">Activo</span>
-                                    {% else %}
-                                    <span class="badge bg-secondary">Inactivo</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-nowrap">
-                                    <a href="{% url 'editar_conductor' conductor.id %}"
-                                        class="btn btn-info btn-circle btn-sm" title="Editar">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </a>
-
-                                    <form method="POST" action="{% url 'toggle_activo_conductor' conductor.id %}"
-                                        style="display: inline-block;">
-                                        {% csrf_token %}
-                                        <button type="submit"
-                                            class="btn btn-{% if conductor.activo %}warning{% else %}success{% endif %} btn-circle btn-sm"
-                                            title="{% if conductor.activo %}Desactivar{% else %}Activar{% endif %}">
-                                            <i
-                                                class="fas fa-{% if conductor.activo %}eye-slash{% else %}eye{% endif %}"></i>
-                                        </button>
-                                    </form>
-
-                                    <form method="POST" action="{% url 'eliminar_conductor' conductor.id %}"
-                                        style="display: inline-block;"
-                                        onsubmit="return confirm('¿Estás seguro de que deseas eliminar a {{ conductor.nombre|escapejs }}? Esta acción no se puede deshacer.');">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger btn-circle btn-sm" title="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="5" class="text-center">No hay conductores registrados.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-microphone text-success me-2"></i>
+                        Gestión de Conductores
+                    </h6>
+                    <a href="{% url 'crear_conductor' %}" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus me-1"></i>
+                        Nuevo Conductor
+                    </a>
                 </div>
-                {% if conductores.has_other_pages %}
-                <div class="card-footer">
-                    <nav aria-label="Paginación de conductores">
-                        <ul class="pagination pagination-sm justify-content-center mb-0">
-                            {% if conductores.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link"
-                                    href="?conductores_page=1{% if programs.number %}&programs_page={{ programs.number }}{% endif %}">Primera</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link"
-                                    href="?conductores_page={{ conductores.previous_page_number }}{% if programs.number %}&programs_page={{ programs.number }}{% endif %}">Anterior</a>
-                            </li>
-                            {% endif %}
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Nombre</th>
+                                    <th>Apodo</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for conductor in conductores %}
+                                <tr>
+                                    <td class="text-center">
+                                        {% if conductor.foto %}
+                                        <img src="{{ conductor.foto.url }}" alt="{{ conductor.nombre }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user text-muted"></i>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td><strong>{{ conductor.nombre }} {{ conductor.apellido }}</strong></td>
+                                    <td>{{ conductor.apodo|default:"-" }}</td>
+                                    <td>
+                                        {% if conductor.activo %}
+                                        <span class="badge bg-success">Activo</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'editar_conductor' conductor.id %}" class="btn btn-info btn-circle btn-sm" title="Editar">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </a>
 
-                            {% for num in conductores.paginator.page_range %}
-                            {% if conductores.number == num %}
-                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                            {% elif num > conductores.number|add:'-3' and num < conductores.number|add:'3' %} <li
-                                class="page-item"><a class="page-link"
-                                    href="?conductores_page={{ num }}{% if programs.number %}&programs_page={{ programs.number }}{% endif %}">{{
-                                    num }}</a></li>
+                                            <form method="POST" action="{% url 'toggle_activo_conductor' conductor.id %}" style="display: inline-block;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-{% if conductor.activo %}warning{% else %}success{% endif %} btn-circle btn-sm" title="{% if conductor.activo %}Desactivar{% else %}Activar{% endif %}">
+                                                    <i class="fas fa-{% if conductor.activo %}eye-slash{% else %}eye{% endif %}"></i>
+                                                </button>
+                                            </form>
+
+                                            <form method="POST" action="{% url 'eliminar_conductor' conductor.id %}" style="display: inline-block;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a {{ conductor.nombre|escapejs }}? Esta acción no se puede deshacer.');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger btn-circle btn-sm" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <i class="fas fa-microphone fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No hay conductores registrados</p>
+                                        <a href="{% url 'crear_conductor' %}" class="btn btn-primary">
+                                            Crear Primer Conductor
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if conductores.has_other_pages %}
+                    <div class="card-footer">
+                        <nav aria-label="Paginación de conductores">
+                            <ul class="pagination pagination-sm justify-content-center mb-0">
+                                {% if conductores.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?conductores_page=1{% if programs.number %}&programs_page={{ programs.number }}{% endif %}">Primera</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?conductores_page={{ conductores.previous_page_number }}{% if programs.number %}&programs_page={{ programs.number }}{% endif %}">Anterior</a>
+                                </li>
+                                {% endif %}
+
+                                {% for num in conductores.paginator.page_range %}
+                                {% if conductores.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% elif num > conductores.number|add:'-3' and num < conductores.number|add:'3' %}
+                                <li class="page-item"><a class="page-link" href="?conductores_page={{ num }}{% if programs.number %}&programs_page={{ programs.number }}{% endif %}">{{ num }}</a></li>
                                 {% endif %}
                                 {% endfor %}
 
                                 {% if conductores.has_next %}
                                 <li class="page-item">
-                                    <a class="page-link"
-                                        href="?conductores_page={{ conductores.next_page_number }}{% if programs.number %}&programs_page={{ programs.number }}{% endif %}">Siguiente</a>
+                                    <a class="page-link" href="?conductores_page={{ conductores.next_page_number }}{% if programs.number %}&programs_page={{ programs.number }}{% endif %}">Siguiente</a>
                                 </li>
                                 <li class="page-item">
-                                    <a class="page-link"
-                                        href="?conductores_page={{ conductores.paginator.num_pages }}{% if programs.number %}&programs_page={{ programs.number }}{% endif %}">Última</a>
+                                    <a class="page-link" href="?conductores_page={{ conductores.paginator.num_pages }}{% if programs.number %}&programs_page={{ programs.number }}{% endif %}">Última</a>
                                 </li>
                                 {% endif %}
-                        </ul>
-                    </nav>
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
+    </div>
 
-        <!-- Modal para agregar programa -->
-        <div class="modal fade" id="addProgramModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+    <!-- Modal para agregar programa -->
+    <div class="modal fade" id="addProgramModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nuevo Programa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" action="{% url 'create_program' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre del Programa</label>
+                            <input type="text" class="form-control" name="nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" name="descripcion" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Días de Emisión *</label>
+                            <div class="row g-2">
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="1" id="dia-lunes-add">
+                                        <label class="form-check-label" for="dia-lunes-add">Lunes</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="2" id="dia-martes-add">
+                                        <label class="form-check-label" for="dia-martes-add">Martes</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="3" id="dia-miercoles-add">
+                                        <label class="form-check-label" for="dia-miercoles-add">Miércoles</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="4" id="dia-jueves-add">
+                                        <label class="form-check-label" for="dia-jueves-add">Jueves</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="5" id="dia-viernes-add">
+                                        <label class="form-check-label" for="dia-viernes-add">Viernes</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="6" id="dia-sabado-add">
+                                        <label class="form-check-label" for="dia-sabado-add">Sábado</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="0" id="dia-domingo-add">
+                                        <label class="form-check-label" for="dia-domingo-add">Domingo</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="hora_inicio" class="form-label">Hora de Inicio *</label>
+                                    <input type="time" class="form-control" name="hora_inicio" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="hora_fin" class="form-label">Hora de Fin *</label>
+                                    <input type="time" class="form-control" name="hora_fin" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="activo" id="activo" checked>
+                            <label class="form-check-label" for="activo">Programa activo</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Crear Programa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para configurar estación -->
+    <div class="modal fade" id="stationConfigModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{% url 'update_station' %}">
+                    {% csrf_token %}
                     <div class="modal-header">
-                        <h5 class="modal-title">Nuevo Programa</h5>
+                        <h5 class="modal-title">Configuración de Estación</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <form method="post" action="{% url 'create_program' %}">
-                        {% csrf_token %}
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label for="nombre" class="form-label">Nombre del Programa</label>
-                                <input type="text" class="form-control" name="nombre" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="descripcion" class="form-label">Descripción</label>
-                                <textarea class="form-control" name="descripcion" rows="3"></textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Días de Emisión *</label>
-                                <div class="row g-2">
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="1"
-                                                id="dia-lunes-add">
-                                            <label class="form-check-label" for="dia-lunes-add">Lunes</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="2"
-                                                id="dia-martes-add">
-                                            <label class="form-check-label" for="dia-martes-add">Martes</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="3"
-                                                id="dia-miercoles-add">
-                                            <label class="form-check-label" for="dia-miercoles-add">Miércoles</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="4"
-                                                id="dia-jueves-add">
-                                            <label class="form-check-label" for="dia-jueves-add">Jueves</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="5"
-                                                id="dia-viernes-add">
-                                            <label class="form-check-label" for="dia-viernes-add">Viernes</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="6"
-                                                id="dia-sabado-add">
-                                            <label class="form-check-label" for="dia-sabado-add">Sábado</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="0"
-                                                id="dia-domingo-add">
-                                            <label class="form-check-label" for="dia-domingo-add">Domingo</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="hora_inicio" class="form-label">Hora de Inicio *</label>
-                                        <input type="time" class="form-control" name="hora_inicio" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="hora_fin" class="form-label">Hora de Fin *</label>
-                                        <input type="time" class="form-control" name="hora_fin" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" name="activo" id="activo" checked>
-                                <label class="form-check-label" for="activo">Programa activo</label>
-                            </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre de la Estación</label>
+                            <input type="text" class="form-control" name="nombre" value="{{ station.nombre|default:'Radio Oriente FM' }}" required>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Crear Programa</button>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-control" name="descripcion" rows="3">{{ station.descripcion|default:'' }}</textarea>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal para configurar estación -->
-        <div class="modal fade" id="stationConfigModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form method="post" action="{% url 'update_station' %}">
-                        {% csrf_token %}
-                        <div class="modal-header">
-                            <h5 class="modal-title">Configuración de Estación</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <div class="mb-3">
+                            <label class="form-label">URL del Stream de Audio</label>
+                            <input type="url" class="form-control" name="stream_url" value="{{ station.stream_url|default:'' }}" placeholder="https://stream.example.com/radio">
+                            <small class="form-text text-muted">URL para la transmisión de audio en vivo</small>
                         </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label">Nombre de la Estación</label>
-                                <input type="text" class="form-control" name="nombre"
-                                    value="{{ station.nombre|default:'Radio Oriente FM' }}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Descripción</label>
-                                <textarea class="form-control" name="descripcion"
-                                    rows="3">{{ station.descripcion|default:'' }}</textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">URL del Stream</label>
-                                <input type="url" class="form-control" name="stream_url"
-                                    value="{{ station.stream_url|default:'' }}"
-                                    placeholder="https://stream.example.com/radio">
-                            </div>
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" name="activo" id="stationActive" {% if station.activo %}checked{% endif %}>
-                                <label class="form-check-label" for="stationActive">Estación en vivo</label>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">URL de Transmisión en Vivo</label>
+                            <input type="url" class="form-control" name="live_stream_url" value="{{ station.live_stream_url|default:'' }}" placeholder="https://www.youtube.com/watch?v=... o https://www.facebook.com/...">
+                            <small class="form-text text-muted">URL de YouTube Live, Facebook Live u otra plataforma para eventos especiales</small>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="activo" id="stationActive" {% if station.activo %}checked{% endif %}>
+                            <label class="form-check-label" for="stationActive">Estación en vivo</label>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal para editar programa -->
-        <div class="modal fade" id="editProgramModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Editar Programa</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <form method="post" id="editProgramForm">
-                        {% csrf_token %}
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label for="edit-nombre" class="form-label">Nombre del Programa</label>
-                                <input type="text" class="form-control" name="nombre" id="edit-nombre" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="edit-descripcion" class="form-label">Descripción</label>
-                                <textarea class="form-control" name="descripcion" id="edit-descripcion"
-                                    rows="3"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Conductores</label>
-                                <div id="edit-conductores-list" class="list-group list-group-flush"
-                                    style="max-height: 150px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px;">
-                                    {% for conductor in all_conductores %}
-                                    {% if conductor.activo %}
-                                    <label class="list-group-item">
-                                        <input class="form-check-input me-2" type="checkbox" name="conductores[]"
-                                            value="{{ conductor.id }}" id="edit-conductor-{{ conductor.id }}">
-                                        {{ conductor }}
-                                    </label>
-                                    {% endif %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Días de Emisión *</label>
-                                <div class="row g-2">
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="1"
-                                                id="dia-lunes-edit">
-                                            <label class="form-check-label" for="dia-lunes-edit">Lunes</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="2"
-                                                id="dia-martes-edit">
-                                            <label class="form-check-label" for="dia-martes-edit">Martes</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="3"
-                                                id="dia-miercoles-edit">
-                                            <label class="form-check-label" for="dia-miercoles-edit">Miércoles</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="4"
-                                                id="dia-jueves-edit">
-                                            <label class="form-check-label" for="dia-jueves-edit">Jueves</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="5"
-                                                id="dia-viernes-edit">
-                                            <label class="form-check-label" for="dia-viernes-edit">Viernes</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="6"
-                                                id="dia-sabado-edit">
-                                            <label class="form-check-label" for="dia-sabado-edit">Sábado</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="dias[]" value="0"
-                                                id="dia-domingo-edit">
-                                            <label class="form-check-label" for="dia-domingo-edit">Domingo</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="edit-hora-inicio" class="form-label">Hora de Inicio *</label>
-                                        <input type="time" class="form-control" name="hora_inicio" id="edit-hora-inicio"
-                                            required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="edit-hora-fin" class="form-label">Hora de Fin *</label>
-                                        <input type="time" class="form-control" name="hora_fin" id="edit-hora-fin"
-                                            required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" name="activo" id="edit-activo">
-                                <label class="form-check-label" for="edit-activo">
-                                    Programa activo
+    <!-- Modal para editar programa -->
+    <div class="modal fade" id="editProgramModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Programa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" id="editProgramForm">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="edit-nombre" class="form-label">Nombre del Programa</label>
+                            <input type="text" class="form-control" name="nombre" id="edit-nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" name="descripcion" id="edit-descripcion" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Conductores</label>
+                            <div id="edit-conductores-list" class="list-group list-group-flush" style="max-height: 150px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px;">
+                                {% for conductor in all_conductores %}
+                                {% if conductor.activo %}
+                                <label class="list-group-item">
+                                    <input class="form-check-input me-2" type="checkbox" name="conductores[]" value="{{ conductor.id }}" id="edit-conductor-{{ conductor.id }}">
+                                    {{ conductor }}
                                 </label>
+                                {% endif %}
+                                {% endfor %}
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Actualizar Programa</button>
+                        <div class="mb-3">
+                            <label class="form-label">Días de Emisión *</label>
+                            <div class="row g-2">
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="1" id="dia-lunes-edit">
+                                        <label class="form-check-label" for="dia-lunes-edit">Lunes</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="2" id="dia-martes-edit">
+                                        <label class="form-check-label" for="dia-martes-edit">Martes</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="3" id="dia-miercoles-edit">
+                                        <label class="form-check-label" for="dia-miercoles-edit">Miércoles</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="4" id="dia-jueves-edit">
+                                        <label class="form-check-label" for="dia-jueves-edit">Jueves</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="5" id="dia-viernes-edit">
+                                        <label class="form-check-label" for="dia-viernes-edit">Viernes</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="6" id="dia-sabado-edit">
+                                        <label class="form-check-label" for="dia-sabado-edit">Sábado</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]" value="0" id="dia-domingo-edit">
+                                        <label class="form-check-label" for="dia-domingo-edit">Domingo</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </form>
-                </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit-hora-inicio" class="form-label">Hora de Inicio *</label>
+                                    <input type="time" class="form-control" name="hora_inicio" id="edit-hora-inicio" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit-hora-fin" class="form-label">Hora de Fin *</label>
+                                    <input type="time" class="form-control" name="hora_fin" id="edit-hora-fin" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="activo" id="edit-activo">
+                            <label class="form-check-label" for="edit-activo">
+                                Programa activo
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Actualizar Programa</button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        <script>
-            function deleteItem(url, name) {
-                if (confirm('¿Estás seguro de que deseas eliminar el programa: ' + name + '?')) {
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': '{{ csrf_token }}',
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: 'csrfmiddlewaretoken={{ csrf_token }}'
-                    }).then(function (response) {
-                        if (response.ok) {
-                            window.location.reload();
-                        } else {
-                            alert('Error al eliminar el programa');
-                        }
-                    });
-                }
-            }
-
-            document.addEventListener('DOMContentLoaded', function () {
-
-                // --- LÓGICA PARA EL MODAL DE EDICIÓN DE PROGRAMA ---
-                document.querySelectorAll('[data-bs-target="#editProgramModal"]').forEach(function (button) {
-                    button.addEventListener('click', function () {
-
-                        var programId = this.getAttribute('data-program-id');
-                        var nombre = this.getAttribute('data-program-nombre');
-                        var descripcion = this.getAttribute('data-program-descripcion');
-                        var horaInicio = this.getAttribute('data-program-hora-inicio');
-                        var horaFin = this.getAttribute('data-program-hora-fin');
-                        var activo = this.getAttribute('data-program-activo') === 'true'; // Convertir a booleano
-
-                        var dias = (this.getAttribute('data-program-dias') || "").split(',').filter(Boolean);
-                        var conductores = (this.getAttribute('data-program-conductores') || "").split(',').filter(Boolean);
-
-                        document.getElementById('edit-nombre').value = nombre || '';
-                        document.getElementById('edit-descripcion').value = descripcion || '';
-                        document.getElementById('edit-hora-inicio').value = horaInicio || '';
-                        document.getElementById('edit-hora-fin').value = horaFin || '';
-                        document.getElementById('edit-activo').checked = activo;
-
-                        document.querySelectorAll('#editProgramModal input[type="checkbox"]').forEach(function (chk) {
-                            chk.checked = false;
-                        });
-
-                        dias.forEach(function (dia) {
-                            var chk = document.querySelector(`#editProgramModal input[name="dias[]"][value="${dia}"]`);
-                            if (chk) chk.checked = true;
-                        });
-
-                        conductores.forEach(function (id) {
-                            var chk = document.getElementById(`edit-conductor-${id}`);
-                            if (chk) chk.checked = true;
-                        });
-
-                        document.getElementById('editProgramForm').action = `/dashboard/radio/edit-program/${programId}/`;
-                    });
+    <script>
+        function deleteItem(url, name) {
+            if (confirm('¿Estás seguro de que deseas eliminar el programa: ' + name + '?')) {
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'csrfmiddlewaretoken={{ csrf_token }}'
+                }).then(function (response) {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Error al eliminar el programa');
+                    }
                 });
+            }
+        }
 
-                // --- LÓGICA PARA LOS BOTONES DE ELIMINAR PROGRAMA ---
-                document.querySelectorAll('.delete-program').forEach(function (button) {
-                    button.addEventListener('click', function () {
-                        var url = this.getAttribute('data-url');
-                        var name = this.getAttribute('data-name');
-                        deleteItem(url, name);
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // --- LÓGICA PARA EL MODAL DE EDICIÓN DE PROGRAMA ---
+            document.querySelectorAll('[data-bs-target="#editProgramModal"]').forEach(function (button) {
+                button.addEventListener('click', function () {
+
+                    var programId = this.getAttribute('data-program-id');
+                    var nombre = this.getAttribute('data-program-nombre');
+                    var descripcion = this.getAttribute('data-program-descripcion');
+                    var horaInicio = this.getAttribute('data-program-hora-inicio');
+                    var horaFin = this.getAttribute('data-program-hora-fin');
+                    var activo = this.getAttribute('data-program-activo') === 'true'; // Convertir a booleano
+
+                    var dias = (this.getAttribute('data-program-dias') || "").split(',').filter(Boolean);
+                    var conductores = (this.getAttribute('data-program-conductores') || "").split(',').filter(Boolean);
+
+                    document.getElementById('edit-nombre').value = nombre || '';
+                    document.getElementById('edit-descripcion').value = descripcion || '';
+                    document.getElementById('edit-hora-inicio').value = horaInicio || '';
+                    document.getElementById('edit-hora-fin').value = horaFin || '';
+                    document.getElementById('edit-activo').checked = activo;
+
+                    document.querySelectorAll('#editProgramModal input[type="checkbox"]').forEach(function (chk) {
+                        chk.checked = false;
                     });
-                }); 
 
-            }); 
-        </script>
-        {% endblock %}
+                    dias.forEach(function (dia) {
+                        var chk = document.querySelector(`#editProgramModal input[name="dias[]"][value="${dia}"]`);
+                        if (chk) chk.checked = true;
+                    });
+
+                    conductores.forEach(function (id) {
+                        var chk = document.getElementById(`edit-conductor-${id}`);
+                        if (chk) chk.checked = true;
+                    });
+
+                    document.getElementById('editProgramForm').action = `/dashboard/radio/edit-program/${programId}/`;
+                });
+            });
+
+            // --- LÓGICA PARA LOS BOTONES DE ELIMINAR PROGRAMA ---
+            document.querySelectorAll('.delete-program').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var url = this.getAttribute('data-url');
+                    var name = this.getAttribute('data-name');
+                    deleteItem(url, name);
+                });
+            });
+
+        });
+    </script>
+{% endblock %}

@@ -5,100 +5,157 @@
     <link rel="icon" href="/images/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Radio Oriente FM - Tu radio en línea"
-    />
+    <meta name="description" content="Radio Oriente FM - Tu radio en línea" />
     <link rel="apple-touch-icon" href="/images/logo.png" />
     <title>Radio Oriente FM</title>
   </head>
   <body>
-    <noscript>Necesitas habilitar JavaScript para ejecutar esta aplicación.</noscript>
+    <noscript
+      >Necesitas habilitar JavaScript para ejecutar esta aplicación.</noscript
+    >
     <div id="root"></div>
     <vapi-widget
+      id="vapi-widget-custom"
       public-key="ff86e4e9-7fec-4c06-886c-18d61bd33d1a"
       assistant-id="3e2b0f28-c14d-4b0d-b3d9-8eb385b31af1"
       mode="chat"
       theme="dark"
-      base-bg-color="#2f2f2f"
+      size="compact"
+      radius="large"
+      base-color="#2f2f2f"
       accent-color="#ee0f0f"
-      cta-button-color="#000000"
-      cta-button-text-color="#ffffff"
-      border-radius="large"
-      size="full"
-      position="bottom-left"
-      title="Habla con Radio Oriente"
+      button-base-color="#000000"
+      button-accent-color="#ffffff"
+      main-label="RO"
       start-button-text="Start"
-      end-button-text="End Call"
-      chat-first-message="Hola que quieres saber hoy?"
-      chat-placeholder="Hablame"
-      voice-show-transcript="true"
-      consent-required="true"
-      consent-title="Terminos y Condiciones"
-      consent-content="Al aceptar estas dando consentimiento de que tu chat puede ser registrado y analizado por los administradores."
-      consent-storage-key="vapi_widget_consent"
-      style="--vapi-widget-bottom-offset: 85px !important;"
+      end-button-text="End Chat"
+      empty-chat-message="¡Hola! ¿Qué quieres saber hoy?"
+      show-transcript="true"
+      require-consent="true"
+      terms-content="Al aceptar estas dando consentimiento de que tu chat puede ser registrado y analizado por los administradores."
+      local-storage-key="vapi_widget_consent"
+      position="bottom-left"
     ></vapi-widget>
-    <script src="https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js" async type="text/javascript"></script>
+    <script
+      src="https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js"
+      async
+      type="text/javascript"
+    ></script>
+    <style>
+      /* Forzar posición del widget Vapi en móviles */
+      @media (max-width: 480px) {
+        vapi-widget {
+          left: 0.75rem !important;
+          bottom: 80px !important;
+          right: auto !important;
+        }
+
+        body.player-collapsed vapi-widget {
+          bottom: 1rem !important;
+        }
+      }
+
+    </style>
     <script>
-      // Ajustar posición del widget Vapi - buscar el DIV interno
-      function adjustVapiWidget() {
-        const vapiWidget = document.querySelector('vapi-widget');
-        if (!vapiWidget) return;
-
-        // Buscar el DIV interno que tiene position: fixed
-        const innerDiv = vapiWidget.querySelector('div[style*="position: fixed"]') ||
-                         vapiWidget.querySelector('div.vapi-widget-wrapper') ||
-                         vapiWidget.querySelector('div');
-
-        const isMobile = window.innerWidth <= 768;
-        const isSmallMobile = window.innerWidth <= 480;
-
-        // Aplicar estilos al widget principal
-        vapiWidget.style.setProperty('z-index', '1400', 'important');
-
-        // Aplicar estilos al DIV interno (el que realmente se posiciona)
-        if (innerDiv) {
-          innerDiv.style.setProperty('z-index', '1400', 'important');
-
-          if (isSmallMobile) {
-            innerDiv.style.setProperty('bottom', '85px', 'important');
-            innerDiv.style.setProperty('left', '0.75rem', 'important');
-          } else if (isMobile) {
-            innerDiv.style.setProperty('bottom', '90px', 'important');
-            innerDiv.style.setProperty('left', '1rem', 'important');
+      // Detectar cuando el reproductor se colapsa
+      function updatePlayerCollapsedClass() {
+        const radioPlayer = document.querySelector(".radio-player-wrapper");
+        if (radioPlayer) {
+          if (radioPlayer.classList.contains("collapsed")) {
+            document.body.classList.add("player-collapsed");
           } else {
-            innerDiv.style.setProperty('bottom', '1.5rem', 'important');
-            innerDiv.style.setProperty('left', '1.5rem', 'important');
+            document.body.classList.remove("player-collapsed");
           }
         }
       }
 
-      // Ejecutar continuamente
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', adjustVapiWidget);
-      } else {
-        adjustVapiWidget();
+      function setupPlayerObserver() {
+        const radioPlayer = document.querySelector(".radio-player-wrapper");
+        if (radioPlayer) {
+          const observer = new MutationObserver(updatePlayerCollapsedClass);
+          observer.observe(radioPlayer, {
+            attributes: true,
+            attributeFilter: ["class"],
+          });
+          updatePlayerCollapsedClass();
+        }
       }
 
-      setTimeout(adjustVapiWidget, 500);
-      setTimeout(adjustVapiWidget, 1000);
-      setTimeout(adjustVapiWidget, 2000);
-      setTimeout(adjustVapiWidget, 3000);
-      setTimeout(adjustVapiWidget, 5000);
+      // Forzar posición del widget Vapi (expuesta globalmente)
+      window.forceVapiPosition = function() {
+        const isMobile = window.innerWidth <= 480;
+        if (!isMobile) return;
 
-      window.addEventListener('resize', adjustVapiWidget);
+        const vapiWidget = document.getElementById('vapi-widget-custom');
+        if (vapiWidget) {
+          const radioPlayer = document.querySelector(".radio-player-wrapper");
+          const isCollapsed = radioPlayer?.classList.contains("collapsed");
+          const bottomValue = isCollapsed ? "1rem" : "90px";
 
-      const observer = new MutationObserver(() => adjustVapiWidget());
-      observer.observe(document.body, { childList: true, subtree: true });
+          vapiWidget.style.setProperty('position', 'fixed', 'important');
+          vapiWidget.style.setProperty('left', '0.75rem', 'important');
+          vapiWidget.style.setProperty('bottom', bottomValue, 'important');
+          vapiWidget.style.setProperty('right', 'auto', 'important');
 
-      // Forzar ajuste cada 2 segundos durante los primeros 10 segundos
-      let attempts = 0;
-      const forceAdjust = setInterval(() => {
-        adjustVapiWidget();
-        attempts++;
-        if (attempts >= 5) clearInterval(forceAdjust);
-      }, 2000);
+          // Buscar el botón dentro del widget (puede estar en Shadow DOM)
+          const allDivs = document.querySelectorAll('div[style*="position: fixed"]');
+          allDivs.forEach(el => {
+            const styles = window.getComputedStyle(el);
+            if (styles.position === 'fixed' && el !== vapiWidget && el.closest('vapi-widget')) {
+              el.style.setProperty('position', 'fixed', 'important');
+              el.style.setProperty('left', '0.75rem', 'important');
+              el.style.setProperty('bottom', bottomValue, 'important');
+              el.style.setProperty('right', 'auto', 'important');
+            }
+          });
+        }
+      };
+
+      // Cambiar texto del widget según tamaño de pantalla
+      function updateVapiLabel() {
+        const vapiWidget = document.getElementById('vapi-widget-custom');
+        if (vapiWidget) {
+          const isMobile = window.innerWidth <= 480;
+          const newLabel = isMobile ? 'RO' : 'Habla con Radio Oriente';
+
+          // Cambiar el atributo
+          vapiWidget.setAttribute('main-label', newLabel);
+
+          // Forzar actualización buscando el texto dentro del Shadow DOM
+          setTimeout(() => {
+            const shadowRoot = vapiWidget.shadowRoot;
+            if (shadowRoot) {
+              const buttons = shadowRoot.querySelectorAll('button');
+              buttons.forEach(btn => {
+                if (btn.textContent.includes('RO') || btn.textContent.includes('Habla')) {
+                  btn.textContent = newLabel;
+                }
+              });
+            }
+          }, 500);
+        }
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function() {
+          setupPlayerObserver();
+          setTimeout(() => {
+            window.forceVapiPosition();
+            updateVapiLabel();
+          }, 2000);
+        });
+      } else {
+        setupPlayerObserver();
+        setTimeout(() => {
+          window.forceVapiPosition();
+          updateVapiLabel();
+        }, 2000);
+      }
+
+      window.addEventListener("resize", () => {
+        window.forceVapiPosition();
+        updateVapiLabel();
+      });
     </script>
     <script type="module" src="/src/index.js"></script>
   </body>

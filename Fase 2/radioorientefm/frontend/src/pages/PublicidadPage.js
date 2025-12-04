@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './PublicidadPage.module.css';
 const CLP = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
 
@@ -88,12 +88,7 @@ const PublicidadPage = () => {
   const [selectedIds, setSelectedIds] = useState([]);
 
   const backendBase = useMemo(() => {
-    if (window.location.port === '3000') {
-      const host = window.location.hostname; // respeta localhost vs 127.0.0.1
-      const protocol = window.location.protocol || 'http:';
-      return `${protocol}//${host}:8000`;
-    }
-    return window.location.origin;
+    return import.meta.env.VITE_API_URL || 'http://localhost:8000';
   }, []);
 
   useEffect(() => {
@@ -107,16 +102,14 @@ const PublicidadPage = () => {
           return;
         }
         let data;
-      try {
-        data = await res.json();
-      } catch (e) {
-        const text = await res.text().catch(() => '');
-        console.error('[Publicidad] Respuesta no JSON', res.status, text);
-        alert(`Error al crear la solicitud: HTTP ${res.status}`);
-        return;
-      }
-      console.log('[Publicidad] Respuesta crear solicitud:', data);
-        console.log('API ubicaciones (debug)', data);
+        try {
+          data = await res.json();
+        } catch (e) {
+          const text = await res.text().catch(() => '');
+          console.error('[Publicidad] Respuesta no JSON', res.status, text);
+          alert(`Error al crear la solicitud: HTTP ${res.status}`);
+          return;
+        }
         if (!mounted) return;
         setTipos(Array.isArray(data.tipos) ? data.tipos : []);
         const mapped = (data.ubicaciones || []).map(u => ({
@@ -158,27 +151,27 @@ const PublicidadPage = () => {
   const selectedCards = useMemo(() => cards.filter(c => selectedIds.includes(c.id)), [cards, selectedIds]);
   const totalCLP = useMemo(() => selectedCards.reduce((acc, c) => acc + (Number(c.price) || 0), 0), [selectedCards]);
 
-  function toggleSelect(card) {
+  const toggleSelect = useCallback((card) => {
     setSelectedIds(prev => prev.includes(card.id) ? prev.filter(id => id !== card.id) : [...prev, card.id]);
-  }
+  }, []);
 
   async function submitSolicitud() {
     try {
       const ubicaciones = selectedCards.length ? selectedCards : (selected ? [selected] : []);
       
-      // Validar campos requeridos
+      //validar campos requeridos
       if (!form.nombre_contacto || !form.email_contacto || !ubicaciones.length) {
         alert('Completa nombre, email y selecciona al menos una ubicación.');
         return;
       }
 
-      // Validar URL de destino (requerida por ItemSolicitudWeb)
+      //validar url de destino (requerida por itemsolicitudweb)
       if (!form.url_destino) {
         alert('Ingresa la URL de destino de tu publicidad.');
         return;
       }
 
-      // Autocompletar fechas por mes si no se proporcionan
+      //autocompletar fechas por mes si no se proporcionan
       const fmt = (d) => d.toISOString().split('T')[0];
       const today = new Date();
       const startAuto = fmt(today);
@@ -186,11 +179,11 @@ const PublicidadPage = () => {
       const fechaInicio = form.fecha_inicio || startAuto;
       const fechaFin = form.fecha_fin || endAuto;
 
-      // Nota: el endpoint actual no acepta imágenes. No bloqueamos por falta de imagen.
+      //el endpoint actual no acepta imágenes. no bloqueamos por falta de imagen
 
       const ubicacionIds = ubicaciones.map(u => u.id);
 
-      // Crear el payload en el formato que espera el endpoint de dashboard
+      //crear el payload en el formato que espera el endpoint de dashboard
       const payload = {
         nombre: String(form.nombre_contacto || '').trim(),
         email: String(form.email_contacto || '').trim(),
@@ -201,14 +194,12 @@ const PublicidadPage = () => {
         fecha_inicio: fechaInicio,
         fecha_fin: fechaFin,
         mensaje: form.mensaje || '',
-        // Copias de respaldo (por si hay otras vistas que las lean)
+        //copias de respaldo (por si hay otras vistas que las lean)
         nombre_contacto: String(form.nombre_contacto || '').trim(),
         email_contacto: String(form.email_contacto || '').trim(),
       };
 
-      console.log('[Publicidad] Enviando solicitud:', payload);
-
-      // Función auxiliar para obtener cookies
+      //funcion auxiliar para obtener cookies
       const getCookie = (name) => {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
@@ -216,7 +207,7 @@ const PublicidadPage = () => {
         return null;
       };
       
-      // Configurar headers con el token CSRF si está disponible
+      //configurar headers con el token csrf si está disponible
       const headers = {
         'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
@@ -226,7 +217,7 @@ const PublicidadPage = () => {
       if (csrfToken) {
         headers['X-CSRFToken'] = csrfToken;
       }
-      // Incluir token si el usuario inició sesión vía API
+      //incluir token si el usuario inició sesión vía api
       try {
         const token = localStorage.getItem('token');
         if (token) {
@@ -243,7 +234,7 @@ const PublicidadPage = () => {
           body: JSON.stringify(payload),
         });
         
-        // Si el usuario no está autenticado, redirigir al login del frontend
+        //si el usuario no está autenticado, redirigir al login del frontend
         if (res.status === 401) {
           alert('Debes iniciar sesión para enviar la solicitud.');
           const next = encodeURIComponent(window.location.pathname);
@@ -257,61 +248,56 @@ const PublicidadPage = () => {
           throw new Error(data.message || 'Error al procesar la solicitud');
         }
 
-        console.log('[Publicidad] Solicitud creada:', data);
-        
-      } catch (error) {
-        console.error('Error en la solicitud:', error);
-        alert(`Error: ${error.message || 'No se pudo completar la solicitud'}`);
-        return; // Detener flujo si hubo error
-      }
+        //subir imágenes si existen
+        if (data.items_web && data.items_web.length > 0 && Object.keys(form.imagenes).length > 0) {
+          for (const item of data.items_web) {
+            const imagen = form.imagenes[item.ubicacion_id];
+            if (imagen) {
+              try {
+                const formData = new FormData();
+                formData.append('imagen', imagen);
+                formData.append('descripcion', `Imagen para ${ubicaciones.find(u => u.id === item.ubicacion_id)?.title || 'ubicación'}`);
+                formData.append('orden', '0');
 
-      // Subir imágenes si existen
-      if (data.items_web && data.items_web.length > 0 && Object.keys(form.imagenes).length > 0) {
-        console.log('[Publicidad] Subiendo imágenes...');
-        
-        for (const item of data.items_web) {
-          const imagen = form.imagenes[item.ubicacion_id];
-          if (imagen) {
-            try {
-              const formData = new FormData();
-              formData.append('imagen', imagen);
-              formData.append('descripcion', `Imagen para ${ubicaciones.find(u => u.id === item.ubicacion_id)?.title || 'ubicación'}`);
-              formData.append('orden', '0');
+                const imgRes = await fetch(`${backendBase}/dashboard/api/publicidad/items/${item.id}/imagenes/subir/`, {
+                  method: 'POST',
+                  credentials: 'include',
+                  body: formData,
+                });
 
-              const imgRes = await fetch(`${backendBase}/dashboard/api/publicidad/items/${item.id}/imagenes/subir/`, {
-                method: 'POST',
-                credentials: 'include',
-                body: formData,
-              });
-
-              const imgData = await imgRes.json();
-              if (!imgRes.ok || !imgData.success) {
-                console.error(`Error al subir imagen para item ${item.id}:`, imgData.message);
-              } else {
-                console.log(`Imagen subida para item ${item.id}`);
+                const imgData = await imgRes.json();
+                if (!imgRes.ok || !imgData.success) {
+                  console.error(`Error al subir imagen para item ${item.id}:`, imgData.message);
+                } else {
+                  console.log(`Imagen subida para item ${item.id}`);
+                }
+              } catch (imgError) {
+                console.error(`Error al subir imagen para item ${item.id}:`, imgError);
               }
-            } catch (imgError) {
-              console.error(`Error al subir imagen para item ${item.id}:`, imgError);
             }
           }
         }
-      }
 
-      alert(data.message || 'Solicitud enviada correctamente');
-      setShowModal(false);
-      setSelected(null);
-      setSelectedIds([]);
-      setForm({
-        nombre_contacto: '',
-        email_contacto: '',
-        telefono_contacto: '',
-        preferencia_contacto: 'email',
-        url_destino: '',
-        fecha_inicio: '',
-        fecha_fin: '',
-        mensaje: '',
-        imagenes: {},
-      });
+        alert(data.message || 'Solicitud enviada correctamente');
+        setShowModal(false);
+        setSelected(null);
+        setSelectedIds([]);
+        setForm({
+          nombre_contacto: '',
+          email_contacto: '',
+          telefono_contacto: '',
+          preferencia_contacto: 'email',
+          url_destino: '',
+          fecha_inicio: '',
+          fecha_fin: '',
+          mensaje: '',
+          imagenes: {},
+        });
+      } catch (e) {
+        console.error('Error en la solicitud:', e);
+        alert(`Error: ${e.message || 'No se pudo completar la solicitud'}`);
+        return; // Detener flujo si hubo error
+      }
     } catch (e) {
       console.error(e);
       alert('Ocurrió un error al enviar la solicitud');
@@ -383,9 +369,9 @@ const PublicidadPage = () => {
           ))}
         </div>
 
-        {/* Barra de selección y total */}
+        {/*barra de selección y total*/}
         {selectedIds.length > 0 && (
-          <div style={{ position: 'sticky', bottom: 16, marginTop: 24, background: '#1f1f1f', border: '1px solid #333', padding: 12, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ position: 'sticky', bottom: 16, marginTop: 24, background: '#1f1f1f', border: '1px solid #333', padding: 12, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#ffffff' }}>
             <div>
               <strong>{selectedIds.length}</strong> espacios seleccionados · Total: <strong>{CLP.format(totalCLP)}</strong>
             </div>
@@ -398,7 +384,20 @@ const PublicidadPage = () => {
         <div className={styles.locationMap}>
           <h2>Mapa de Ubicaciones Publicitarias</h2>
           <div className={styles.websitePreview}>
-            <div className={styles.locationHeader}>Radio Oriente FM - Navbar</div>
+            <div className={styles.navbarMock}>
+              <div className={styles.navbarMockLogo}>Radio Oriente FM</div>
+              <div className={styles.navbarMockCenter}>
+                <span className={styles.navbarMockLink}>Inicio</span>
+                <span className={styles.navbarMockLink}>Programación</span>
+                <span className={styles.navbarMockLink}>Artículos</span>
+                <span className={styles.navbarMockLink}>En Vivo</span>
+                <span className={styles.navbarMockLink}>Contacto</span>
+              </div>
+              <div className={styles.navbarMockRight}>
+                <span className={styles.navbarMockButton}>Iniciar Sesión</span>
+                <span className={styles.navbarMockPill}>TV en vivo</span>
+              </div>
+            </div>
             <div className={styles.locationSidebar}>
               <div className={`${styles.locationSpot} ${styles.sidebarSpot}`}>
                 Panel<br />Lateral<br />Izquierdo<br />(300x600)<br /><br />$25.000/mes
@@ -418,7 +417,7 @@ const PublicidadPage = () => {
             <div className={styles.locationSpot}>Banner Footer (1200x200) - $20.000/mes</div>
           </div>
         </div>
-        {/* Modal de solicitud */}
+        {/*modal de solicitud*/}
         <ModalSolicitud
           open={showModal}
           onClose={() => setShowModal(false)}
@@ -434,26 +433,22 @@ const PublicidadPage = () => {
   );
 };
 
-// Modal simple inline
-function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle, form, setForm, CLP }) {
+//modal simple inline
+const ModalSolicitud = memo(function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle, form, setForm, CLP }) {
   if (!open) return null;
   const list = selectedSingle ? [selectedSingle] : selectedCards;
   const total = list.reduce((acc, c) => acc + (Number(c.price) || 0), 0);
-  const backdrop = { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', overflowY: 'auto', padding: '24px 0', backdropFilter: 'blur(2px)' };
-  const modal = { width: 'min(920px, 96vw)', background: '#1f1f1f', color: '#fff', border: '1px solid #3d3d3d', borderRadius: 14, padding: 28, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif' };
-  const input = { width: '100%', padding: 14, borderRadius: 8, border: '1px solid #555', background: '#0f0f0f', color: '#fff', fontSize: '1em' };
-  const row = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 };
   
   const handleImageChange = (ubicacionId, event) => {
     const file = event.target.files[0];
     if (file) {
-      // Validar tamaño de la imagen (máx 5MB)
+      //validar tamaño de la imagen (máx 5mb)
       if (file.size > 5 * 1024 * 1024) {
         alert('La imagen no debe superar los 5MB');
         return;
       }
       
-      // Validar tipo de archivo
+      //validar tipo de archivo
       const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
       if (!validTypes.includes(file.type)) {
         alert('Formato de archivo no válido. Usa JPG, PNG, GIF o WebP');
@@ -476,17 +471,11 @@ function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle
     
     const previewUrl = URL.createObjectURL(file);
     return (
-      <div style={{ marginTop: 8, position: 'relative' }}>
+      <div className={styles.imagePreview}>
         <img 
           src={previewUrl} 
           alt="Vista previa" 
-          style={{ 
-            maxWidth: '100%', 
-            maxHeight: '150px', 
-            borderRadius: 8,
-            border: '2px solid #dc143c',
-            boxSizing: 'border-box'
-          }} 
+          className={styles.previewImage}
         />
         <button 
           onClick={(e) => {
@@ -497,24 +486,7 @@ function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle
               return { ...prev, imagenes: newImagenes };
             });
           }}
-          style={{
-            position: 'absolute',
-            top: 5,
-            right: 5,
-            background: '#dc143c',
-            border: 'none',
-            borderRadius: '50%',
-            width: 24,
-            height: 24,
-            color: 'white',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 0,
-            fontSize: 12,
-            lineHeight: 1
-          }}
+          className={styles.removeImageBtn}
         >
           ×
         </button>
@@ -529,20 +501,7 @@ function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle
       </div>
       <label 
         htmlFor={`file-upload-${ubicacion.id}`} 
-        style={{
-          display: 'block',
-          padding: '12px 16px',
-          background: '#2d2d2d',
-          border: '2px dashed #444',
-          borderRadius: 8,
-          textAlign: 'center',
-          cursor: 'pointer',
-          transition: 'all 0.3s ease',
-          ':hover': {
-            borderColor: '#dc143c',
-            background: '#333'
-          }
-        }}
+        className={styles.fileUploadLabel}
       >
         {form.imagenes[ubicacion.id] ? 'Cambiar imagen' : 'Seleccionar imagen'}
         <input
@@ -560,11 +519,11 @@ function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle
     </div>
   );
   return (
-    <div style={backdrop} onClick={onClose}>
-      <div style={modal} onClick={e => e.stopPropagation()}>
-        <h3 style={{ marginTop: 0, color: '#fff', borderBottom: '1px solid #3d3d3d', paddingBottom: 14, marginBottom: 24, fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif', fontWeight: 700, fontSize: '1.8em', letterSpacing: '0.5px', textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>Solicitud de Publicidad</h3>
+    <div className={styles.modalBackdrop} onClick={onClose}>
+      <div className={styles.modalContainer} onClick={e => e.stopPropagation()}>
+        <h3 className={styles.modalTitle}>Solicitud de Publicidad</h3>
         
-        <div style={{ marginBottom: 24 }}>
+        <div className={styles.modalSection}>
           <h4 style={{ marginTop: 0, marginBottom: 12, color: '#ddd' }}>Espacios seleccionados:</h4>
           <ul style={{ paddingLeft: 20, margin: '0 0 16px 0' }}>
             {list.map(c => (
@@ -578,13 +537,13 @@ function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle
           </div>
         </div>
 
-        <div style={{ marginBottom: 24 }}>
-          <h4 style={{ marginTop: 0, marginBottom: 16, color: '#ddd', borderBottom: '1px solid #444', paddingBottom: 8 }}>Datos de contacto</h4>
+        <div className={styles.modalSection}>
+          <h4 className={styles.modalSectionTitle}>Datos de contacto</h4>
           <div style={{ display: 'grid', gap: 16 }}>
             <div>
-              <label style={{ display: 'block', marginBottom: 6, color: '#bbb' }}>Nombre completo *</label>
+              <label className={styles.modalLabel}>Nombre completo *</label>
               <input 
-                style={input} 
+                className={styles.modalInput}
                 placeholder="Tu nombre" 
                 value={form.nombre_contacto} 
                 onChange={e => setForm({ ...form, nombre_contacto: e.target.value })} 
@@ -592,9 +551,9 @@ function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle
             </div>
             
             <div>
-              <label style={{ display: 'block', marginBottom: 6, color: '#bbb' }}>Email *</label>
+              <label className={styles.modalLabel}>Email *</label>
               <input 
-                style={input} 
+                className={styles.modalInput}
                 type="email" 
                 placeholder="tu@email.com" 
                 value={form.email_contacto} 
@@ -602,20 +561,20 @@ function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle
               />
             </div>
             
-            <div style={row}>
+            <div className={styles.modalRow}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: 6, color: '#bbb' }}>Teléfono</label>
+                <label className={styles.modalLabel}>Teléfono</label>
                 <input 
-                  style={input} 
+                  className={styles.modalInput}
                   placeholder="+56912345678" 
                   value={form.telefono_contacto} 
                   onChange={e => setForm({ ...form, telefono_contacto: e.target.value })} 
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: 6, color: '#bbb' }}>Preferencia de contacto</label>
+                <label className={styles.modalLabel}>Preferencia de contacto</label>
                 <select 
-                  style={{ ...input, width: '100%' }} 
+                  className={styles.modalInput}
                   value={form.preferencia_contacto} 
                   onChange={e => setForm({ ...form, preferencia_contacto: e.target.value })}
                 >
@@ -627,9 +586,9 @@ function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle
             </div>
             
             <div>
-              <label style={{ display: 'block', marginBottom: 6, color: '#bbb' }}>URL de destino</label>
+              <label className={styles.modalLabel}>URL de destino</label>
               <input 
-                style={input} 
+                className={styles.modalInput}
                 type="url" 
                 placeholder="https://tusitio.com" 
                 value={form.url_destino} 
@@ -637,12 +596,13 @@ function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle
               />
             </div>
             
-            {/* Campos de fecha ocultos: el período se determina al aprobar en el dashboard */}
+            {/*campos de fecha ocultos: el período se determina al aprobar en el dashboard*/}
             
             <div>
-              <label style={{ display: 'block', marginBottom: 6, color: '#bbb' }}>Mensaje adicional (opcional)</label>
+              <label className={styles.modalLabel}>Mensaje adicional (opcional)</label>
               <textarea 
-                style={{ ...input, minHeight: 100 }} 
+                className={styles.modalInput}
+                style={{ minHeight: 100 }}
                 placeholder="¿Algo más que quieras contarnos sobre tu publicidad?" 
                 value={form.mensaje} 
                 onChange={e => setForm({ ...form, mensaje: e.target.value })} 
@@ -651,8 +611,8 @@ function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle
           </div>
         </div>
 
-        <div style={{ marginBottom: 24 }}>
-          <h4 style={{ marginTop: 0, marginBottom: 16, color: '#ddd', borderBottom: '1px solid #444', paddingBottom: 8 }}>
+        <div className={styles.modalSection}>
+          <h4 className={styles.modalSectionTitle}>
             Imágenes para publicidad
           </h4>
           <div style={{ display: 'grid', gap: 20 }}>
@@ -660,48 +620,16 @@ function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle
           </div>
         </div>
 
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          paddingTop: 16,
-          borderTop: '1px solid #444',
-          marginTop: 8
-        }}>
+        <div className={styles.modalButtonRow}>
           <button 
             onClick={onClose}
-            style={{
-              padding: '10px 24px',
-              background: 'transparent',
-              border: '1px solid #666',
-              color: '#ddd',
-              borderRadius: 6,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              ':hover': {
-                background: '#333',
-                borderColor: '#888'
-              }
-            }}
+            className={styles.modalCancelBtn}
           >
             Cancelar
           </button>
           <button 
             onClick={onSubmit}
-            style={{
-              padding: '10px 32px',
-              background: '#dc143c',
-              border: 'none',
-              color: 'white',
-              borderRadius: 6,
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              ':hover': {
-                background: '#b01030',
-                transform: 'translateY(-1px)'
-              }
-            }}
+            className={styles.modalSubmitBtn}
           >
             Enviar solicitud
           </button>
@@ -709,6 +637,6 @@ function ModalSolicitud({ open, onClose, onSubmit, selectedCards, selectedSingle
       </div>
     </div>
   );
-}
+});
 
 export default PublicidadPage;

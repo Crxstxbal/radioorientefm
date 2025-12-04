@@ -12,27 +12,27 @@ from .serializers import (
     HorarioProgramaSerializer, ProgramaConductorSerializer
 )
 
-# ViewSets normalizados
+#viewsets normalizados
 class EstacionRadioViewSet(viewsets.ModelViewSet):
-    """ViewSet para estaciones de radio"""
+    """viewset para estaciones de radio"""
     queryset = EstacionRadio.objects.all()
     serializer_class = EstacionRadioSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 class GeneroMusicalViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet para géneros musicales (solo lectura)"""
+    """viewset para géneros musicales (solo lectura)"""
     queryset = GeneroMusical.objects.all()
     serializer_class = GeneroMusicalSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 class ConductorViewSet(viewsets.ModelViewSet):
-    """ViewSet para conductores"""
+    """viewset para conductores"""
     queryset = Conductor.objects.filter(activo=True)
     serializer_class = ConductorSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 class ProgramaViewSet(viewsets.ModelViewSet):
-    """ViewSet para programas"""
+    """viewset para programas"""
     queryset = Programa.objects.filter(activo=True).prefetch_related('conductores', 'horarios')
     serializer_class = ProgramaSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -44,7 +44,7 @@ class ProgramaViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def por_dia(self, request):
-        """Obtener programas por día de la semana (paginado)"""
+        """obtener programas por día de la semana (paginado)"""
         dia = request.query_params.get('dia')
         if dia is None:
             return Response([])
@@ -53,7 +53,7 @@ class ProgramaViewSet(viewsets.ModelViewSet):
             dia = int(dia)
             queryset = self.queryset.filter(horarios__dia_semana=dia, horarios__activo=True).distinct()
 
-            # Aplicar paginación
+            #aplicar paginacion
             paginator = StandardResultsSetPagination()
             page = paginator.paginate_queryset(queryset, request)
 
@@ -67,14 +67,14 @@ class ProgramaViewSet(viewsets.ModelViewSet):
             return Response({'error': 'El parámetro dia debe ser un número'}, status=status.HTTP_400_BAD_REQUEST)
 
 class HorarioProgramaViewSet(viewsets.ModelViewSet):
-    """ViewSet para horarios de programas"""
+    """viewset para horarios de programas"""
     queryset = HorarioPrograma.objects.select_related('programa').filter(activo=True)
     serializer_class = HorarioProgramaSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-# Views de compatibilidad para el frontend existente
+#views de compatibilidad para el frontend existente
 class RadioStationView(generics.RetrieveUpdateAPIView):
-    """Vista de compatibilidad para estación de radio"""
+    """vista de compatibilidad para estación de radio"""
     queryset = EstacionRadio.objects.all()
     serializer_class = EstacionRadioSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -91,13 +91,13 @@ class RadioStationView(generics.RetrieveUpdateAPIView):
         return station
 
 class ProgramListView(generics.ListCreateAPIView):
-    """Vista de compatibilidad para programas"""
+    """vista de compatibilidad para programas"""
     queryset = Programa.objects.filter(activo=True)
     serializer_class = ProgramLegacySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 class ProgramDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """Vista de compatibilidad para detalle de programa"""
+    """vista de compatibilidad para detalle de programa"""
     queryset = Programa.objects.all()
     serializer_class = ProgramLegacySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -105,19 +105,16 @@ class ProgramDetailView(generics.RetrieveUpdateDestroyAPIView):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_current_song(request):
-    """Actualizar canción actual (funcionalidad futura)"""
+    """actualizar canción actual (funcionalidad futura)"""
     try:
         station = EstacionRadio.objects.get(id=1)
-        # Funcionalidad para implementar después
+        #funcionalidad para implementar después
         return Response({'message': 'Funcionalidad en desarrollo'})
     except EstacionRadio.DoesNotExist:
         return Response({'error': 'Estación no encontrada'}, status=status.HTTP_404_NOT_FOUND)
 
 class LocutoresActivosListView(ListAPIView):
-    """
-    API endpoint que devuelve una lista de locutores (conductores)
-    que están marcados como 'activos'.
-    """
+    """api endpoint que devuelve una lista de locutores (conductores) que están marcados como 'activos'"""
     queryset = Conductor.objects.filter(activo=True).order_by('nombre')
 
     serializer_class = ConductorSerializer

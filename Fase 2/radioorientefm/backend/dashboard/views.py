@@ -48,23 +48,23 @@ def is_staff_user(user):
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_home(request):
-    """Dashboard principal con métricas generales"""
-    # Estadísticas generales
+    """dashboard principal con metricas generales"""
+    #estadisticas generales
     total_users = User.objects.count()
     total_posts = Articulo.objects.count()
     total_programs = Programa.objects.count()
     total_subscriptions = Suscripcion.objects.count()
     
-    # Estadísticas de la última semana
+    #estadisticas de la ultima semana
     last_week = timezone.now() - timedelta(days=7)
     new_users_week = User.objects.filter(fecha_creacion__gte=last_week).count()
     new_posts_week = Articulo.objects.filter(fecha_creacion__gte=last_week).count()
     new_messages_week = ChatMessage.objects.filter(fecha_envio__gte=last_week).count()
     
-    # Artículos más populares (por fecha de publicación reciente)
+    #articulos mas populares por fecha de publicacion reciente
     popular_posts = Articulo.objects.filter(publicado=True).order_by('-fecha_publicacion')[:5]
     
-    # Mensajes de contacto recientes
+    #mensajes de contacto recientes
     recent_contacts = Contacto.objects.order_by('-fecha_envio')[:5]
     
     context = {
@@ -89,11 +89,11 @@ def dashboard_calendario(request):
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_users(request):
-    """Gestión de usuarios con paginación y búsqueda"""
-    # Obtener parámetro de búsqueda
+    """gestion de usuarios con paginacion y busqueda"""
+    #obtener parametro de busqueda
     search_query = request.GET.get('search', '').strip()
 
-    # Filtrar usuarios
+    #filtrar usuarios
     users = User.objects.all()
     if search_query:
         users = users.filter(
@@ -105,7 +105,7 @@ def dashboard_users(request):
 
     users = users.order_by('-fecha_creacion')
 
-    # Paginación - 10 usuarios por página
+    #paginacion 10 usuarios por pagina
     paginator = Paginator(users, 10)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
@@ -119,12 +119,12 @@ def dashboard_users(request):
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_articulos(request):
-    """Gestión de artículos con paginación y búsqueda"""
-    # Obtener parámetros de búsqueda y filtro
+    """gestion de articulos con paginacion y busqueda"""
+    #obtener parametros de busqueda y filtro
     search_query = request.GET.get('search', '').strip()
     status_filter = request.GET.get('status', '')
 
-    # Filtrar artículos
+    #filtrar articulos
     articulos = Articulo.objects.select_related('autor', 'categoria').all()
 
     if search_query:
@@ -141,15 +141,15 @@ def dashboard_articulos(request):
 
     articulos = articulos.order_by('-fecha_creacion')
 
-    # Paginación - 10 artículos por página
+    #paginacion 10 articulos por pagina
     paginator = Paginator(articulos, 10)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
-    # Obtener categorías
+    #obtener categorias
     categorias = Categoria.objects.all().order_by('nombre')
 
-    # Contadores para tarjetas: total, publicados y borradores
+    #contadores para tarjetas total publicados y borradores
     total_articles = Articulo.objects.count()
     published_count = Articulo.objects.filter(publicado=True).count()
     draft_count = Articulo.objects.filter(publicado=False).count()
@@ -169,7 +169,7 @@ def dashboard_articulos(request):
 @user_passes_test(is_staff_user)
 @require_http_methods(["POST"])
 def agregar_categoria(request):
-    """Agregar una nueva categoría de artículo, con soporte para AJAX y fallback."""
+    """agregar una nueva categoría de artículo, con soporte para ajax y fallback"""
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     nombre = request.POST.get('nombre')
     descripcion = request.POST.get('descripcion', '')
@@ -213,7 +213,7 @@ def agregar_categoria(request):
 @user_passes_test(is_staff_user)
 @require_http_methods(["POST"])
 def eliminar_categoria(request, categoria_id):
-    """Eliminar una categoría de artículo, con soporte para AJAX y fallback."""
+    """eliminar una categoría de artículo, con soporte para ajax y fallback"""
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
     try:
@@ -246,8 +246,8 @@ def eliminar_categoria(request, categoria_id):
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_radio(request):
-    """Gestión de radio y programas con paginación"""
-    # Paginación para programas
+    """gestion de radio y programas con paginacion"""
+    #paginacion para programas
     programs_list = Programa.objects.all().order_by('nombre')
     programs_paginator = Paginator(programs_list, 10) # 10 programas por página
     programs_page_number = request.GET.get('programs_page', 1)
@@ -284,7 +284,7 @@ def dashboard_radio(request):
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_chat(request):
-    """Moderación del chat"""
+    """moderación del chat"""
     messages = ChatMessage.objects.all().order_by('-fecha_envio')[:50]
     now = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -338,7 +338,7 @@ def dashboard_chat(request):
 @login_required
 @user_passes_test(is_staff_user)
 def clear_chat_messages(request):
-    """Limpiar todos los mensajes del chat - Vista de Django pura"""
+    """limpiar todos los mensajes del chat - vista de django pura"""
     print(f"=== CLEAR CHAT MESSAGES (Django View) ===")
     print(f"User: {request.user}")
     print(f"Is staff: {request.user.is_staff}")
@@ -367,18 +367,18 @@ def clear_chat_messages(request):
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_analytics(request):
-    """Analytics y estadísticas detalladas"""
-    # Datos para gráficos
+    """analytics y estadisticas detalladas"""
+    #datos para graficos
     last_30_days = timezone.now() - timedelta(days=30)
     
-    # Usuarios por día (últimos 30 días)
+    #usuarios por día (últimos 30 días)
     users_by_day = []
     for i in range(30):
         date = timezone.now() - timedelta(days=i)
         count = User.objects.filter(fecha_creacion__date=date.date()).count()
         users_by_day.append({'date': date.strftime('%Y-%m-%d'), 'count': count})
     
-    # Posts por mes (últimos 6 meses)
+    #posts por mes (últimos 6 meses)
     posts_by_month = []
     for i in range(6):
         date = timezone.now() - timedelta(days=30*i)
@@ -398,14 +398,14 @@ def dashboard_analytics(request):
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_publicidad(request):
-    """Gestión de Publicidad Web: solicitudes y campañas publicadas"""
-    # Solicitudes con paginación
+    """gestion de publicidad web: solicitudes y campañas publicadas"""
+    #solicitudes con paginacion
     solicitudes_list = SolicitudPublicidadWeb.objects.select_related('usuario').order_by('-fecha_solicitud')
     solicitudes_paginator = Paginator(solicitudes_list, 10)
     solicitudes_page = request.GET.get('solicitudes_page')
     solicitudes = solicitudes_paginator.get_page(solicitudes_page)
 
-    # Campañas con paginación
+    #campañas con paginacion
     campanias_list = Publicidad.objects.filter(tipo='WEB').select_related('web_config').order_by('-fecha_creacion')
     campanias_paginator = Paginator(campanias_list, 10)
     campanias_page = request.GET.get('campanias_page')
@@ -419,7 +419,7 @@ def dashboard_publicidad(request):
 @login_required
 @user_passes_test(is_staff_user)
 def ubicaciones_publicidad(request):
-    """Gestión de ubicaciones de publicidad (carousels, banners, etc.)"""
+    """gestion de ubicaciones de publicidad (carousels, banners, etc.)"""
     ubicaciones = (
         UbicacionPublicidadWeb.objects
         .select_related('tipo')
@@ -433,12 +433,12 @@ def ubicaciones_publicidad(request):
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
-        # Gestión de eliminación de Ubicación
+        #gestion de eliminacion de ubicacion
         if form_type == 'delete_ubicacion':
             del_id = request.POST.get('ubicacion_id')
             try:
                 ubic = UbicacionPublicidadWeb.objects.get(id=del_id)
-                # Evitar borrar si tiene items asociados
+                #evitar borrar si tiene items asociados
                 if ubic.items_solicitud_web.exists():
                     messages.warning(request, 'No se puede eliminar: la ubicación tiene elementos asociados.')
                 else:
@@ -450,7 +450,7 @@ def ubicaciones_publicidad(request):
                 messages.error(request, f'Error al eliminar la ubicación: {str(e)}')
             return redirect('dashboard_publicidad_ubicaciones')
 
-        # Gestión de eliminación de Tipo
+        #gestion de eliminacion de tipo
         if form_type == 'delete_tipo':
             del_tipo_id = request.POST.get('tipo_id')
             try:
@@ -466,7 +466,7 @@ def ubicaciones_publicidad(request):
                 messages.error(request, f'Error al eliminar el tipo de ubicación: {str(e)}')
             return redirect('dashboard_publicidad_ubicaciones')
 
-        # Gestión de Tipos de Ubicación
+        #gestion de tipos de ubicacion
         if form_type == 'tipo':
             tipo_id_form = request.POST.get('tipo_id')
             nombre_tipo = request.POST.get('tipo_nombre')
@@ -478,7 +478,7 @@ def ubicaciones_publicidad(request):
                 if tipo_id_form:
                     tipo = TipoUbicacion.objects.get(id=tipo_id_form)
                     tipo.nombre = nombre_tipo
-                    # Mantener codigo inmutable al editar (como en admin)
+                    #mantener codigo inmutable al editar (como en admin)
                     tipo.descripcion = descripcion_tipo
                     tipo.activo = activo_tipo
                     tipo.save()
@@ -495,7 +495,7 @@ def ubicaciones_publicidad(request):
             except Exception as e:
                 messages.error(request, f'Error al guardar el tipo de ubicación: {str(e)}')
 
-        # Gestión de Ubicaciones
+        #gestion de ubicaciones
         else:
             ubicacion_id = request.POST.get('ubicacion_id')
             nombre = request.POST.get('nombre')
@@ -538,12 +538,12 @@ def ubicaciones_publicidad(request):
             except Exception as e:
                 messages.error(request, f'Error al guardar la ubicación: {str(e)}')
     
-    # Paginación para ubicaciones
+    #paginacion para ubicaciones
     ubicaciones_paginator = Paginator(ubicaciones, 10)
     ubicaciones_page = request.GET.get('ubicaciones_page')
     ubicaciones_paginadas = ubicaciones_paginator.get_page(ubicaciones_page)
 
-    # Paginación para tipos de ubicación
+    #paginacion para tipos de ubicacion
     tipos_paginator = Paginator(tipos_ubicacion_all, 10)
     tipos_page = request.GET.get('tipos_page')
     tipos_paginados = tipos_paginator.get_page(tipos_page)
@@ -555,7 +555,7 @@ def ubicaciones_publicidad(request):
     })
 
 def dashboard_login(request):
-    """Login específico para el dashboard"""
+    """login especifico para el dashboard"""
     if request.user.is_authenticated and request.user.is_staff:
         return redirect('dashboard_home')
     
@@ -575,20 +575,20 @@ def dashboard_login(request):
     return render(request, 'dashboard/login.html')
 
 def dashboard_logout(request):
-    """Logout del dashboard"""
+    """logout del dashboard"""
     logout(request)
     return redirect('dashboard_login')
 
 @login_required
 @user_passes_test(is_staff_user)
 def api_dashboard_stats(request):
-    """API endpoint para estadísticas del dashboard con filtros de tiempo"""
+    """api endpoint para estadisticas del dashboard con filtros de tiempo"""
     from django.db.models.functions import TruncDate
 
-    # Obtener el filtro de tiempo
+    #obtener el filtro de tiempo
     time_filter = request.GET.get('filter', 'hoy')
 
-    # Calcular las fechas según el filtro
+    #calcular las fechas según el filtro
     now = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -604,18 +604,18 @@ def api_dashboard_stats(request):
         start_date = today_start - timedelta(days=30)
         prev_start = start_date - timedelta(days=30)
         prev_end = start_date
-    else:  # todos
+    else:  #todos
         start_date = None
         prev_start = None
         prev_end = None
 
-    # Filtrar por fecha si es necesario
+    #filtrar por fecha si es necesario
     def filter_by_date(queryset, date_field='created_at'):
         if start_date:
             return queryset.filter(**{f'{date_field}__gte': start_date})
         return queryset
 
-    # KPIs - Totales actuales
+    #kpis - totales actuales
     total_users = filter_by_date(User.objects.all(), 'fecha_creacion').count()
     total_messages = filter_by_date(ChatMessage.objects.all(), 'fecha_envio').count()
     total_articles = filter_by_date(Articulo.objects.all(), 'fecha_creacion').count()
@@ -625,7 +625,7 @@ def api_dashboard_stats(request):
     total_bandas_emergentes = filter_by_date(BandaEmergente.objects.all(), 'fecha_envio').count()
     total_reproducciones_unicas = filter_by_date(ReproduccionRadio.objects.all(), 'fecha_reproduccion').count()
 
-    # KPIs - Período anterior para comparación
+    #kpis - período anterior para comparación
     users_change = 0
     messages_change = 0
     if prev_start and prev_end:
@@ -635,7 +635,7 @@ def api_dashboard_stats(request):
         users_change = ((total_users - prev_users) / prev_users * 100) if prev_users > 0 else 0
         messages_change = ((total_messages - prev_messages) / prev_messages * 100) if prev_messages > 0 else 0
 
-    # Gráfico 1: Usuarios por día
+    #gráfico 1: usuarios por día
     users_by_day = list(
         filter_by_date(User.objects.all(), 'fecha_creacion')
         .annotate(date=TruncDate('fecha_creacion'))
@@ -645,7 +645,7 @@ def api_dashboard_stats(request):
         .values_list('date', 'count')
     )
 
-    # Gráfico 2: Mensajes por día
+    #gráfico 2: mensajes por día
     messages_by_day = list(
         filter_by_date(ChatMessage.objects.all(), 'fecha_envio')
         .annotate(date=TruncDate('fecha_envio'))
@@ -655,7 +655,7 @@ def api_dashboard_stats(request):
         .values_list('date', 'count')
     )
 
-    # Gráfico 3: Artículos por categoría
+    #gráfico 3: articulos por categoría
     articles_by_category = list(
         filter_by_date(Articulo.objects.all(), 'fecha_creacion')
         .values('categoria__nombre')
@@ -664,7 +664,7 @@ def api_dashboard_stats(request):
         .values_list('categoria__nombre', 'count')
     )
 
-    # Gráfico 4: Contactos por tipo
+    #gráfico 4: contactos por tipo
     contacts_by_type = list(
         filter_by_date(Contacto.objects.all(), 'fecha_envio')
         .values('tipo_asunto__nombre')
@@ -673,7 +673,7 @@ def api_dashboard_stats(request):
         .values_list('tipo_asunto__nombre', 'count')
     )
 
-    # Gráfico 5: Suscripciones por día
+    #gráfico 5: suscripciones por día
     subscriptions_by_day = list(
         filter_by_date(Suscripcion.objects.all(), 'fecha_suscripcion')
         .annotate(date=TruncDate('fecha_suscripcion'))
@@ -683,7 +683,7 @@ def api_dashboard_stats(request):
         .values_list('date', 'count')
     )
 
-    # Gráfico 6: Infracciones por tipo
+    #gráfico 6: infracciones por tipo
     infractions_by_type = list(
         filter_by_date(InfraccionUsuario.objects.all(), 'fecha_infraccion')
         .values('tipo_infraccion')
@@ -692,7 +692,7 @@ def api_dashboard_stats(request):
         .values_list('tipo_infraccion', 'count')
     )
 
-    # Gráfico 7: Top artículos más vistos (solo con vistas > 0)
+    #gráfico 7: top articulos mas vistos (solo con vistas > 0)
     top_articles = list(
         filter_by_date(Articulo.objects.all(), 'fecha_creacion')
         .filter(vistas__gt=0)
@@ -700,11 +700,11 @@ def api_dashboard_stats(request):
         .values_list('titulo', 'vistas')
     )
 
-    # Gráfico 8: Estado de publicidad
+    #gráfico 8: estado de publicidad
     publicidad_activa = Publicidad.objects.filter(activo=True).count()
     publicidad_inactiva = Publicidad.objects.filter(activo=False).count()
 
-    # Respuesta en el formato esperado por el frontend
+    #respuesta en el formato esperado por el frontend
     response_data = {
         'kpis': {
             'total_users': total_users,
@@ -737,20 +737,20 @@ def api_dashboard_stats(request):
     return JsonResponse(response_data)
 
 def api_publicidad_ubicaciones(request):
-    """API JSON para el frontend: lista tipos activos y sus ubicaciones activas."""
+    """api json para el frontend: lista tipos activos y sus ubicaciones activas"""
     from django.http import JsonResponse
     from apps.publicidad.models import TipoUbicacion, UbicacionPublicidadWeb
     
     try:
         include_all = request.GET.get('all') == '1'
         
-        # Obtener tipos de ubicación
+        #obtener tipos de ubicacion
         tipos_qs = TipoUbicacion.objects.all() if include_all else TipoUbicacion.objects.filter(activo=True)
         tipos = list(
             tipos_qs.order_by('nombre').values('id', 'nombre', 'codigo', 'descripcion', 'activo')
         )
         
-        # Obtener ubicaciones
+        #obtener ubicaciones
         ubic_qs = UbicacionPublicidadWeb.objects.select_related('tipo')
         if not include_all:
             ubic_qs = ubic_qs.filter(activo=True, tipo__activo=True)
@@ -762,7 +762,7 @@ def api_publicidad_ubicaciones(request):
             )
         )
         
-        # Devolver la respuesta JSON
+        #devolver la respuesta json
         return JsonResponse({
             'success': True,
             'tipos': tipos,
@@ -800,10 +800,10 @@ def api_publicidad_activas(request):
             limit = 50
         limit = max(1, min(limit, 200))
 
-        # Cargar campañas WEB activas en rango de fechas y publicadas/aprobadas
-        # Considera:
-        #  - Solicitudes aprobadas o activas
-        #  - Campañas creadas manualmente (sin solicitud asociada)
+        #cargar campañas web activas en rango de fechas y publicadas/aprobadas
+        #considera
+        #- solicitudes aprobadas o activas
+        #- campañas creadas manualmente (sin solicitud asociada)
         pubs = (Publicidad.objects
                 .filter(
                     tipo='WEB',
@@ -821,13 +821,13 @@ def api_publicidad_activas(request):
             wc = getattr(pub, 'web_config', None)
             if not wc:
                 continue
-            # Obtener media url
+            #obtener media url
             media_val = getattr(wc, 'archivo_media', None)
             media_url = None
             if media_val:
                 media_url = getattr(media_val, 'url', None) or str(media_val)
 
-            # Intentar resolver ubicacion desde la descripción (Item #id)
+            #intentar resolver ubicacion desde la descripcion (item #id)
             ubic = None
             item_from_desc = None
             try:
@@ -838,7 +838,7 @@ def api_publicidad_activas(request):
                     item = ItemSolicitudWeb.objects.select_related('ubicacion__tipo').get(id=item_id)
                     item_from_desc = item
                     if item.ubicacion:
-                        # Normalizar dimensiones de la ubicación a formato 000x000
+                        #normalizar dimensiones de la ubicacion a formato 000x000
                         dims_raw = getattr(item.ubicacion, 'dimensiones', None) or ''
                         dims_norm = None
                         try:
@@ -855,7 +855,7 @@ def api_publicidad_activas(request):
             except Exception:
                 pass
 
-            # Fallback desde formato
+            #fallback desde formato
             if not ubic:
                 formato = getattr(wc, 'formato', '') or ''
                 nombre = None
@@ -872,12 +872,12 @@ def api_publicidad_activas(request):
                             tipo = (m2.group(1) or '').strip() or None
                             dims = (m2.group(2) or '').replace(' ', '')
                         else:
-                            # Buscar dimensiones en cualquier parte
+                            #buscar dimensiones en cualquier parte
                             m3 = re.search(r'(\d+\s*x\s*\d+)', formato, re.I)
                             if m3:
                                 dims = m3.group(1).replace(' ', '')
                 else:
-                    # Solo dimensiones presentes
+                    #solo dimensiones presentes
                     m4 = re.search(r'(\d+\s*x\s*\d+)', formato, re.I)
                     dims = m4.group(1).replace(' ', '') if m4 else None
                 ubic = {
@@ -886,7 +886,7 @@ def api_publicidad_activas(request):
                     'dimensiones': dims,
                 }
 
-            # Si aún no hay ubicación, intentar desde la solicitud asociada
+            #si aún no hay ubicacion, intentar desde la solicitud asociada
             if not ubic:
                 try:
                     sol_rel = getattr(pub, 'solicitud_web', None)
@@ -910,7 +910,7 @@ def api_publicidad_activas(request):
                                 'dimensiones': dims_norm2 or (getattr(item_sol.ubicacion, 'dimensiones', None) or ''),
                                 'tipo': getattr(getattr(item_sol.ubicacion, 'tipo', None), 'nombre', None),
                             }
-                            # Media fallback desde imagen del item si sigue faltando
+                            #media fallback desde imagen del item si sigue faltando
                             if not media_url:
                                 try:
                                     img2 = item_sol.imagenes_web.order_by('orden', 'fecha_subida').first()
@@ -921,7 +921,7 @@ def api_publicidad_activas(request):
                 except Exception:
                     pass
 
-            # Fallback de media desde la primera imagen del item asociado
+            #fallback de media desde la primera imagen del item asociado
             if not media_url and item_from_desc is not None:
                 try:
                     img = item_from_desc.imagenes_web.order_by('orden', 'fecha_subida').first()
@@ -933,14 +933,14 @@ def api_publicidad_activas(request):
             if not media_url:
                 continue
 
-            # Asegurar URL absoluta para el frontend
+            #asegurar url absoluta para el frontend
             try:
                 if isinstance(media_url, str) and media_url.startswith('/'):
                     media_url = request.build_absolute_uri(media_url)
             except Exception:
                 pass
 
-            # Aplicar filtros
+            #aplicar filtros
             if q:
                 nombre_l = (ubic.get('nombre') or '').lower()
                 tipo_l = (ubic.get('tipo') or '').lower()
@@ -949,13 +949,13 @@ def api_publicidad_activas(request):
             if dimensiones_filter and (ubic.get('dimensiones') or '').lower() != dimensiones_filter:
                 continue
 
-            # Forzar uso de proxy anti-adblock (ruta neutral)
+            #forzar uso de proxy anti-adblock (ruta neutral)
             try:
                 from django.urls import reverse
                 try:
                     proxy_path = reverse('api_adimg_media', args=[pub.id])
                 except Exception:
-                    proxy_path = reverse('api_publicidad_media', args=[pub.id])  # compat
+                    proxy_path = reverse('api_publicidad_media', args=[pub.id])  #compatibilidad
                 media_url_proxy = request.build_absolute_uri(proxy_path)
             except Exception:
                 media_url_proxy = media_url
@@ -981,11 +981,11 @@ def api_publicidad_activas(request):
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_chat(request):
-    """Moderación del chat"""
-    # Obtener todos los mensajes
+    """moderación del chat"""
+    #obtener todos los mensajes
     messages = ChatMessage.objects.all().order_by('-fecha_envio')[:50]
 
-    # Calcular estadísticas usando timezone aware datetime
+    #estadisticas del dia
     now = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
@@ -995,19 +995,19 @@ def dashboard_chat(request):
         fecha_envio__lte=today_end
     ).count()
 
-    # Usuarios únicos activos hoy (basado en mensajes)
+    #usuarios unicos activos hoy (basado en mensajes)
     active_users_today = ChatMessage.objects.filter(
         fecha_envio__gte=today_start,
         fecha_envio__lte=today_end
     ).values('usuario_id').distinct().count()
 
-    # Obtener usuarios más activos (top 10 con más mensajes)
+    #obtener usuarios mas activos (top 10 con mas mensajes)
     from django.db.models import Count
     top_users = ChatMessage.objects.values('usuario_id', 'usuario_nombre').annotate(
         message_count=Count('id')
     ).order_by('-message_count')[:10]
 
-    # Obtener información de bloqueo para cada usuario
+    #obtener informacion de bloqueo para cada usuario
     User = get_user_model()
     top_users_list = []
     for user_data in top_users:
@@ -1041,7 +1041,7 @@ def dashboard_chat(request):
 @login_required
 @user_passes_test(is_staff_user)
 def clear_chat_messages(request):
-    """Limpiar todos los mensajes del chat - Vista de Django pura"""
+    """limpiar todos los mensajes del chat - vista de django pura"""
     print(f"=== CLEAR CHAT MESSAGES (Django View) ===")
     print(f"User: {request.user}")
     print(f"Is staff: {request.user.is_staff}")
@@ -1070,18 +1070,18 @@ def clear_chat_messages(request):
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_analytics(request):
-    """Analytics y estadísticas detalladas"""
-    # Datos para gráficos
+    """analytics y estadisticas detalladas"""
+    #datos para graficos
     last_30_days = timezone.now() - timedelta(days=30)
     
-    # Usuarios por día (últimos 30 días)
+    #usuarios por día (últimos 30 días)
     users_by_day = []
     for i in range(30):
         date = timezone.now() - timedelta(days=i)
         count = User.objects.filter(fecha_creacion__date=date.date()).count()
         users_by_day.append({'date': date.strftime('%Y-%m-%d'), 'count': count})
     
-    # Posts por mes (últimos 6 meses)
+    #posts por mes (últimos 6 meses)
     posts_by_month = []
     for i in range(6):
         date = timezone.now() - timedelta(days=30*i)
@@ -1101,14 +1101,14 @@ def dashboard_analytics(request):
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_publicidad(request):
-    """Gestión de Publicidad Web: solicitudes y campañas publicadas"""
-    # Solicitudes con paginación
+    """gestion de publicidad web: solicitudes y campañas publicadas"""
+    #solicitudes con paginacion
     solicitudes_list = SolicitudPublicidadWeb.objects.select_related('usuario').order_by('-fecha_solicitud')
     solicitudes_paginator = Paginator(solicitudes_list, 10)
     solicitudes_page = request.GET.get('solicitudes_page')
     solicitudes = solicitudes_paginator.get_page(solicitudes_page)
 
-    # Campañas con paginación
+    #campañas con paginacion
     campanias_list = Publicidad.objects.filter(tipo='WEB').select_related('web_config').order_by('-fecha_creacion')
     campanias_paginator = Paginator(campanias_list, 10)
     campanias_page = request.GET.get('campanias_page')
@@ -1122,7 +1122,7 @@ def dashboard_publicidad(request):
 @login_required
 @user_passes_test(is_staff_user)
 def ubicaciones_publicidad(request):
-    """Gestión de ubicaciones de publicidad (carousels, banners, etc.)"""
+    """gestion de ubicaciones de publicidad (carousels, banners, etc.)"""
     ubicaciones = (
         UbicacionPublicidadWeb.objects
         .select_related('tipo')
@@ -1136,12 +1136,12 @@ def ubicaciones_publicidad(request):
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
-        # Gestión de eliminación de Ubicación
+        #gestion de eliminacion de ubicacion
         if form_type == 'delete_ubicacion':
             del_id = request.POST.get('ubicacion_id')
             try:
                 ubic = UbicacionPublicidadWeb.objects.get(id=del_id)
-                # Evitar borrar si tiene items asociados
+                #evitar borrar si tiene items asociados
                 if ubic.items_solicitud_web.exists():
                     messages.warning(request, 'No se puede eliminar: la ubicación tiene elementos asociados.')
                 else:
@@ -1153,7 +1153,7 @@ def ubicaciones_publicidad(request):
                 messages.error(request, f'Error al eliminar la ubicación: {str(e)}')
             return redirect('dashboard_publicidad_ubicaciones')
 
-        # Gestión de eliminación de Tipo
+        #gestion de eliminacion de tipo
         if form_type == 'delete_tipo':
             del_tipo_id = request.POST.get('tipo_id')
             try:
@@ -1169,7 +1169,7 @@ def ubicaciones_publicidad(request):
                 messages.error(request, f'Error al eliminar el tipo de ubicación: {str(e)}')
             return redirect('dashboard_publicidad_ubicaciones')
 
-        # Gestión de Tipos de Ubicación
+        #gestion de tipos de ubicacion
         if form_type == 'tipo':
             tipo_id_form = request.POST.get('tipo_id')
             nombre_tipo = request.POST.get('tipo_nombre')
@@ -1181,7 +1181,7 @@ def ubicaciones_publicidad(request):
                 if tipo_id_form:
                     tipo = TipoUbicacion.objects.get(id=tipo_id_form)
                     tipo.nombre = nombre_tipo
-                    # Mantener codigo inmutable al editar (como en admin)
+                    #mantener codigo inmutable al editar (como en admin)
                     tipo.descripcion = descripcion_tipo
                     tipo.activo = activo_tipo
                     tipo.save()
@@ -1198,9 +1198,9 @@ def ubicaciones_publicidad(request):
             except Exception as e:
                 messages.error(request, f'Error al guardar el tipo de ubicación: {str(e)}')
 
-        # Gestión de Ubicaciones
+        #gestion de ubicaciones
         else:
-            # Handle form submission for creating/updating locations
+            #procesar formulario
             ubicacion_id = request.POST.get('ubicacion_id')
             nombre = request.POST.get('nombre')
             tipo_id = request.POST.get('tipo')
@@ -1209,11 +1209,12 @@ def ubicaciones_publicidad(request):
             precio_mensual = request.POST.get('precio_mensual')
             activo = 'activo' in request.POST
             orden = request.POST.get('orden', 0)
-            
+
             try:
                 tipo = TipoUbicacion.objects.get(id=tipo_id)
-                
-                if ubicacion_id:  # Update existing
+
+                if ubicacion_id:
+                    #actualizar existente
                     ubicacion = UbicacionPublicidadWeb.objects.get(id=ubicacion_id)
                     ubicacion.nombre = nombre
                     ubicacion.tipo = tipo
@@ -1224,7 +1225,8 @@ def ubicaciones_publicidad(request):
                     ubicacion.orden = orden
                     ubicacion.save()
                     messages.success(request, 'Ubicación actualizada correctamente')
-                else:  # Create new
+                else:
+                    #crear nuevo
                     UbicacionPublicidadWeb.objects.create(
                         nombre=nombre,
                         tipo=tipo,
@@ -1235,19 +1237,20 @@ def ubicaciones_publicidad(request):
                         orden=orden
                     )
                     messages.success(request, 'Ubicación creada correctamente')
+
                 return redirect('dashboard_publicidad_ubicaciones')
-                
+
             except TipoUbicacion.DoesNotExist:
                 messages.error(request, 'El tipo de ubicación seleccionado no existe')
             except Exception as e:
                 messages.error(request, f'Error al guardar la ubicación: {str(e)}')
     
-    # Paginación para ubicaciones
+    #paginacion para ubicaciones
     ubicaciones_paginator = Paginator(ubicaciones, 10)
     ubicaciones_page = request.GET.get('ubicaciones_page')
     ubicaciones_paginadas = ubicaciones_paginator.get_page(ubicaciones_page)
 
-    # Paginación para tipos de ubicación
+    #paginacion para tipos de ubicacion
     tipos_paginator = Paginator(tipos_ubicacion_all, 10)
     tipos_page = request.GET.get('tipos_page')
     tipos_paginados = tipos_paginator.get_page(tipos_page)
@@ -1259,7 +1262,7 @@ def ubicaciones_publicidad(request):
     })
 
 def dashboard_login(request):
-    """Login específico para el dashboard"""
+    """login especifico para el dashboard"""
     if request.user.is_authenticated and request.user.is_staff:
         return redirect('dashboard_home')
     
@@ -1279,20 +1282,20 @@ def dashboard_login(request):
     return render(request, 'dashboard/login.html')
 
 def dashboard_logout(request):
-    """Logout del dashboard"""
+    """logout del dashboard"""
     logout(request)
     return redirect('dashboard_login')
 
 @login_required
 @user_passes_test(is_staff_user)
 def api_dashboard_stats(request):
-    """API endpoint para estadísticas del dashboard con filtros de tiempo"""
+    """api endpoint para estadisticas del dashboard con filtros de tiempo"""
     from django.db.models.functions import TruncDate
 
-    # Obtener el filtro de tiempo
+    #obtener el filtro de tiempo
     time_filter = request.GET.get('filter', 'hoy')
 
-    # Calcular las fechas según el filtro
+    #calcular las fechas según el filtro
     now = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -1308,18 +1311,18 @@ def api_dashboard_stats(request):
         start_date = today_start - timedelta(days=30)
         prev_start = start_date - timedelta(days=30)
         prev_end = start_date
-    else:  # todos
+    else:  #todos
         start_date = None
         prev_start = None
         prev_end = None
 
-    # Filtrar por fecha si es necesario
+    #filtrar por fecha si es necesario
     def filter_by_date(queryset, date_field='created_at'):
         if start_date:
             return queryset.filter(**{f'{date_field}__gte': start_date})
         return queryset
 
-    # KPIs - Totales actuales
+    #kpis - totales actuales
     total_users = filter_by_date(User.objects.all(), 'fecha_creacion').count()
     total_messages = filter_by_date(ChatMessage.objects.all(), 'fecha_envio').count()
     total_articles = filter_by_date(Articulo.objects.all(), 'fecha_creacion').count()
@@ -1329,7 +1332,7 @@ def api_dashboard_stats(request):
     total_bandas_emergentes = filter_by_date(BandaEmergente.objects.all(), 'fecha_envio').count()
     total_reproducciones_unicas = filter_by_date(ReproduccionRadio.objects.all(), 'fecha_reproduccion').count()
 
-    # KPIs - Período anterior para comparación
+    #kpis - período anterior para comparación
     users_change = 0
     messages_change = 0
     if prev_start and prev_end:
@@ -1339,7 +1342,7 @@ def api_dashboard_stats(request):
         users_change = ((total_users - prev_users) / prev_users * 100) if prev_users > 0 else 0
         messages_change = ((total_messages - prev_messages) / prev_messages * 100) if prev_messages > 0 else 0
 
-    # Gráfico 1: Usuarios por día
+    #gráfico 1: usuarios por día
     users_by_day = list(
         filter_by_date(User.objects.all(), 'fecha_creacion')
         .annotate(date=TruncDate('fecha_creacion'))
@@ -1349,7 +1352,7 @@ def api_dashboard_stats(request):
         .values_list('date', 'count')
     )
 
-    # Gráfico 2: Mensajes por día
+    #gráfico 2: mensajes por día
     messages_by_day = list(
         filter_by_date(ChatMessage.objects.all(), 'fecha_envio')
         .annotate(date=TruncDate('fecha_envio'))
@@ -1359,7 +1362,7 @@ def api_dashboard_stats(request):
         .values_list('date', 'count')
     )
 
-    # Gráfico 3: Artículos por categoría
+    #gráfico 3: articulos por categoría
     articles_by_category = list(
         filter_by_date(Articulo.objects.all(), 'fecha_creacion')
         .values('categoria__nombre')
@@ -1368,7 +1371,7 @@ def api_dashboard_stats(request):
         .values_list('categoria__nombre', 'count')
     )
 
-    # Gráfico 4: Contactos por tipo
+    #gráfico 4: contactos por tipo
     contacts_by_type = list(
         filter_by_date(Contacto.objects.all(), 'fecha_envio')
         .values('tipo_asunto__nombre')
@@ -1377,7 +1380,7 @@ def api_dashboard_stats(request):
         .values_list('tipo_asunto__nombre', 'count')
     )
 
-    # Gráfico 5: Suscripciones por día
+    #gráfico 5: suscripciones por día
     subscriptions_by_day = list(
         filter_by_date(Suscripcion.objects.all(), 'fecha_suscripcion')
         .annotate(date=TruncDate('fecha_suscripcion'))
@@ -1387,7 +1390,7 @@ def api_dashboard_stats(request):
         .values_list('date', 'count')
     )
 
-    # Gráfico 6: Infracciones por tipo
+    #gráfico 6: infracciones por tipo
     infractions_by_type = list(
         filter_by_date(InfraccionUsuario.objects.all(), 'fecha_infraccion')
         .values('tipo_infraccion')
@@ -1396,7 +1399,7 @@ def api_dashboard_stats(request):
         .values_list('tipo_infraccion', 'count')
     )
 
-    # Gráfico 7: Top artículos más vistos (solo con vistas > 0)
+    #gráfico 7: top articulos mas vistos (solo con vistas > 0)
     top_articles = list(
         filter_by_date(Articulo.objects.all(), 'fecha_creacion')
         .filter(vistas__gt=0)
@@ -1404,11 +1407,11 @@ def api_dashboard_stats(request):
         .values_list('titulo', 'vistas')
     )
 
-    # Gráfico 8: Estado de publicidad
+    #gráfico 8: estado de publicidad
     publicidad_activa = Publicidad.objects.filter(activo=True).count()
     publicidad_inactiva = Publicidad.objects.filter(activo=False).count()
 
-    # Respuesta en el formato esperado por el frontend
+    #respuesta en el formato esperado por el frontend
     response_data = {
         'kpis': {
             'total_users': total_users,
@@ -1441,20 +1444,20 @@ def api_dashboard_stats(request):
     return JsonResponse(response_data)
 
 def api_publicidad_ubicaciones(request):
-    """API JSON para el frontend: lista tipos activos y sus ubicaciones activas."""
+    """api json para el frontend: lista tipos activos y sus ubicaciones activas"""
     from django.http import JsonResponse
     from apps.publicidad.models import TipoUbicacion, UbicacionPublicidadWeb
     
     try:
         include_all = request.GET.get('all') == '1'
         
-        # Obtener tipos de ubicación
+        #obtener tipos de ubicacion
         tipos_qs = TipoUbicacion.objects.all() if include_all else TipoUbicacion.objects.filter(activo=True)
         tipos = list(
             tipos_qs.order_by('nombre').values('id', 'nombre', 'codigo', 'descripcion', 'activo')
         )
         
-        # Obtener ubicaciones
+        #obtener ubicaciones
         ubic_qs = UbicacionPublicidadWeb.objects.select_related('tipo')
         if not include_all:
             ubic_qs = ubic_qs.filter(activo=True, tipo__activo=True)
@@ -1466,7 +1469,7 @@ def api_publicidad_ubicaciones(request):
             )
         )
         
-        # Devolver la respuesta JSON
+        #devolver la respuesta json
         return JsonResponse({
             'success': True,
             'tipos': tipos,
@@ -1504,10 +1507,10 @@ def api_publicidad_activas(request):
             limit = 50
         limit = max(1, min(limit, 200))
 
-        # Cargar campañas WEB activas en rango de fechas y publicadas/aprobadas
-        # Considera:
-        #  - Solicitudes aprobadas o activas
-        #  - Campañas creadas manualmente (sin solicitud asociada)
+        #cargar campañas web activas en rango de fechas y publicadas/aprobadas
+        #considera
+        #- solicitudes aprobadas o activas
+        #- campañas creadas manualmente (sin solicitud asociada)
         pubs = (Publicidad.objects
                 .filter(
                     tipo='WEB',
@@ -1525,13 +1528,13 @@ def api_publicidad_activas(request):
             wc = getattr(pub, 'web_config', None)
             if not wc:
                 continue
-            # Obtener media url
+            #obtener media url
             media_val = getattr(wc, 'archivo_media', None)
             media_url = None
             if media_val:
                 media_url = getattr(media_val, 'url', None) or str(media_val)
 
-            # Intentar resolver ubicacion desde la descripción (Item #id)
+            #intentar resolver ubicacion desde la descripcion (item #id)
             ubic = None
             item_from_desc = None
             try:
@@ -1542,7 +1545,7 @@ def api_publicidad_activas(request):
                     item = ItemSolicitudWeb.objects.select_related('ubicacion__tipo').get(id=item_id)
                     item_from_desc = item
                     if item.ubicacion:
-                        # Normalizar dimensiones de la ubicación a formato 000x000
+                        #normalizar dimensiones de la ubicacion a formato 000x000
                         dims_raw = getattr(item.ubicacion, 'dimensiones', None) or ''
                         dims_norm = None
                         try:
@@ -1559,7 +1562,7 @@ def api_publicidad_activas(request):
             except Exception:
                 pass
 
-            # Fallback desde formato
+            #fallback desde formato
             if not ubic:
                 formato = getattr(wc, 'formato', '') or ''
                 nombre = None
@@ -1576,12 +1579,12 @@ def api_publicidad_activas(request):
                             tipo = (m2.group(1) or '').strip() or None
                             dims = (m2.group(2) or '').replace(' ', '')
                         else:
-                            # Buscar dimensiones en cualquier parte
+                            #buscar dimensiones en cualquier parte
                             m3 = re.search(r'(\d+\s*x\s*\d+)', formato, re.I)
                             if m3:
                                 dims = m3.group(1).replace(' ', '')
                 else:
-                    # Solo dimensiones presentes
+                    #solo dimensiones presentes
                     m4 = re.search(r'(\d+\s*x\s*\d+)', formato, re.I)
                     dims = m4.group(1).replace(' ', '') if m4 else None
                 ubic = {
@@ -1590,7 +1593,7 @@ def api_publicidad_activas(request):
                     'dimensiones': dims,
                 }
 
-            # Si aún no hay ubicación, intentar desde la solicitud asociada
+            #si aún no hay ubicacion, intentar desde la solicitud asociada
             if not ubic:
                 try:
                     sol_rel = getattr(pub, 'solicitud_web', None)
@@ -1614,7 +1617,7 @@ def api_publicidad_activas(request):
                                 'dimensiones': dims_norm2 or (getattr(item_sol.ubicacion, 'dimensiones', None) or ''),
                                 'tipo': getattr(getattr(item_sol.ubicacion, 'tipo', None), 'nombre', None),
                             }
-                            # Media fallback desde imagen del item si sigue faltando
+                            #media fallback desde imagen del item si sigue faltando
                             if not media_url:
                                 try:
                                     img2 = item_sol.imagenes_web.order_by('orden', 'fecha_subida').first()
@@ -1625,7 +1628,7 @@ def api_publicidad_activas(request):
                 except Exception:
                     pass
 
-            # Fallback de media desde la primera imagen del item asociado
+            #fallback de media desde la primera imagen del item asociado
             if not media_url and item_from_desc is not None:
                 try:
                     img = item_from_desc.imagenes_web.order_by('orden', 'fecha_subida').first()
@@ -1637,14 +1640,14 @@ def api_publicidad_activas(request):
             if not media_url:
                 continue
 
-            # Asegurar URL absoluta para el frontend
+            #asegurar url absoluta para el frontend
             try:
                 if isinstance(media_url, str) and media_url.startswith('/'):
                     media_url = request.build_absolute_uri(media_url)
             except Exception:
                 pass
 
-            # Aplicar filtros
+            #aplicar filtros
             if q:
                 nombre_l = (ubic.get('nombre') or '').lower()
                 tipo_l = (ubic.get('tipo') or '').lower()
@@ -1653,13 +1656,13 @@ def api_publicidad_activas(request):
             if dimensiones_filter and (ubic.get('dimensiones') or '').lower() != dimensiones_filter:
                 continue
 
-            # Forzar uso de proxy anti-adblock (ruta neutral)
+            #forzar uso de proxy anti-adblock (ruta neutral)
             try:
                 from django.urls import reverse
                 try:
                     proxy_path = reverse('api_adimg_media', args=[pub.id])
                 except Exception:
-                    proxy_path = reverse('api_publicidad_media', args=[pub.id])  # compat
+                    proxy_path = reverse('api_publicidad_media', args=[pub.id])  #compatibilidad
                 media_url_proxy = request.build_absolute_uri(proxy_path)
             except Exception:
                 media_url_proxy = media_url
@@ -1685,32 +1688,32 @@ def api_publicidad_activas(request):
 @login_required
 @user_passes_test(is_staff_user)
 def api_aprobar_solicitud(request, solicitud_id: int):
-    """Aprobar una SolicitudPublicidadWeb y generar la campaña Publicidad + PublicidadWeb."""
+    """aprobar una solicitudpublicidadweb y generar la campaña publicidad + publicidadweb"""
     from django.core.files import File
     from django.conf import settings
     import os
     from django.db import transaction
     
     try:
-        # Obtener la solicitud con todas las relaciones necesarias
+        #obtener la solicitud con todas las relaciones necesarias
         sol = (SolicitudPublicidadWeb.objects
               .select_related('usuario')
               .prefetch_related(
                   'items_web__ubicacion',
-                  'items_web__imagenes_web'  # Incluir las imágenes relacionadas
+  #incluir las imagenes relacionadas
               ).get(id=solicitud_id))
     except SolicitudPublicidadWeb.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'Solicitud no encontrada'}, status=404)
 
-    # Si ya tiene publicación asociada, verificar si ya está aprobada
+    #si ya tiene publicacion asociada, verificar si ya está aprobada
     if sol.publicacion_id:
         if sol.estado != 'aprobada':
-            # Si tiene publicación pero no está marcada como aprobada, actualizar estado
+            #si tiene publicacion pero no está marcada como aprobada, actualizar estado
             sol.estado = 'aprobada'
             sol.fecha_aprobacion = timezone.now()
             sol.save(update_fields=['estado', 'fecha_aprobacion'])
             
-            # Intentar notificar al usuario (ignorar errores)
+            #intentar notificar al usuario (ignorar errores)
             try:
                 notificar_aprobacion_solicitud(sol, request.user)
             except Exception:
@@ -1724,10 +1727,10 @@ def api_aprobar_solicitud(request, solicitud_id: int):
 
     try:
         with transaction.atomic():
-            # Crear una campaña por cada item de la solicitud
+            #crear una campaña por cada item de la solicitud
             created_campaign_ids = []
             nombre_cliente = sol.nombre_contacto or sol.usuario.get_full_name() or sol.usuario.username
-            # Definir rango de publicación a partir de la aprobación
+            #definir rango de publicacion a partir de la aprobación
             from datetime import timedelta
             start_date = timezone.now().date()
             end_date = start_date + timedelta(days=30)
@@ -1743,14 +1746,14 @@ def api_aprobar_solicitud(request, solicitud_id: int):
                     activo=True,
                 )
 
-                # Construir formato combinando nombre de ubicación, tipo y dimensiones si existen
+                #construir formato combinando nombre de ubicacion, tipo y dimensiones si existen
                 formato_str = item_solicitud.formato or ''
                 try:
                     if item_solicitud.ubicacion:
                         ubic_nombre = getattr(item_solicitud.ubicacion, 'nombre', '') or ''
                         tipo_nombre = getattr(getattr(item_solicitud.ubicacion, 'tipo', None), 'nombre', '') or ''
                         dims = getattr(item_solicitud.ubicacion, 'dimensiones', '') or ''
-                        # Ej: "Home Header — Banner 728x90"
+                        #ej: "home header — banner 728x90"
                         left = (ubic_nombre or '').strip()
                         right = (tipo_nombre + (' ' if tipo_nombre and dims else '') + (dims or '')).strip()
                         combinado = (left + (' — ' if left and right else '') + right).strip()
@@ -1758,7 +1761,7 @@ def api_aprobar_solicitud(request, solicitud_id: int):
                 except Exception:
                     pass
 
-                # Configuración web por item
+                #configuracion web por item
                 pub_web = PublicidadWeb.objects.create(
                     publicidad=pub,
                     url_destino=item_solicitud.url_destino or '',
@@ -1767,7 +1770,7 @@ def api_aprobar_solicitud(request, solicitud_id: int):
                     clics=0
                 )
 
-                # Copiar la primera imagen asociada al ítem (si existe)
+                #copiar la primera imagen asociada al ítem (si existe)
                 if item_solicitud.imagenes_web.exists():
                     img = item_solicitud.imagenes_web.first()
                     if img and img.imagen:
@@ -1792,16 +1795,16 @@ def api_aprobar_solicitud(request, solicitud_id: int):
 
                 created_campaign_ids.append(pub.id)
 
-            # Actualizar la solicitud
+            #actualizar la solicitud
             if created_campaign_ids:
-                # opcional: asociar la primera publicación creada
+                #asociar publicacion creada
                 try:
                     sol.publicacion_id = created_campaign_ids[0]
                 except Exception:
                     pass
             sol.estado = 'aprobada'
             sol.fecha_aprobacion = timezone.now()
-            # Actualizar también las fechas solicitadas para reflejar el rango real de publicación
+            #actualizar fechas solicitadas
             try:
                 sol.fecha_inicio_solicitada = start_date
                 sol.fecha_fin_solicitada = end_date
@@ -1809,7 +1812,7 @@ def api_aprobar_solicitud(request, solicitud_id: int):
             except Exception:
                 sol.save(update_fields=['estado', 'fecha_aprobacion'])
 
-            # Notificar al usuario solicitante
+            #notificar al usuario solicitante
             try:
                 titulo = f"Solicitud de publicidad #{sol.id} aprobada"
                 mensaje = (
@@ -1847,7 +1850,7 @@ def api_aprobar_solicitud(request, solicitud_id: int):
 @user_passes_test(is_staff_user)
 @require_http_methods(["PATCH", "POST"])
 def api_cambiar_estado_solicitud(request, solicitud_id: int):
-    """Cambia el estado de una solicitud: pendiente | en_revision | aprobada | rechazada."""
+    """cambia el estado de una solicitud: pendiente | en_revision | aprobada | rechazada"""
     try:
         sol = SolicitudPublicidadWeb.objects.get(id=solicitud_id)
     except SolicitudPublicidadWeb.DoesNotExist:
@@ -1862,11 +1865,11 @@ def api_cambiar_estado_solicitud(request, solicitud_id: int):
     if nuevo not in {'pendiente', 'en_revision', 'aprobada', 'rechazada'}:
         return JsonResponse({'success': False, 'message': 'Estado inválido'}, status=400)
 
-    # Si es aprobación, delegamos a la función específica
+    #si es aprobación, delegamos a la funcion específica
     if nuevo == 'aprobada':
         return api_aprobar_solicitud(request, solicitud_id)
 
-    # Revisión / Rechazo
+    #revisión / rechazo
     if 'notas_admin' in data:
         sol.notas_admin = data.get('notas_admin') or None
     if nuevo == 'rechazada' and 'motivo' in data:
@@ -1875,7 +1878,7 @@ def api_cambiar_estado_solicitud(request, solicitud_id: int):
     sol.estado = nuevo
     sol.save(update_fields=['estado', 'notas_admin', 'motivo_rechazo'])
 
-    # Notificar al usuario sobre el cambio de estado (en revisión / rechazado)
+    #notificar al usuario sobre el cambio de estado (en revisión / rechazado)
     try:
         if nuevo == 'en_revision':
             titulo = f"Solicitud de publicidad #{sol.id} en revisión"
@@ -1910,7 +1913,7 @@ def api_cambiar_estado_solicitud(request, solicitud_id: int):
 @user_passes_test(is_staff_user)
 @require_http_methods(["PATCH"]) 
 def api_actualizar_campania_web(request, campania_id: int):
-    """Actualizar datos web (url_destino, formato, archivo_media) de una campaña WEB."""
+    """actualizar datos web (url_destino, formato, archivo_media) de una campaña web"""
     if not request.user.is_authenticated:
         return JsonResponse({'success': False, 'message': 'No autenticado'}, status=401)
     if not is_staff_user(request.user):
@@ -1926,7 +1929,7 @@ def api_actualizar_campania_web(request, campania_id: int):
         data = {}
     web = getattr(pub, 'web_config', None)
     try:
-        # Permitir activar/desactivar la campaña
+        #permitir activar/desactivar la campaña
         if 'activo' in data:
             try:
                 pub.activo = bool(data.get('activo'))
@@ -1962,20 +1965,13 @@ def api_actualizar_campania_web(request, campania_id: int):
 
 @require_http_methods(["GET"]) 
 def api_ver_campania(request, campania_id: int):
-    """
-    Devuelve los detalles de una campaña Publicidad (WEB) para la vista de dashboard.
-    Estructura esperada por el frontend (verDetallesCampania):
-    {
-      id, nombre_cliente, activo, fecha_inicio, fecha_fin,
-      web_config: { url_destino, formato, archivo_media, impresiones, clics }
-    }
-    """
+    """devuelve los detalles de una campaña publicidad (web) para la vista de dashboard. estructura esperada por el frontend (verdetallescampania): { id, nombre_cliente, activo, fecha_inicio, fecha_fin, web_config: { url_destino, formato, archivo_media, impresiones, clics } }"""
     try:
         pub = Publicidad.objects.select_related('web_config').get(id=campania_id, tipo='WEB')
     except Publicidad.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'Campaña no encontrada'}, status=404)
 
-    # Construir respuesta
+    #construir respuesta
     data = {
         'id': pub.id,
         'nombre_cliente': getattr(pub, 'nombre_cliente', '') or '',
@@ -2002,7 +1998,7 @@ def api_ver_campania(request, campania_id: int):
             'clics': getattr(wc, 'clics', 0) or 0,
         }
 
-    #Intenta obtener la ubicacion como el nombre, tipo, dimensiones desde el item original
+    #intenta obtener la ubicacion como el nombre, tipo, dimensiones desde el item original
     try:
         desc = getattr(pub, 'descripcion', '') or ''
         import re
@@ -2023,11 +2019,8 @@ def api_ver_campania(request, campania_id: int):
 @csrf_exempt
 @require_http_methods(["POST"])
 def api_publicidad_solicitar(request):
-    """Crea una solicitud de publicidad web. Requiere autenticación.
-    Espera JSON con: nombre, email, telefono, preferencia_contacto, ubicacion_id, url_destino,
-    fecha_inicio, fecha_fin, mensaje (opcional).
-    """
-    # Resolver usuario autenticado (sesión o token)
+    """crea una solicitud de publicidad web. requiere autenticacion. espera json con: nombre, email, telefono, preferencia_contacto, ubicacion_id, url_destino, fecha_inicio, fecha_fin, mensaje (opcional)"""
+    #resolver usuario autenticado (sesión o token)
     auth_user = request.user if request.user.is_authenticated else None
     if not auth_user:
         try:
@@ -2041,9 +2034,9 @@ def api_publicidad_solicitar(request):
         except Exception:
             auth_user = None
 
-    # Verificar autenticación primero
+    #verificar autenticacion primero
     if not auth_user:
-        # Para API, nunca redirigimos: devolvemos 401 consistente
+        #para api, nunca redirigimos: devolvemos 401 consistente
         return JsonResponse(
             {'success': False, 'message': 'Debes iniciar sesión para enviar una solicitud de publicidad'}, 
             status=401
@@ -2054,13 +2047,13 @@ def api_publicidad_solicitar(request):
     except Exception:
         return JsonResponse({'success': False, 'message': 'JSON inválido'}, status=400)
 
-    # Usar datos del usuario autenticado si no se proporcionan
+    #datos del usuario autenticado
     if not data.get('email'):
         data['email'] = auth_user.email
     if not data.get('nombre'):
         data['nombre'] = auth_user.get_full_name() or auth_user.username
 
-    # Puede venir 'ubicacion_id' (uno), 'ubicacion_ids' (lista) o 'ubicaciones' (lista de IDs u objetos con id)
+    #puede venir 'ubicacion_id' (uno), 'ubicacion_ids' (lista) o 'ubicaciones' (lista de ids u objetos con id)
     required = ['nombre', 'email']
     missing = [k for k in required if not data.get(k)]
     if missing:
@@ -2071,11 +2064,11 @@ def api_publicidad_solicitar(request):
         single = data.get('ubicacion_id')
         ubicacion_ids = [single] if single else []
 
-    # Otra variante: 'ubicaciones'
+    #otra variante: 'ubicaciones'
     if not ubicacion_ids and data.get('ubicaciones'):
         ub = data.get('ubicaciones')
         if isinstance(ub, list):
-            # Aceptar lista de IDs o lista de objetos {id: ...}
+            #aceptar lista de ids o lista de objetos {id: ...}
             ubicacion_ids = [ (x.get('id') if isinstance(x, dict) else x) for x in ub ]
     ubicacion_ids = [uid for uid in ubicacion_ids if uid]
     if not ubicacion_ids:
@@ -2094,9 +2087,9 @@ def api_publicidad_solicitar(request):
     fecha_fin = data.get('fecha_fin')
     mensaje = data.get('mensaje', '')
 
-    # Crear Solicitud + Item (solo para usuarios autenticados)
+    #crear solicitud + item (solo para usuarios autenticados)
     try:
-        # Fechas opcionales
+        #fechas opcionales
         from datetime import date
         def parse_date(s):
             try:
@@ -2106,10 +2099,10 @@ def api_publicidad_solicitar(request):
         fi = parse_date(fecha_inicio) or timezone.now().date()
         ff = parse_date(fecha_fin) or fi
 
-        # Total estimado suma de ubicaciones seleccionadas
+        #total estimado suma de ubicaciones seleccionadas
         total_estimado = sum([u.precio_mensual for u in ubics])
         
-        # Usar el usuario autenticado (sesión o token)
+        #usuario autenticado
         solicitud = SolicitudPublicidadWeb.objects.create(
             usuario=auth_user,
             nombre_contacto=nombre or auth_user.get_full_name() or auth_user.username,
@@ -2152,17 +2145,14 @@ def api_publicidad_solicitar(request):
 
 
 def api_ver_solicitud(request, solicitud_id):
-    """
-    Devuelve los detalles completos de una solicitud de publicidad web,
-    incluyendo sus ítems e imágenes asociadas.
-    """
+    """devuelve los detalles completos de una solicitud de publicidad web, incluyendo sus ítems e imágenes asociadas"""
     from apps.publicidad.models import SolicitudPublicidadWeb, ItemSolicitudWeb, ImagenPublicidadWeb, UbicacionPublicidadWeb
     from django.core.serializers.json import DjangoJSONEncoder
     from django.http import JsonResponse
     import json
     
     try:
-        # Obtener la solicitud con relaciones optimizadas
+        #obtener la solicitud con relaciones optimizadas
         solicitud = (SolicitudPublicidadWeb.objects
             .select_related('usuario')
             .prefetch_related(
@@ -2172,7 +2162,7 @@ def api_ver_solicitud(request, solicitud_id):
             .get(id=solicitud_id)
         )
         
-        # Construir la respuesta
+        #construir la respuesta
         data = {
             'id': solicitud.id,
             'nombre_contacto': solicitud.nombre_contacto or '',
@@ -2192,7 +2182,7 @@ def api_ver_solicitud(request, solicitud_id):
             'items_web': []
         }
         
-        # Agregar los ítems de la solicitud
+        #agregar los ítems de la solicitud
         for item in solicitud.items_web.all():
             ubicacion = item.ubicacion
             item_data = {
@@ -2206,7 +2196,7 @@ def api_ver_solicitud(request, solicitud_id):
                 'imagenes': []
             }
             
-            # Agregar las imágenes del ítem si existen
+            #agregar las imágenes del ítem si existen
             for img in item.imagenes_web.all():
                 item_data['imagenes'].append({
                     'id': img.id,
@@ -2234,7 +2224,7 @@ def api_ver_solicitud(request, solicitud_id):
 
 @require_http_methods(["GET"])
 def api_item_imagenes(request, item_id: int):
-    """Lista imágenes de un ItemSolicitudWeb."""
+    """lista imágenes de un itemsolicitudweb"""
     from apps.publicidad.models import ItemSolicitudWeb
     try:
         item = ItemSolicitudWeb.objects.get(id=item_id)
@@ -2255,7 +2245,7 @@ def api_item_imagenes(request, item_id: int):
 @csrf_exempt
 @require_http_methods(["POST"])
 def api_item_subir_imagen(request, item_id: int):
-    """Sube una imagen para un ItemSolicitudWeb."""
+    """sube una imagen para un itemsolicitudweb"""
     from apps.publicidad.models import ItemSolicitudWeb, ImagenPublicidadWeb
     try:
         item = ItemSolicitudWeb.objects.get(id=item_id)
@@ -2290,7 +2280,7 @@ def api_item_subir_imagen(request, item_id: int):
 @csrf_exempt
 @require_http_methods(["POST", "DELETE"])
 def api_item_eliminar_imagen(request, imagen_id: int):
-    """Elimina una imagen de un ItemSolicitudWeb."""
+    """elimina una imagen de un itemsolicitudweb"""
     from apps.publicidad.models import ImagenPublicidadWeb
     try:
         img = ImagenPublicidadWeb.objects.get(id=imagen_id)
@@ -2303,58 +2293,55 @@ def api_item_eliminar_imagen(request, imagen_id: int):
 @login_required
 @require_http_methods(["DELETE", "POST"])
 def eliminar_campania_web(request, campania_id):
-    """
-    Elimina una campaña de publicidad web y sus elementos asociados.
-    Acepta tanto DELETE como POST para mayor compatibilidad.
-    """
+    """elimina una campaña de publicidad web y sus elementos asociados. acepta tanto delete como post para mayor compatibilidad"""
     try:
         campania = get_object_or_404(Publicidad, id=campania_id, tipo='WEB')
         
-        # Verificar permisos (solo staff puede eliminar)
+        #verificar permisos (solo staff puede eliminar)
         if not request.user.is_staff:
             return JsonResponse({'error': 'No tienes permiso para realizar esta acción'}, status=403)
             
-        # Eliminar la configuración web si existe
+        #eliminar la configuracion web si existe
         if hasattr(campania, 'web_config'):
-            # Eliminar el archivo de medios si existe (acepta URL, ruta relativa o FileField)
+            #eliminar el archivo de medios si existe (acepta url, ruta relativa o filefield)
             try:
                 media_value = getattr(campania.web_config, 'archivo_media', None)
                 if media_value:
-                    # Si es un FileField con .path
+                    #si es un filefield con .path
                     file_path = None
                     if hasattr(media_value, 'path'):
                         file_path = media_value.path
                     else:
-                        # media_value puede ser str (URL absoluta, "/media/..." o relativa)
+                        #media_value puede ser str (url absoluta, "/media/..." o relativa)
                         from urllib.parse import urlparse
                         raw = str(media_value)
                         parsed = urlparse(raw)
                         candidate_path = parsed.path if parsed.scheme in ('http', 'https') else raw
-                        # Normalizar contra MEDIA_URL
+                        #normalizar contra media_url
                         if getattr(settings, 'MEDIA_URL', '') and candidate_path.startswith(settings.MEDIA_URL):
                             rel = candidate_path[len(settings.MEDIA_URL):]
                             file_path = os.path.join(settings.MEDIA_ROOT, rel)
                         elif candidate_path.startswith('/'):
-                            # Si es ruta absoluta del sistema, usarla tal cual; si parece bajo /media, unir a MEDIA_ROOT
+                            #si es ruta absoluta del sistema, usarla tal cual; si parece bajo /media, unir a media_root
                             if getattr(settings, 'MEDIA_URL', '') and candidate_path.startswith(settings.MEDIA_URL):
                                 rel = candidate_path[len(settings.MEDIA_URL):]
                                 file_path = os.path.join(settings.MEDIA_ROOT, rel)
                             else:
-                                # Podría ya ser una ruta absoluta válida
+                                #podría ya ser una ruta absoluta válida
                                 file_path = candidate_path
                         else:
-                            # Ruta relativa: asumir relativa a MEDIA_ROOT
+                            #ruta relativa: asumir relativa a media_root
                             file_path = os.path.join(settings.MEDIA_ROOT, candidate_path)
 
                     if file_path and os.path.isfile(file_path):
                         os.remove(file_path)
             except Exception:
-                # No bloquear la eliminación por fallo al borrar archivo
+                #no bloquear la eliminacion por fallo al borrar archivo
                 pass
 
             campania.web_config.delete()
             
-        # Finalmente, eliminar la campaña
+        #finalmente, eliminar la campaña
         campania.delete()
         
         return JsonResponse({'success': True, 'message': 'Campaña eliminada correctamente'})
@@ -2365,19 +2352,17 @@ def eliminar_campania_web(request, campania_id):
 @login_required
 @require_http_methods(["POST"])
 def eliminar_solicitud(request, solicitud_id):
-    """
-    Elimina una solicitud de publicidad y sus elementos asociados.
-    """
+    """elimina una solicitud de publicidad y sus elementos asociados"""
     try:
         solicitud = get_object_or_404(SolicitudPublicidadWeb, id=solicitud_id)
         
-        # Verificar permisos (solo staff puede eliminar)
+        #verificar permisos (solo staff puede eliminar)
         if not request.user.is_staff:
             return JsonResponse({'error': 'No tienes permiso para realizar esta acción'}, status=403)
             
-        # Eliminar los items y sus imágenes asociadas
+        #eliminar los items y sus imágenes asociadas
         for item in solicitud.items_web.all():
-            # Eliminar las imágenes del storage
+            #eliminar las imágenes del storage
             for img in item.imagenes_web.all():
                 if img.imagen:
                     if os.path.isfile(img.imagen.path):
@@ -2385,12 +2370,12 @@ def eliminar_solicitud(request, solicitud_id):
                 img.delete()
             item.delete()
             
-        # Finalmente, eliminar la solicitud
+        #finalmente, eliminar la solicitud
         solicitud.delete()
         
         return JsonResponse({'success': True, 'message': 'Solicitud eliminada correctamente'})
         
-        # Si no es AJAX, redirigir con mensaje
+        #si no es ajax, redirigir con mensaje
         messages.success(request, f'Solicitud #{solicitud_id} eliminada correctamente.')
         return redirect('dashboard_publicidad')
         
@@ -2402,11 +2387,11 @@ def eliminar_solicitud(request, solicitud_id):
         messages.error(request, error_msg)
         return redirect('dashboard_publicidad')
 
-# CRUD Operations for Users
+#crud operations for users
 @login_required
 @user_passes_test(is_staff_user)
 def create_user(request):
-    """Crear nuevo usuario"""
+    """crear nuevo usuario"""
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
         usuario = request.POST.get('usuario')
@@ -2431,7 +2416,7 @@ def create_user(request):
 @login_required
 @user_passes_test(is_staff_user)
 def edit_user(request, user_id):
-    """Editar usuario existente"""
+    """editar usuario existente"""
     user = get_object_or_404(User, id=user_id)
     
     if request.method == 'POST':
@@ -2440,11 +2425,7 @@ def edit_user(request, user_id):
         user.correo = request.POST.get('correo')
         user.is_staff = request.POST.get('is_staff') == 'on'
         user.is_active = request.POST.get('is_active') == 'on'
-        
-        password = request.POST.get('password')
-        if password:
-            user.set_password(password)
-        
+
         try:
             user.save()
             messages.success(request, f'Usuario {user.usuario} actualizado exitosamente')
@@ -2456,7 +2437,7 @@ def edit_user(request, user_id):
 @login_required
 @user_passes_test(is_staff_user)
 def delete_user(request, user_id):
-    """Eliminar usuario"""
+    """eliminar usuario"""
     user = get_object_or_404(User, id=user_id)
     
     if request.method == 'POST':
@@ -2469,35 +2450,35 @@ def delete_user(request, user_id):
     
     return redirect('dashboard_users')
 
-# CRUD Operations for Articulos
+#crud operations for articulos
 @login_required
 @user_passes_test(is_staff_user)
 def create_articulo(request):
-    """Crear nuevo artículo con soporte multimedia"""
+    """crear nuevo artículo con soporte multimedia"""
     if request.method == 'POST':
         try:
-            # Obtener datos del formulario
+            #obtener datos del formulario
             titulo = request.POST.get('titulo')
             contenido = request.POST.get('contenido')
             categoria_id = request.POST.get('categoria')
             resumen = request.POST.get('resumen', '')
             publicado = request.POST.get('publicado') == 'on'
             
-            # Obtener archivos
+            #obtener archivos
             imagen_portada = request.FILES.get('imagen_portada')
             imagen_thumbnail = request.FILES.get('imagen_thumbnail')
             archivo_adjunto = request.FILES.get('archivo_adjunto')
             
-            # Obtener URLs
+            #obtener urls
             imagen_url = request.POST.get('imagen_url', '')
             video_url = request.POST.get('video_url', '')
             
-            # Validaciones básicas
+            #validaciones básicas
             if not titulo or not contenido or not categoria_id:
                 messages.error(request, 'Por favor complete todos los campos requeridos')
                 return redirect('dashboard_articulos')
                 
-            # Crear el artículo
+            #crear el artículo y adjuntar archivos antes del primer save
             articulo = Articulo(
                 titulo=titulo,
                 contenido=contenido,
@@ -2508,22 +2489,18 @@ def create_articulo(request):
                 imagen_url=imagen_url if imagen_url else None,
                 video_url=video_url if video_url else None
             )
-            
-            # Guardar el artículo para obtener un ID
-            articulo.save()
-            
-            # Manejar archivos
+            #asignar archivos antes del primer guardado
             if imagen_portada:
                 articulo.imagen_portada = imagen_portada
             if imagen_thumbnail:
                 articulo.imagen_thumbnail = imagen_thumbnail
             if archivo_adjunto:
                 articulo.archivo_adjunto = archivo_adjunto
-                
-            # Guardar nuevamente con los archivos
+
+            #guardar con todo adjuntado
             articulo.save()
             
-            # La notificación se maneja mediante la señal post_save en el modelo Notificacion
+            #la notificacion se maneja mediante la señal post_save en el modelo notificacion
             messages.success(request, 'Artículo creado exitosamente')
             return redirect('dashboard_articulos')
             
@@ -2531,13 +2508,13 @@ def create_articulo(request):
             messages.error(request, f'Error al crear el artículo: {str(e)}')
             return redirect('dashboard_articulos')
     
-    # Si no es POST, redirigir a la lista de artículos
+    #si no es post, redirigir a la lista de articulos
     return redirect('dashboard_articulos')
 
 @login_required
 @user_passes_test(is_staff_user)
 def edit_articulo(request, articulo_id):
-    """Editar artículo con soporte multimedia"""
+    """editar artículo con soporte multimedia"""
     articulo = get_object_or_404(Articulo, id=articulo_id)
     
     if request.method == 'POST':
@@ -2549,7 +2526,7 @@ def edit_articulo(request, articulo_id):
         articulo.imagen_url = request.POST.get('imagen_url')
         articulo.video_url = request.POST.get('video_url')
         
-        # Actualizar archivos si se proporcionan nuevos
+        #actualizar archivos si se proporcionan nuevos
         imagen_portada = request.FILES.get('imagen_portada')
         if imagen_portada:
             articulo.imagen_portada = imagen_portada
@@ -2563,7 +2540,7 @@ def edit_articulo(request, articulo_id):
             articulo.archivo_adjunto = archivo_adjunto
         
         try:
-            # Actualizar categoría si se proporciona
+            #actualizar categoría si se proporciona
             if categoria_id:
                 articulo.categoria = Categoria.objects.get(id=categoria_id)
             articulo.save()
@@ -2576,7 +2553,7 @@ def edit_articulo(request, articulo_id):
 @login_required
 @user_passes_test(is_staff_user)
 def delete_articulo(request, articulo_id):
-    """Eliminar artículo"""
+    """eliminar artículo"""
     articulo = get_object_or_404(Articulo, id=articulo_id)
     
     if request.method == 'POST':
@@ -2589,11 +2566,11 @@ def delete_articulo(request, articulo_id):
     
     return redirect('dashboard_articulos')
 
-# CRUD Operations for Radio Programs
+#crud operations for radio programs
 @login_required
 @user_passes_test(is_staff_user)
 def create_program(request):
-    """Crear nuevo programa de radio"""
+    """crear nuevo programa de radio"""
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
         descripcion = request.POST.get('descripcion')
@@ -2604,10 +2581,10 @@ def create_program(request):
         conductor_ids = request.POST.getlist('conductores[]')
         
         try:
-            # --- Convertir strings de hora a objetos time ---
+            #--- convertir strings de hora a objetos time ---
             hora_inicio_obj = dt_datetime.strptime(hora_inicio_str, '%H:%M').time()
             hora_fin_obj = dt_datetime.strptime(hora_fin_str, '%H:%M').time()
-            # ----------------------------------------------------
+            #----------------------------------------------------
         except (ValueError, TypeError):
             messages.error(request, 'Formato de hora inválido. Use HH:MM.')
             return redirect('dashboard_radio')
@@ -2648,7 +2625,7 @@ def create_program(request):
 @login_required
 @user_passes_test(is_staff_user)
 def edit_program(request, program_id):
-    """Editar programa de radio"""
+    """editar programa de radio"""
     program = get_object_or_404(Programa, id=program_id)
     
     if request.method == 'POST':
@@ -2664,7 +2641,7 @@ def edit_program(request, program_id):
         try:
             hora_inicio_obj = dt_datetime.strptime(hora_inicio_str, '%H:%M').time()
             hora_fin_obj = dt_datetime.strptime(hora_fin_str, '%H:%M').time()
-            # ----------------------------------------------------
+            #----------------------------------------------------
         except (ValueError, TypeError):
             messages.error(request, 'Formato de hora inválido. Use HH:MM.')
             return redirect('dashboard_radio')
@@ -2703,7 +2680,7 @@ def edit_program(request, program_id):
 @login_required
 @user_passes_test(is_staff_user)
 def delete_program(request, program_id):
-    """Eliminar programa de radio"""
+    """eliminar programa de radio"""
     program = get_object_or_404(Programa, id=program_id)
     
     if request.method == 'POST':
@@ -2716,11 +2693,11 @@ def delete_program(request, program_id):
     
     return redirect('dashboard_radio')
 
-# CRUD Operations for News
+#crud operations for news
 @login_required
 @user_passes_test(is_staff_user)
 def create_news(request):
-    """Crear nueva noticia"""
+    """crear nueva noticia"""
     if request.method == 'POST':
         titulo = request.POST.get('titulo')
         contenido = request.POST.get('contenido')
@@ -2729,10 +2706,10 @@ def create_news(request):
         publicado = request.POST.get('publicado') == 'on'
         
         try:
-            # Obtener categoría de noticias
+            #obtener categoría de noticias
             categoria_noticias = Categoria.objects.get_or_create(nombre='Noticias')[0]
             
-            # Crear artículo de noticias
+            #crear artículo de noticias
             news = Articulo.objects.create(
                 titulo=titulo,
                 contenido=contenido,
@@ -2750,7 +2727,7 @@ def create_news(request):
 @login_required
 @user_passes_test(is_staff_user)
 def delete_news(request, news_id):
-    """Eliminar noticia"""
+    """eliminar noticia"""
     news = get_object_or_404(Articulo, id=news_id)
     
     if request.method == 'POST':
@@ -2763,12 +2740,12 @@ def delete_news(request, news_id):
     
     return redirect('dashboard_radio')
 
-# Estado CRUD
+#estado crud
 @login_required
 @user_passes_test(is_staff_user)
 @require_http_methods(["POST"])
 def agregar_estado(request):
-    """Agregar un nuevo estado, con soporte para AJAX y fallback."""
+    """agregar un nuevo estado, con soporte para ajax y fallback"""
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     nombre = request.POST.get('nombre')
     descripcion = request.POST.get('descripcion', '')
@@ -2810,34 +2787,34 @@ def agregar_estado(request):
         if is_ajax:
             return JsonResponse({'status': 'error', 'message': message}, status=500)
         messages.error(request, message)
-
     return redirect('dashboard_emergentes')
 
 @login_required
 @user_passes_test(is_staff_user)
 @require_http_methods(["POST"])
 def eliminar_estado(request, estado_id):
-    """Eliminar un estado, con soporte para AJAX y fallback."""
+    """eliminar un estado, con soporte para ajax y fallback"""
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    next_url = request.META.get('HTTP_REFERER')
 
     try:
         estado = get_object_or_404(Estado, id=estado_id)
         nombre_estado = estado.nombre
 
-        # Verificar si hay elementos usando este estado
+        #verificar si hay elementos usando este estado
         if estado.tipo_entidad == 'contacto' and estado.contactos.exists():
             message = f'No se puede eliminar el estado "{nombre_estado}" porque está siendo usado por contactos.'
             if is_ajax:
                 return JsonResponse({'status': 'error', 'message': message}, status=400)
             messages.error(request, message)
-            return redirect('dashboard_emergentes')
+            return redirect(next_url or 'dashboard_emergentes')
 
         if estado.tipo_entidad == 'banda' and BandaEmergente.objects.filter(estado=estado).exists():
             message = f'No se puede eliminar el estado "{nombre_estado}" porque está siendo usado por bandas.'
             if is_ajax:
                 return JsonResponse({'status': 'error', 'message': message}, status=400)
             messages.error(request, message)
-            return redirect('dashboard_emergentes')
+            return redirect(next_url or 'dashboard_emergentes')
 
         estado.delete()
         message = f'Estado "{nombre_estado}" eliminado correctamente.'
@@ -2852,13 +2829,13 @@ def eliminar_estado(request, estado_id):
             return JsonResponse({'status': 'error', 'message': message}, status=500)
         messages.error(request, message)
 
-    return redirect('dashboard_emergentes')
+    return redirect(next_url or 'dashboard_emergentes')
 
-# Chat Moderation
+#chat moderation
 @login_required
 @user_passes_test(is_staff_user)
 def delete_message(request, message_id):
-    """Eliminar mensaje del chat"""
+    """eliminar mensaje del chat"""
     if request.method == 'POST':
         try:
             message = get_object_or_404(ChatMessage, id=message_id)
@@ -2872,14 +2849,16 @@ def delete_message(request, message_id):
 @login_required
 @user_passes_test(is_staff_user)
 def update_station(request):
-    """Actualizar configuración de la estación"""
+    """actualizar configuracion de la estación"""
     station = EstacionRadio.objects.first()
     
     if request.method == 'POST':
         station.nombre = request.POST.get('nombre', station.nombre)
         station.descripcion = request.POST.get('descripcion', station.descripcion)
         station.stream_url = request.POST.get('stream_url', station.stream_url)
-        # Actualizar otros campos si existen en el formulario
+        station.live_stream_url = request.POST.get('live_stream_url', station.live_stream_url)
+        station.activo = request.POST.get('activo') == 'on'
+        #actualizar otros campos si existen en el formulario
         station.telefono = request.POST.get('telefono', station.telefono)
         station.email = request.POST.get('email', station.email)
         station.direccion = request.POST.get('direccion', station.direccion)
@@ -2892,7 +2871,7 @@ def update_station(request):
 @login_required
 @user_passes_test(is_staff_user)
 def toggle_station_status(request):
-    """Alternar el estado de la estación (activo/inactivo)"""
+    """alternar el estado de la estación (activo/inactivo)"""
     if request.method == 'POST':
         try:
             station = EstacionRadio.objects.first()
@@ -2908,13 +2887,13 @@ def toggle_station_status(request):
     
     return redirect('dashboard_radio')
 
-# ===============================
-# Bandas Emergentes (CRUD + Estado)
-# ===============================
+#===============================
+#bandas emergentes (crud + estado)
+#===============================
 @login_required
 @user_passes_test(is_staff_user)
 def get_comunas_ajax(request):
-    """Vista para obtener las comunas de una región mediante AJAX"""
+    """vista para obtener las comunas de una región mediante ajax"""
     region_id = request.GET.get('region_id')
     if region_id:
         comunas = Comuna.objects.filter(region_id=region_id).order_by('nombre')
@@ -2927,7 +2906,7 @@ def get_comunas_ajax(request):
 @login_required
 @user_passes_test(is_staff_user)
 def crear_banda_emergente(request):
-    """Vista para crear una nueva banda emergente"""
+    """vista para crear una nueva banda emergente"""
     if request.method == 'POST':
         form = BandaEmergenteForm(request.POST, request.FILES)
         if form.is_valid():
@@ -2947,7 +2926,7 @@ def crear_banda_emergente(request):
 @login_required
 @user_passes_test(is_staff_user)
 def editar_banda_emergente(request, banda_id):
-    """Vista para editar una banda emergente existente"""
+    """vista para editar una banda emergente existente"""
     banda = get_object_or_404(BandaEmergente, id=banda_id)
     
     if request.method == 'POST':
@@ -2967,13 +2946,13 @@ def editar_banda_emergente(request, banda_id):
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_emergentes(request):
-    """Gestión de bandas emergentes"""
-    # Obtener todas las bandas con sus relaciones
+    """gestion de bandas emergentes"""
+    #obtener todas las bandas con sus relaciones
     bandas = BandaEmergente.objects.select_related(
         'genero', 'usuario', 'estado', 'comuna', 'comuna__ciudad', 'comuna__ciudad__pais'
     ).prefetch_related('integrantes__integrante', 'links').order_by('-fecha_envio')
     
-    # Filtros
+    #filtros
     estado = request.GET.get('estado')
     genero = request.GET.get('genero')
     busqueda = request.GET.get('q')
@@ -2992,25 +2971,25 @@ def dashboard_emergentes(request):
             Q(comuna__ciudad__nombre__icontains=busqueda)
         )
     
-    # Obtener estadísticas de estados para el filtro
+    #obtener estadisticas de estados para el filtro
     stats_estados = BandaEmergente.objects.values('estado__nombre').annotate(
         total=Count('id')
     ).order_by('estado__nombre')
 
-    # Convertir a diccionario para el template
+    #convertir a diccionario para el template
     stats_estados = {item['estado__nombre']: item['total'] for item in stats_estados}
 
-    # Obtener top géneros musicales (top 5)
+    #obtener top géneros musicales (top 5)
     top_generos = BandaEmergente.objects.values('genero__nombre').annotate(
         total=Count('id')
     ).order_by('-total')[:5]
 
-    # Paginación
+    #paginacion
     paginator = Paginator(bandas, 10)  # 10 bandas por página
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # Obtener todos los géneros para el filtro y la gestión
+    #obtener todos los géneros para el filtro y la gestion
     generos = GeneroMusical.objects.all().order_by('nombre')
 
     context = {
@@ -3030,11 +3009,11 @@ def dashboard_emergentes(request):
 @login_required
 @user_passes_test(is_staff_user)
 def cambiar_estado_banda(request, banda_id, nuevo_estado):
-    """Cambiar el estado de una banda y registrar quién lo revisó"""
+    """cambiar el estado de una banda y registrar quién lo revisó"""
     banda = get_object_or_404(BandaEmergente, id=banda_id)
     
     try:
-        # Mapeo de estados (de la URL a los nombres en la BD)
+        #mapeo de estados (de la url a los nombres en la bd)
         estados_mapping = {
             'pendiente': 'Pendiente',
             'aprobado': 'Aprobado', 
@@ -3042,14 +3021,14 @@ def cambiar_estado_banda(request, banda_id, nuevo_estado):
             'revision': 'Revisado'
         }
         
-        # Buscar el estado en la tabla Estado
+        #buscar el estado en la tabla estado
         nombre_estado = estados_mapping.get(nuevo_estado.lower(), nuevo_estado)
         estado_obj = Estado.objects.get(
             nombre=nombre_estado,
             tipo_entidad='banda'
         )
         
-        # Actualizar estado y registrar quién lo revisó
+        #actualizar estado y registrar quién lo revisó
         banda.estado = estado_obj
         banda.revisado_por = request.user
         banda.fecha_revision = timezone.now()
@@ -3067,7 +3046,7 @@ def cambiar_estado_banda(request, banda_id, nuevo_estado):
 @login_required
 @user_passes_test(is_staff_user)
 def view_banda(request, banda_id):
-    """Ver detalle completo de una banda emergente"""
+    """ver detalle completo de una banda emergente"""
     banda = get_object_or_404(BandaEmergente, id=banda_id)
     return render(request, 'dashboard/emergente_detail.html', {'banda': banda})
 
@@ -3075,7 +3054,7 @@ def view_banda(request, banda_id):
 @login_required
 @user_passes_test(is_staff_user)
 def eliminar_banda_emergente(request, banda_id):
-    """Eliminar banda emergente"""
+    """eliminar banda emergente"""
     if request.method != 'POST':
         return redirect('dashboard_emergentes')
 
@@ -3092,12 +3071,12 @@ def eliminar_banda_emergente(request, banda_id):
     return redirect('dashboard_emergentes')
 
 
-# Las vistas para crear y editar bandas emergentes se manejarán en el frontend
+#las vistas para crear y editar bandas emergentes se manejarán en el frontend
 @login_required
 @user_passes_test(is_staff_user)
 @require_http_methods(["POST"])
 def agregar_genero(request):
-    """Agregar un nuevo género musical, con soporte para AJAX y fallback."""
+    """agregar un nuevo género musical, con soporte para ajax y fallback"""
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     nombre = request.POST.get('nombre')
     descripcion = request.POST.get('descripcion', '')
@@ -3141,7 +3120,7 @@ def agregar_genero(request):
 @user_passes_test(is_staff_user)
 @require_http_methods(["POST"])
 def eliminar_genero(request, genero_id):
-    """Eliminar un género musical, con soporte para AJAX y fallback."""
+    """eliminar un género musical, con soporte para ajax y fallback"""
     is_ajax = request.headers.get('X-Requested-with') == 'XMLHttpRequest'
 
     try:
@@ -3164,24 +3143,24 @@ def eliminar_genero(request, genero_id):
     return redirect('dashboard_emergentes')
 
 
-# ===============================
-# Contactos (CRUD + Estado)
-# ===============================
+#===============================
+#contactos (crud + estado)
+#===============================
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_contactos(request):
-    """Gestión de contactos"""
-    # Obtener parámetros de filtro
+    """gestion de contactos"""
+    #obtener parametros de filtro
     estado_filter = request.GET.get('estado')
     tipo_filter = request.GET.get('tipo')
     search_query = request.GET.get('q')
 
-    # Query base
+    #query base
     contactos = Contacto.objects.select_related(
         'tipo_asunto', 'estado', 'usuario', 'respondido_por'
     ).order_by('-fecha_envio')
 
-    # Aplicar filtros
+    #aplicar filtros
     if estado_filter:
         contactos = contactos.filter(estado_id=estado_filter)
     if tipo_filter:
@@ -3193,31 +3172,34 @@ def dashboard_contactos(request):
             Q(mensaje__icontains=search_query)
         )
 
-    # Estadísticas
+    #estadisticas
     total_contactos = Contacto.objects.count()
 
-    # Contactos pendientes (estado Recibida o Pendiente)
+    #contactos pendientes (estado recibida o pendiente)
     contactos_pendientes = Contacto.objects.filter(
         Q(estado__nombre__iexact='Recibida') | Q(estado__nombre__iexact='Pendiente')
     ).count()
 
-    # Contactos respondidos
+    #contactos respondidos
     contactos_respondidos = Contacto.objects.filter(
         estado__nombre__iexact='Respondida'
     ).count()
 
-    # Contactos de esta semana
+    #contactos de esta semana
     last_week = timezone.now() - timedelta(days=7)
     contactos_semana = Contacto.objects.filter(fecha_envio__gte=last_week).count()
 
-    # Paginación
+    #paginacion
     paginator = Paginator(contactos, 10)  # 10 contactos por página
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # Obtener estados y tipos de asunto disponibles
-    estados_disponibles = Estado.objects.filter(tipo_entidad='contacto').order_by('nombre')
+    #obtener estados y tipos de asunto disponibles
+    estados_disponibles = Estado.objects.all().order_by('nombre')
     tipos_asunto = TipoAsunto.objects.all().order_by('nombre')
+
+    # estados para la sección "Gestión de estados" (contactos y bandas)
+    estados = Estado.objects.all().order_by('tipo_entidad', 'nombre')
 
     context = {
         'contactos': page_obj,
@@ -3228,7 +3210,8 @@ def dashboard_contactos(request):
         'contactos_semana': contactos_semana,
         'estados_disponibles': estados_disponibles,
         'tipos_asunto': tipos_asunto,
-        'estados': Estado.objects.all().order_by('tipo_entidad', 'nombre'),  # Añadido para la gestión de estados
+        'estados': estados,
+  #añadido para la gestion de estados
     }
 
     return render(request, 'dashboard/contactos.html', context)
@@ -3237,17 +3220,17 @@ def dashboard_contactos(request):
 @login_required
 @user_passes_test(is_staff_user)
 def update_contacto(request, contacto_id):
-    """Actualizar estado de un contacto"""
+    """actualizar estado de un contacto"""
     contacto = get_object_or_404(Contacto, id=contacto_id)
 
     if request.method == 'POST':
         nuevo_estado_id = request.POST.get('estado')
 
         try:
-            nuevo_estado = Estado.objects.get(id=nuevo_estado_id, tipo_entidad='contacto')
+            nuevo_estado = Estado.objects.get(id=nuevo_estado_id)
             contacto.estado = nuevo_estado
 
-            # Si el estado es "Respondida", marcar fecha y usuario
+            #si el estado es "respondida", marcar fecha y usuario
             if nuevo_estado.nombre.lower() == 'respondida':
                 contacto.fecha_respuesta = timezone.now()
                 contacto.respondido_por = request.user
@@ -3265,9 +3248,7 @@ def update_contacto(request, contacto_id):
 @login_required
 @user_passes_test(is_staff_user)
 def agregar_tipo_asunto(request):
-    """
-    Agregar un nuevo tipo de asunto, con soporte para AJAX y fallback.
-    """
+    """agregar un nuevo tipo de asunto, con soporte para ajax y fallback"""
     if request.method == 'POST':
         nombre = request.POST.get('nombre', '').strip()
         descripcion = request.POST.get('descripcion', '').strip()
@@ -3279,14 +3260,14 @@ def agregar_tipo_asunto(request):
             return redirect('dashboard_contactos')
         
         try:
-            # Verificar si ya existe un tipo con el mismo nombre
+            #verificar si ya existe un tipo con el mismo nombre
             if TipoAsunto.objects.filter(nombre__iexact=nombre).exists():
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return JsonResponse({'success': False, 'error': 'Ya existe un tipo de asunto con este nombre'}, status=400)
                 messages.error(request, 'Ya existe un tipo de asunto con este nombre.')
                 return redirect('dashboard_contactos')
             
-            # Crear el nuevo tipo de asunto
+            #crear el nuevo tipo de asunto
             tipo = TipoAsunto.objects.create(
                 nombre=nombre,
                 descripcion=descripcion if descripcion else None
@@ -3311,17 +3292,14 @@ def agregar_tipo_asunto(request):
             messages.error(request, f'Error al agregar el tipo de asunto: {str(e)}')
             return redirect('dashboard_contactos')
     
-    # Si no es una petición POST, redirigir al dashboard
+    #si no es una petición post, redirigir al dashboard
     return redirect('dashboard_contactos')
 
 
 @login_required
 @user_passes_test(is_staff_user)
 def eliminar_tipo_asunto(request, tipo_id):
-    """
-    Eliminar un tipo de asunto, con soporte para AJAX y fallback.
-    Si hay contactos usando este tipo, se les asignará un tipo por defecto.
-    """
+    """eliminar un tipo de asunto, con soporte para ajax y fallback. si hay contactos usando este tipo, se les asignará un tipo por defecto"""
     if request.method != 'POST':
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
@@ -3329,14 +3307,14 @@ def eliminar_tipo_asunto(request, tipo_id):
         return redirect('dashboard_contactos')
     
     try:
-        # Obtener el tipo de asunto
+        #obtener el tipo de asunto
         tipo = TipoAsunto.objects.get(id=tipo_id)
         nombre_tipo = tipo.nombre
         
-        # Obtener el primer tipo de asunto que no sea el actual
+        #obtener el primer tipo de asunto que no sea el actual
         tipo_por_defecto = TipoAsunto.objects.exclude(id=tipo_id).first()
         
-        # Si hay contactos usando este tipo, actualizarlos al tipo por defecto
+        #si hay contactos usando este tipo, actualizarlos al tipo por defecto
         if Contacto.objects.filter(tipo_asunto=tipo).exists():
             if not tipo_por_defecto:
                 error_msg = 'No se puede eliminar el tipo de asunto porque es el único existente.'
@@ -3345,10 +3323,10 @@ def eliminar_tipo_asunto(request, tipo_id):
                 messages.error(request, error_msg)
                 return redirect('dashboard_contactos')
             
-            # Actualizar los contactos al tipo por defecto
+            #actualizar los contactos al tipo por defecto
             Contacto.objects.filter(tipo_asunto=tipo).update(tipo_asunto=tipo_por_defecto)
         
-        # Eliminar el tipo de asunto
+        #eliminar el tipo de asunto
         tipo.delete()
         
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -3373,7 +3351,7 @@ def eliminar_tipo_asunto(request, tipo_id):
 @login_required
 @user_passes_test(is_staff_user)
 def delete_contacto(request, contacto_id):
-    """Eliminar un contacto"""
+    """eliminar un contacto"""
     contacto = get_object_or_404(Contacto, id=contacto_id)
 
     if request.method == 'POST':
@@ -3386,24 +3364,24 @@ def delete_contacto(request, contacto_id):
 
     return redirect('dashboard_contactos')
 
-# ============================================
-# NOTIFICACIONES
-# ============================================
+#============================================
+#notificaciones
+#============================================
 
 @login_required
 @user_passes_test(is_staff_user)
 def dashboard_notificaciones(request):
-    """Vista principal de notificaciones"""
+    """vista principal de notificaciones"""
     from apps.notifications.models import Notification
     
-    # Obtener filtros
+    #obtener filtros
     filtro_tipo = request.GET.get('tipo', '')
     filtro_leidas = request.GET.get('leidas', '')
     
-    # Query base - solo notificaciones del usuario actual
+    #query base - solo notificaciones del usuario actual
     notificaciones = Notification.objects.filter(usuario=request.user).order_by("-fecha_creacion")
     
-    # Aplicar filtros
+    #aplicar filtros
     if filtro_tipo:
         notificaciones = notificaciones.filter(tipo=filtro_tipo)
     
@@ -3412,12 +3390,12 @@ def dashboard_notificaciones(request):
     elif filtro_leidas == 'no':
         notificaciones = notificaciones.filter(leido=False)
     
-    # Paginación
+    #paginacion
     paginator = Paginator(notificaciones, 20)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
     
-    # Estadísticas
+    #estadisticas
     total_notificaciones = notificaciones.count()
     no_leidas = notificaciones.filter(leido=False).count()
     leidas = notificaciones.filter(leido=True).count()
@@ -3438,7 +3416,7 @@ def dashboard_notificaciones(request):
 @user_passes_test(is_staff_user)
 @require_http_methods(['POST'])
 def marcar_notificacion_leida(request, notificacion_id):
-    """Marcar una notificación como leída"""
+    """marcar una notificacion como leída"""
     from apps.notifications.models import Notification
     
     notificacion = get_object_or_404(Notification, id=notificacion_id, usuario=request.user)
@@ -3455,7 +3433,7 @@ def marcar_notificacion_leida(request, notificacion_id):
 @user_passes_test(is_staff_user)
 @require_http_methods(['POST'])
 def eliminar_notificacion(request, notificacion_id):
-    """Eliminar una notificación"""
+    """eliminar una notificacion"""
     from apps.notifications.models import Notification
     
     notificacion = get_object_or_404(Notification, id=notificacion_id, usuario=request.user)
@@ -3472,7 +3450,7 @@ def eliminar_notificacion(request, notificacion_id):
 @user_passes_test(is_staff_user)
 @require_http_methods(['POST'])
 def marcar_todas_leidas(request):
-    """Marcar todas las notificaciones como leídas"""
+    """marcar todas las notificaciones como leídas"""
     from apps.notifications.models import Notification
     
     count = Notification.objects.filter(usuario=request.user, leido=False).update(leido=True)
@@ -3486,29 +3464,29 @@ def marcar_todas_leidas(request):
 @login_required
 def api_get_calendar_events(request):
     
-    # 1. ID DEL CALENDARIO
+    #1. id del calendario
     CALENDAR_ID = '7505ae36af692d9dc952769cb67cb09e5624f1c041e7e99c0c7efb2928b345b0@group.calendar.google.com' 
 
-    # 2. RUTA A CREDENCIALES
+    #2. ruta a credenciales
     CREDENTIALS_FILE = settings.BASE_DIR / 'google-credentials.json'
 
-    # 3. PERMISOS
+    #3. permisos
     SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
     print(f"[DEBUG] Intentando cargar calendario: {CALENDAR_ID}")
     print(f"[DEBUG] Buscando credenciales en: {CREDENTIALS_FILE}")
 
     try:
-        # Carga las credenciales del archivo JSON
+        #carga las credenciales del archivo json
         creds = service_account.Credentials.from_service_account_file(
             CREDENTIALS_FILE, scopes=SCOPES)
         print("[DEBUG] Credenciales cargadas exitosamente.")
 
-        # Construye el servicio de la API
+        #construye el servicio de la api
         service = build('calendar', 'v3', credentials=creds)
         print("[DEBUG] Servicio de API de Google construido.")
 
-        # Llama a la API
+        #llama a la api
         now = datetime.now(dt_timezone.utc).isoformat()  # 'Z' indica UTC
         
         events_result = service.events().list(
@@ -3523,7 +3501,7 @@ def api_get_calendar_events(request):
         events = events_result.get('items', [])
         print(f"[DEBUG] Encontrados {len(events)} eventos.")
 
-        # FORMATEA LOS EVENTOS PARA FULLCALENDAR
+        #formatea los eventos para fullcalendar
         formatted_events = []
         for event in events:
             start = event['start'].get('dateTime', event['start'].get('date'))
@@ -3539,25 +3517,25 @@ def api_get_calendar_events(request):
         return JsonResponse(formatted_events, safe=False)
 
     except Exception as e:
-        # --- ESTA ES LA PARTE IMPORTANTE ---
-        # ¡Imprime el error completo en tu terminal de Django!
+        #--- esta es la parte importante ---
+        #¡imprime el error completo en tu terminal de django
         print("="*50)
         print("¡ERROR! Falló la API de Google Calendar:")
-        traceback.print_exc() # Esto imprimirá el error rojo
+ #esto imprimira el error rojo
         print("="*50)
-        # -----------------------------------
+        #-----------------------------------
         return JsonResponse({'error': str(e)}, status=500)
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def api_track_impression(request, campania_id):
-    """Registra una impresión para una campaña de publicidad web"""
+    """registra una impresión para una campaña de publicidad web"""
     from apps.publicidad.models import PublicidadWeb
     
     try:
         with transaction.atomic():
-            # Bloquea el registro para actualización
+            #bloquea el registro para actualización
             campania = PublicidadWeb.objects.select_for_update().get(
                 publicidad_id=campania_id,
                 publicidad__tipo='WEB',
@@ -3565,10 +3543,10 @@ def api_track_impression(request, campania_id):
             )
             campania.impresiones = F('impresiones') + 1
             campania.save(update_fields=['impresiones'])
-            # Obtener el valor actualizado desde la BD
+            #obtener el valor actualizado desde la bd
             campania.refresh_from_db(fields=['impresiones'])
             
-            # Registrar la impresión en el log
+            #registrar la impresión en el log
             print(f"[PUBLICIDAD] Impresión registrada para campaña {campania_id}")
             
             return JsonResponse({
@@ -3593,12 +3571,12 @@ def api_track_impression(request, campania_id):
 @csrf_exempt
 @require_http_methods(["POST"])
 def api_track_click(request, campania_id):
-    """Registra un clic para una campaña de publicidad web"""
+    """registra un clic para una campaña de publicidad web"""
     from apps.publicidad.models import PublicidadWeb
     
     try:
         with transaction.atomic():
-            # Bloquea el registro para actualización
+            #bloquea el registro para actualización
             campania = PublicidadWeb.objects.select_for_update().get(
                 publicidad_id=campania_id,
                 publicidad__tipo='WEB',
@@ -3606,13 +3584,13 @@ def api_track_click(request, campania_id):
             )
             campania.clics = F('clics') + 1
             campania.save(update_fields=['clics'])
-            # Obtener el valor actualizado desde la BD
+            #obtener el valor actualizado desde la bd
             campania.refresh_from_db(fields=['clics'])
             
-            # Registrar el clic en el log
+            #registrar el clic en el log
             print(f"[PUBLICIDAD] Clic registrado para campaña {campania_id}")
             
-            # Devolver la URL de destino para redirección en el frontend
+            #devolver la url de destino para redirección en el frontend
             return JsonResponse({
                 'success': True,
                 'redirect_url': campania.url_destino,
@@ -3632,22 +3610,22 @@ def api_track_click(request, campania_id):
         )
 
 
-# ========================
-# Suscripciones
-# ========================
+#========================
+#suscripciones
+#========================
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def dashboard_suscripciones(request):
-    """Gestión de suscripciones al newsletter"""
-    # Parámetros de filtro
+    """gestion de suscripciones al newsletter"""
+    #parametros de filtro
     estado_filter = request.GET.get('estado')  # 'activa' o 'inactiva'
     search_query = request.GET.get('q')
 
-    # Query base
+    #query base
     suscripciones = Suscripcion.objects.select_related('usuario').order_by('-fecha_suscripcion')
 
-    # Aplicar filtros
+    #aplicar filtros
     if estado_filter == 'activa':
         suscripciones = suscripciones.filter(activa=True)
     elif estado_filter == 'inactiva':
@@ -3659,21 +3637,21 @@ def dashboard_suscripciones(request):
             Q(email__icontains=search_query)
         )
 
-    # Paginación
+    #paginacion
     paginator = Paginator(suscripciones, 10)  # 10 suscripciones por página
     page_number = request.GET.get('page', 1)
     suscripciones_page = paginator.get_page(page_number)
 
-    # Estadísticas
+    #estadisticas
     total_suscripciones = Suscripcion.objects.count()
     suscripciones_activas = Suscripcion.objects.filter(activa=True).count()
     suscripciones_inactivas = Suscripcion.objects.filter(activa=False).count()
 
-    # Suscripciones de esta semana
+    #suscripciones de esta semana
     last_week = timezone.now() - timedelta(days=7)
     suscripciones_semana = Suscripcion.objects.filter(fecha_suscripcion__gte=last_week).count()
 
-    # Bajas de esta semana
+    #bajas de esta semana
     bajas_semana = Suscripcion.objects.filter(
         activa=False,
         fecha_baja__isnull=False,
@@ -3697,7 +3675,7 @@ def dashboard_suscripciones(request):
 @user_passes_test(lambda u: u.is_staff)
 @require_http_methods(["POST"])
 def toggle_suscripcion(request, suscripcion_id):
-    """Activar/desactivar una suscripción"""
+    """activar/desactivar una suscripcion"""
     suscripcion = get_object_or_404(Suscripcion, id=suscripcion_id)
 
     if suscripcion.activa:
@@ -3716,7 +3694,7 @@ def toggle_suscripcion(request, suscripcion_id):
 @user_passes_test(lambda u: u.is_staff)
 @require_http_methods(["POST"])
 def delete_suscripcion(request, suscripcion_id):
-    """Eliminar una suscripción permanentemente"""
+    """eliminar una suscripcion permanentemente"""
     suscripcion = get_object_or_404(Suscripcion, id=suscripcion_id)
     email = suscripcion.email
     suscripcion.delete()
@@ -3726,7 +3704,7 @@ def delete_suscripcion(request, suscripcion_id):
 @login_required
 @user_passes_test(is_staff_user)
 def crear_conductor(request):
-    """Muestra el formulario para crear un nuevo conductor."""
+    """muestra el formulario para crear un nuevo conductor"""
     if request.method == 'POST':
         form = ConductorForm(request.POST, request.FILES)
         if form.is_valid():
@@ -3748,16 +3726,16 @@ def crear_conductor(request):
 @login_required
 @user_passes_test(is_staff_user)
 def editar_conductor(request, conductor_id):
-    """Edita un conductor existente."""
+    """edita un conductor existente"""
     conductor = get_object_or_404(Conductor, id=conductor_id)
 
     if request.method == 'POST':
-        # Si el formulario se envió
+        #si el formulario se envió
         form = ConductorForm(request.POST, request.FILES, instance=conductor)
         if form.is_valid():
             form.save()
             messages.success(request, 'Conductor actualizado exitosamente.')
-            return redirect('dashboard_radio') # Vuelve a la página de radio
+ #vuelve a la pagina de radio
         else:
             messages.error(request, 'Error al actualizar. Revisa el formulario.')
     else:
@@ -3774,7 +3752,7 @@ def editar_conductor(request, conductor_id):
 @user_passes_test(is_staff_user)
 @require_POST
 def toggle_activo_conductor(request, conductor_id):
-    """Activa o desactiva un conductor."""
+    """activa o desactiva un conductor"""
     conductor = get_object_or_404(Conductor, id=conductor_id)
 
     conductor.activo = not conductor.activo
@@ -3792,7 +3770,7 @@ def toggle_activo_conductor(request, conductor_id):
 @user_passes_test(is_staff_user)
 @require_POST
 def eliminar_conductor(request, conductor_id):
-    """Elimina un conductor."""
+    """elimina un conductor"""
     conductor = get_object_or_404(Conductor, id=conductor_id)
     nombre_conductor = conductor.nombre
 
@@ -3800,3 +3778,116 @@ def eliminar_conductor(request, conductor_id):
 
     messages.error(request, f'Conductor "{nombre_conductor}" eliminado permanentemente.')
     return redirect('dashboard_radio')
+
+
+def dashboard_password_reset(request):
+    """vista para solicitar recuperación de contraseña desde el dashboard"""
+    if request.method == 'POST':
+        email = request.POST.get('email')
+
+        try:
+            user = User.objects.get(email=email)
+
+            #generar token de reseteo
+            from django.contrib.auth.tokens import default_token_generator
+            from django.utils.encoding import force_bytes
+            from django.utils.http import urlsafe_base64_encode
+            from django.core.mail import send_mail
+
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            #construir url de reseteo para el frontend
+            frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+            reset_url = f"{frontend_url}/resetear-contrasena/{uid}/{token}"
+
+            #enviar correo electrónico
+            subject = 'Recuperación de Contraseña - Radio Oriente FM Dashboard'
+            message = f"""hola {user.first_name or user.username}, recibimos una solicitud para restablecer tu contraseña del dashboard de radio oriente fm. para crear una nueva contraseña, haz clic en el siguiente enlace: {reset_url} este enlace expirará en 24 horas. si no solicitaste este cambio, puedes ignorar este correo electrónico y tu contraseña permanecerá sin cambios. saludos, el equipo de radio oriente fm"""
+
+            try:
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    fail_silently=False,
+                )
+                return render(request, 'dashboard/password_reset.html', {
+                    'success': True,
+                    'message': 'Se ha enviado un correo electrónico con instrucciones para restablecer tu contraseña.'
+                })
+            except Exception as e:
+                return render(request, 'dashboard/password_reset.html', {
+                    'error': f'Error al enviar el correo: {str(e)}'
+                })
+
+        except User.DoesNotExist:
+            #por seguridad, mostrar el mismo mensaje aunque el email no exista
+            return render(request, 'dashboard/password_reset.html', {
+                'success': True,
+                'message': 'Si el correo existe en nuestro sistema, recibirás instrucciones para restablecer tu contraseña.'
+            })
+
+    return render(request, 'dashboard/password_reset.html')
+
+@login_required
+@user_passes_test(is_staff_user)
+@require_http_methods(["POST"])
+def api_subir_imagen_campania(request):
+    """api para subir imágenes de campañas de publicidad"""
+    import os
+    import uuid
+    from django.core.files.storage import default_storage
+    from django.core.files.base import ContentFile
+    from django.conf import settings
+    
+    try:
+        if 'imagen' not in request.FILES:
+            return JsonResponse({'success': False, 'message': 'No se envió ningún archivo'}, status=400)
+        
+        imagen = request.FILES['imagen']
+        
+        #validar tipo de archivo
+        allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+        if imagen.content_type not in allowed_types:
+            return JsonResponse({
+                'success': False, 
+                'message': 'Tipo de archivo no permitido. Solo se permiten imágenes (JPEG, PNG, GIF, WebP)'
+            }, status=400)
+        
+        #validar tamaño (máximo 5mb)
+        if imagen.size > 5 * 1024 * 1024:
+            return JsonResponse({
+                'success': False, 
+                'message': 'El archivo es demasiado grande. Máximo 5MB'
+            }, status=400)
+        
+        #generar nombre unico para el archivo
+        ext = os.path.splitext(imagen.name)[1].lower()
+        filename = f"campania_{uuid.uuid4().hex}{ext}"
+        
+        #crear directorio si no existe
+        upload_path = os.path.join('publicidad', 'campanias')
+        full_path = os.path.join(upload_path, filename)
+        
+        #guardar archivo
+        saved_path = default_storage.save(full_path, ContentFile(imagen.read()))
+        
+        #construir url completa
+        file_url = default_storage.url(saved_path)
+        
+        return JsonResponse({
+            'success': True,
+            'url': file_url,
+            'filename': filename,
+            'message': 'Imagen subida correctamente'
+        })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'message': f'Error al subir la imagen: {str(e)}'
+        }, status=500)

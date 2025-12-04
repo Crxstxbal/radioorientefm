@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Clock, User, Calendar } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 import './Pages.css';
 
 const Programming = () => {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDay, setSelectedDay] = useState(null); // null = todos los días
 
   const daysOfWeek = [
-    { key: 1, name: 'Lunes' },
-    { key: 2, name: 'Martes' },
-    { key: 3, name: 'Miércoles' },
-    { key: 4, name: 'Jueves' },
-    { key: 5, name: 'Viernes' },
-    { key: 6, name: 'Sábado' },
-    { key: 0, name: 'Domingo' }
+    { key: 1, name: 'Lunes', short: 'Lun' },
+    { key: 2, name: 'Martes', short: 'Mar' },
+    { key: 3, name: 'Miércoles', short: 'Mié' },
+    { key: 4, name: 'Jueves', short: 'Jue' },
+    { key: 5, name: 'Viernes', short: 'Vie' },
+    { key: 6, name: 'Sábado', short: 'Sáb' },
+    { key: 0, name: 'Domingo', short: 'Dom' }
   ];
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const programsResponse = await axios.get('/api/radio/programas/');
+        const programsResponse = await api.get('/api/radio/programas/');
         const programsData = programsResponse.data.results || programsResponse.data;
         setPrograms(programsData);
 
@@ -34,7 +35,7 @@ const Programming = () => {
     fetchData();
   }, []);
 
-  const groupProgramsByDay = () => {
+  const groupProgramsByDay = useMemo(() => {
     const grouped = {};
     daysOfWeek.forEach(day => {
       grouped[day.key] = [];
@@ -66,17 +67,24 @@ const Programming = () => {
     });
     
     return grouped;
-  };
+  }, [programs]);
 
-  const formatTime = (time) => {
+  const formatTime = useCallback((time) => {
     if (!time) return '';
     return new Date(`2000-01-01T${time}`).toLocaleTimeString('es-ES', {
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
+  }, []);
 
-  const groupedPrograms = groupProgramsByDay();
+  const groupedPrograms = groupProgramsByDay;
+
+  //memoizar días filtrados
+  const daysToShow = useMemo(() => {
+    return selectedDay !== null
+      ? daysOfWeek.filter(day => day.key === selectedDay)
+      : daysOfWeek;
+  }, [selectedDay]);
 
   return (
     <div className="programming-page">
@@ -91,6 +99,27 @@ const Programming = () => {
           </div>
         </div>
 
+        {/*filtro de días*/}
+        <div className="days-filter">
+          <button
+            className={`day-filter-btn ${selectedDay === null ? 'active' : ''}`}
+            onClick={() => setSelectedDay(null)}
+          >
+            <span className="day-full">Todos</span>
+            <span className="day-short">Todos</span>
+          </button>
+          {daysOfWeek.map((day) => (
+            <button
+              key={day.key}
+              className={`day-filter-btn ${selectedDay === day.key ? 'active' : ''}`}
+              onClick={() => setSelectedDay(day.key)}
+            >
+              <span className="day-full">{day.name}</span>
+              <span className="day-short">{day.short}</span>
+            </button>
+          ))}
+        </div>
+
         {loading ? (
           <div className="loading-container">
             <div className="spinner-large"></div>
@@ -98,7 +127,7 @@ const Programming = () => {
           </div>
         ) : (
           <div className="programming-grid">
-            {daysOfWeek.map((day) => {
+            {daysToShow.map((day) => {
               const dayNumber = day.key;
               return (
                 <div key={day.key} className="day-schedule">
@@ -108,37 +137,56 @@ const Programming = () => {
                       groupedPrograms[dayNumber].map((schedule) => (
                         <div key={schedule.id} className="program-card">
                           {schedule.programa_imagen && (
-                            <img 
-                              src={schedule.programa_imagen} 
+                            <img
+                              src={schedule.programa_imagen}
                               alt={schedule.programa_nombre}
                               className="program-image"
                             />
                           )}
                           <div className="program-content">
-                            
                             <h3 className="program-title">
                               {schedule.programa_nombre}
                             </h3>
-                            
+
+                            <div className="program-time">
+                              <Clock size={18} />
+                              <span>{formatTime(schedule.hora_inicio)} - {formatTime(schedule.hora_fin)}</span>
+                            </div>
+
                             <p className="program-description">
                               {schedule.programa_descripcion || 'Sin descripción disponible'}
                             </p>
-                            <div className="program-meta">
-                              <div className="program-time">
-                                <Clock size={16} />
-                                {formatTime(schedule.hora_inicio)} - {formatTime(schedule.hora_fin)}
-                              </div>
-                              
-                              <div className="program-host">
-                                <User size={16} />
-                                {schedule.conductores && schedule.conductores.length > 0 ? (
-                                  schedule.conductores.map(c => c.conductor_nombre).join(', ')
-                                ) : (
-                                  'Radio Oriente FM'
-                                )}
-                              </div>
 
-                            </div>
+                            {schedule.conductores && schedule.conductores.length > 0 && (
+                              <div className="program-hosts">
+                                <div className="hosts-label">
+                                  <User size={16} />
+                                  <span>Conducido por:</span>
+                                </div>
+                                <div className="hosts-list">
+                                  {schedule.conductores.map((conductor, idx) => (
+                                    <div key={idx} className="host-item">
+                                      {conductor.conductor_foto ? (
+                                        <img
+                                          src={conductor.conductor_foto}
+                                          alt={conductor.conductor_nombre}
+                                          className="host-avatar"
+                                        />
+                                      ) : (
+                                        <div className="host-avatar-placeholder">
+                                          <User size={16} />
+                                        </div>
+                                      )}
+                                      <div className="host-info">
+                                        <span className="host-name">
+                                          {conductor.conductor_apodo || conductor.conductor_nombre}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))

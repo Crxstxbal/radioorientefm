@@ -7,5 +7,5 @@ class ContactConfig(AppConfig):
     verbose_name = 'Contacto'
 
     def ready(self):
-        """Importar señales cuando la aplicación esté lista"""
+        """importar señales cuando la aplicación esté lista"""
         import apps.contact.signals  # noqa

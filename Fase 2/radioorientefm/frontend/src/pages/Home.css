@@ -1,8 +1,9 @@
 .home-page {
   min-height: 100vh;
+  overflow-x: hidden; 
+  overflow-y: visible;
 }
 
-/* Hero Section */
 .home-page .hero {
   position: relative;
   color: var(--color-white);
@@ -10,11 +11,12 @@
   min-height: 70vh;
   display: flex;
   align-items: center;
-  overflow: hidden;
+  overflow: visible;
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+
+
 }
 
-/* Animated gradient mesh background */
 .home-page .hero::before {
   content: '';
   position: absolute;
@@ -31,7 +33,7 @@
   z-index: 0;
 }
 
-/* Subtle overlay for depth */
+  /*subtle overlay for depth*/
 .home-page .hero::after {
   content: '';
   position: absolute;
@@ -45,9 +47,9 @@
   pointer-events: none;
 }
 
-/* Shimmer effect overlay - removed to avoid rectangular marks */
+/*shimmer efecto overlay - removed to avoid rectangular marks*/
 
-/* Gradient animation */
+/*gradient animation*/
 @keyframes gradient-shift {
   0%, 100% {
     opacity: 1;
@@ -67,7 +69,7 @@
   }
 }
 
-/* Contenedor de partículas flotantes */
+/*contenedor de partículas flotantes*/
 .floating-particles {
   position: absolute;
   top: 0;
@@ -79,51 +81,80 @@
   pointer-events: none;
 }
 
-/* Cada partícula individual */
+/*cada partícula individual*/
 .particle {
   position: absolute;
   border-radius: 50%;
-  animation-name: float-particle;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+  animation: float-particle 40s ease-in-out infinite;
   box-shadow: 0 0 10px currentColor, 0 0 15px currentColor;
   will-change: transform, opacity;
   opacity: 0.7;
   filter: blur(0.5px);
 }
 
-/* Animación de flotación con movimiento continuo y suave */
+/*animación de flotación con movimiento continuo, amplio y suave*/
 @keyframes float-particle {
   0% {
     transform: translate(0px, 0px) scale(1);
     opacity: 0.4;
   }
 
-  25% {
-    transform: translate(30px, -60px) scale(1.15);
+  10% {
+    transform: translate(80px, -100px) scale(1.2);
+    opacity: 0.7;
+  }
+
+  20% {
+    transform: translate(-60px, -180px) scale(0.8);
+    opacity: 0.6;
+  }
+
+  30% {
+    transform: translate(120px, -250px) scale(1.1);
+    opacity: 0.5;
+  }
+
+  40% {
+    transform: translate(-90px, -320px) scale(0.9);
     opacity: 0.7;
   }
 
   50% {
-    transform: translate(-20px, -120px) scale(0.9);
+    transform: translate(50px, -400px) scale(1.15);
     opacity: 0.6;
   }
 
-  75% {
-    transform: translate(15px, -60px) scale(1.1);
+  60% {
+    transform: translate(-100px, -480px) scale(0.85);
+    opacity: 0.5;
+  }
+
+  70% {
+    transform: translate(110px, -550px) scale(1.05);
+    opacity: 0.7;
+  }
+
+  80% {
+    transform: translate(-70px, -620px) scale(0.95);
+    opacity: 0.6;
+  }
+
+  90% {
+    transform: translate(90px, -700px) scale(1.1);
     opacity: 0.5;
   }
 
   100% {
-    transform: translate(0px, 0px) scale(1);
-    opacity: 0.4;
+    transform: translate(0px, -800px) scale(1);
+    opacity: 0;
   }
 }
 
-/* Ensure hero content is above background and particles */
+/*ensure hero content is above background and particles*/
 .home-page .hero .container {
   position: relative;
   z-index: 2;
+  
 }
 
 .home-page .hero-content {
@@ -134,7 +165,7 @@
   position: relative;
 }
 
-/* Ensure hero text and image are above background */
+/*ensure hero text and image are above background*/
 .home-page .hero-text,
 .home-page .hero-image {
   position: relative;
@@ -161,7 +192,7 @@
   min-height: 1.2em;
 }
 
-/* Cursor styles removed - now handled in JSX inline styles */
+/*cursor estilos removed - now handled in jsx inline estilos*/
 
 .home-page .hero-description {
   font-size: 1.1rem;
@@ -252,7 +283,7 @@
   }
 }
 
-/* Stats Section */
+/*stats section*/
 .home-page .stats {
   padding: 2.5rem 0;
   background: var(--color-gray-100);
@@ -296,7 +327,7 @@
   font-weight: 500;
 }
 
-/* Featured News */
+/*featured news*/
 .home-page .featured-news {
   padding: 1.5rem 0;
 }
@@ -394,7 +425,7 @@
   color: var(--color-gray-600);
 }
 
-/* Call to Action */
+/*call to action*/
 .home-page .cta {
   background: var(--color-red);
   color: var(--color-white);
@@ -417,7 +448,7 @@
   opacity: 0.9;
 }
 
-/* Responsive Design */
+/*responsivo design*/
 @media (max-width: 1024px) {
   .home-page .hero {
     min-height: 60vh;
@@ -556,7 +587,7 @@
   }
 }
 
-/* Sección general de cards */
+/*sección general de cards*/
 .home-page .cards-section {
   display: flex;
   justify-content: center;
@@ -565,7 +596,7 @@
   padding: 3rem 1rem;
 }
 
-/* Estilo base de cada card */
+/*estilo base de cada card*/
 .home-page .card {
   flex: 1 1 350px;
   max-width: 420px;
@@ -592,7 +623,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Hover effect - Elevación elegante */
+/*hover efecto - elevación elegante*/
 .home-page .card:hover {
   transform: translateY(-12px) scale(1.02);
   box-shadow:
@@ -602,7 +633,7 @@
     0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-/* Efecto de brillo en hover */
+/*efecto de brillo en hover*/
 .home-page .card:hover::after {
   opacity: 0.15;
 }
@@ -626,7 +657,7 @@
   pointer-events: none;
 }
 
-/* Capa de overlay con blur para cada card */
+/*capa de overlay con blur para cada card*/
 .home-page .card::before {
   content: '';
   position: absolute;
@@ -644,7 +675,7 @@
   transition: backdrop-filter 0.4s ease;
 }
 
-/* Aumentar blur en hover */
+/*aumentar blur en hover*/
 .home-page .card:hover::before {
   backdrop-filter: blur(4px);
   background: linear-gradient(
@@ -654,28 +685,28 @@
   );
 }
 
-/* Contenido de la card debe estar por encima del overlay */
+/*contenido de la card debe estar por encima del overlay*/
 .home-page .card > * {
   position: relative;
   z-index: 3;
 }
 
-/* Card de Bandas Emergentes */
+/*card de bandas emergentes*/
 .home-page .card-bandas {
   background-image: url('/images/bandas.jpg') !important;
 }
 
-/* Card de Noticias/Suscripción */
+/*card de noticias/suscripcion*/
 .home-page .card-noticias {
   background-image: url('/images/noticias.webp') !important;
 }
 
-/* Card de Publicidad */
+/*card de publicidad*/
 .home-page .card-publicidad {
   background-image: url('/images/publicidad.jpg') !important;
 }
 
-/* Forzar que las imágenes se mantengan en modo oscuro */
+/*forzar que las imágenes se mantengan en modo oscuro*/
 @media (prefers-color-scheme: dark) {
   .home-page .card-bandas {
     background-image: url('/images/bandas.jpg') !important;
@@ -699,7 +730,7 @@
   }
 }
 
-/* Compatibilidad con clase .dark en html */
+/*compatibilidad con clase .dark en html*/
 html.dark .home-page .card-bandas {
   background-image: url('/images/bandas.jpg') !important;
   background-size: cover !important;
@@ -727,12 +758,12 @@ html.dark .home-page .card-publicidad {
   color: #fff !important;
 }
 
-/* Iconos dentro de la card */
+/*iconos dentro de la card*/
 .home-page .card .icon {
   margin-bottom: 1rem;
 }
 
-/* Títulos */
+/*títulos*/
 .home-page .card .title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -740,7 +771,7 @@ html.dark .home-page .card-publicidad {
   color: #fff;
 }
 
-/* Descripción */
+/*descripcion*/
 .home-page .card .description {
   font-size: 1rem;
   line-height: 1.6;
@@ -748,7 +779,7 @@ html.dark .home-page .card-publicidad {
   color: #fff;
 }
 
-/* Botones blancos */
+/*botones blancos*/
 .home-page .btn-white {
   background-color: #fff;
   color: #dc2626;
@@ -772,7 +803,7 @@ html.dark .home-page .card-publicidad {
   box-shadow: 0 20px 40px rgba(0,0,0,0.2);
 }
 
-/* Mobile responsive */
+/*movil responsivo*/
 @media (max-width: 768px) {
   .home-page .cards-section {
     gap: 1.5rem;
@@ -783,16 +814,14 @@ html.dark .home-page .card-publicidad {
   }
 }
 
-/* ============================================
-   DARK MODE STYLES - Home Page
-   ============================================ */
+/*============================================ dark mode estilos - home page ============================================*/
 
-/* Stats section background */
+/*stats section background*/
 html.dark .home-page .stats {
   background: var(--bg-secondary);
 }
 
-/* Stat items */
+/*stat items*/
 html.dark .home-page .stat-item {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -806,12 +835,12 @@ html.dark .home-page .stat-label {
   color: var(--text-secondary);
 }
 
-/* Section titles */
+/*section titles*/
 html.dark .home-page .section-title {
   color: var(--text-primary);
 }
 
-/* News cards */
+/*news cards*/
 html.dark .home-page .news-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -829,6 +858,99 @@ html.dark .home-page .news-meta {
   color: var(--text-tertiary);
 }
 
+/*autor y la fecha de articulos en home*/
+.home-page .news-meta,
+.home-page .news-meta .meta-item span {
+  color: #111 !important;
+}
+.home-page .news-meta .meta-item svg {
+  color: #111 !important;
+}
+
+html.dark .home-page .news-meta,
+html.dark .home-page .news-meta .meta-item span {
+  color: #ffffff !important;
+}
+html.dark .home-page .news-meta .meta-item svg {
+  color: #ffffff !important;
+}
+
 html.dark .home-page .loading {
   color: var(--text-secondary);
 }
+
+/*animaciones de partículas y radio*/
+@keyframes radio-pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-cursor {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0); opacity: 0.7; }
+  100% { transform: translateY(-100vh); opacity: 0; }
+}
+
+@keyframes floatDown {
+  0% { transform: translateY(0); opacity: 0.7; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@keyframes floatLeft {
+  0% { transform: translateX(0); opacity: 0.7; }
+  100% { transform: translateX(-100vw); opacity: 0; }
+}
+
+@keyframes floatRight {
+  0% { transform: translateX(0); opacity: 0.7; }
+  100% { transform: translateX(100vw); opacity: 0; }
+}
+
+@keyframes floatDiagonal1 {
+  0% { transform: translate(0, 0); opacity: 0.7; }
+  100% { transform: translate(100vw, -100vh); opacity: 0; }
+}
+
+@keyframes floatDiagonal2 {
+  0% { transform: translate(0, 0); opacity: 0.7; }
+  100% { transform: translate(-100vw, -100vh); opacity: 0; }
+}
+
+@keyframes floatDiagonal3 {
+  0% { transform: translate(0, 0); opacity: 0.7; }
+  100% { transform: translate(100vw, 100vh); opacity: 0; }
+}
+
+@keyframes floatDiagonal4 {
+  0% { transform: translate(0, 0); opacity: 0.7; }
+  100% { transform: translate(-100vw, 100vh); opacity: 0; }
+}
+
+.particle-floatUp { animation: floatUp 20s linear infinite !important; }
+.particle-floatDown { animation: floatDown 20s linear infinite !important; }
+.particle-floatLeft { animation: floatLeft 20s linear infinite !important; }
+.particle-floatRight { animation: floatRight 20s linear infinite !important; }
+.particle-floatDiagonal1 { animation: floatDiagonal1 25s linear infinite !important; }
+.particle-floatDiagonal2 { animation: floatDiagonal2 25s linear infinite !important; }
+.particle-floatDiagonal3 { animation: floatDiagonal3 25s linear infinite !important; }
+.particle-floatDiagonal4 { animation: floatDiagonal4 25s linear infinite !important; }

@@ -1,4 +1,4 @@
-# Generated manually to add foreign key relationships
+#generated manually to add foreign key relationships
 
 from django.conf import settings
 from django.db import migrations, models
@@ -6,40 +6,40 @@ import django.db.models.deletion
 
 
 def migrate_existing_data(apps, schema_editor):
-    """Migrar id_usuario existentes al nuevo campo usuario"""
+    """migrar id_usuario existentes al nuevo campo usuario"""
     ChatMessage = apps.get_model('chat', 'ChatMessage')
     InfraccionUsuario = apps.get_model('chat', 'InfraccionUsuario')
     User = apps.get_model(settings.AUTH_USER_MODEL)
 
-    # Obtener el primer usuario staff como fallback
+    #obtener el primer usuario staff como fallback
     admin_user = User.objects.filter(is_staff=True).first()
     if not admin_user:
-        # Si no hay staff, usar el primer usuario
+        #si no hay staff, usar el primer usuario
         admin_user = User.objects.first()
 
     if not admin_user:
         print("⚠️  No hay usuarios en la base de datos. Se deben crear usuarios antes de migrar.")
         return
 
-    # Migrar mensajes
+    #migrar mensajes
     for mensaje in ChatMessage.objects.all():
         try:
-            # Intentar obtener el usuario por id_usuario
+            #intentar obtener el usuario por id_usuario
             usuario = User.objects.get(id=mensaje.id_usuario_old)
             mensaje.usuario_temp = usuario
         except User.DoesNotExist:
-            # Si no existe, usar admin como fallback
+            #si no existe, usar admin como fallback
             mensaje.usuario_temp = admin_user
         mensaje.save()
 
-    # Migrar infracciones
+    #migrar infracciones
     for infraccion in InfraccionUsuario.objects.all():
         try:
-            # Intentar obtener el usuario por id_usuario
+            #intentar obtener el usuario por id_usuario
             usuario = User.objects.get(id=infraccion.id_usuario_old)
             infraccion.usuario_temp = usuario
         except User.objects.model.DoesNotExist:
-            # Si no existe, usar admin como fallback
+            #si no existe, usar admin como fallback
             infraccion.usuario_temp = admin_user
         infraccion.save()
 
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # PASO 1: Renombrar columnas antiguas
+        #paso 1: renombrar columnas antiguas
         migrations.RenameField(
             model_name='chatmessage',
             old_name='id_usuario',
@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
             new_name='id_usuario_old',
         ),
 
-        # PASO 2: Agregar nuevos campos como nullable
+        #paso 2: agregar nuevos campos como nullable
         migrations.AddField(
             model_name='chatmessage',
             name='usuario_temp',
@@ -102,10 +102,10 @@ class Migration(migrations.Migration):
             ),
         ),
 
-        # PASO 3: Migrar datos
+        #paso 3: migrar datos
         migrations.RunPython(migrate_existing_data, migrations.RunPython.noop),
 
-        # PASO 4: Eliminar campos antiguos
+        #paso 4: eliminar campos antiguos
         migrations.RemoveField(
             model_name='chatmessage',
             name='id_usuario_old',
@@ -115,7 +115,7 @@ class Migration(migrations.Migration):
             name='id_usuario_old',
         ),
 
-        # PASO 5: Renombrar campos nuevos al nombre final y hacerlos not-null
+        #paso 5: renombrar campos nuevos al nombre final y hacerlos not-null
         migrations.RenameField(
             model_name='chatmessage',
             old_name='usuario_temp',
@@ -127,7 +127,7 @@ class Migration(migrations.Migration):
             new_name='usuario',
         ),
 
-        # PASO 6: Modificar el campo para que sea NOT NULL y tenga db_column
+        #paso 6: modificar el campo para que sea not null y tenga db_column
         migrations.AlterField(
             model_name='chatmessage',
             name='usuario',
@@ -151,7 +151,7 @@ class Migration(migrations.Migration):
             ),
         ),
 
-        # PASO 7: Agregar índices
+        #paso 7: agregar índices
         migrations.AddIndex(
             model_name='chatmessage',
             index=models.Index(fields=['usuario'], name='mensajes_usuario_idx'),

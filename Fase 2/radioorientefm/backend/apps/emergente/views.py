@@ -10,15 +10,15 @@ from .serializers import (
     BandaEmergenteListSerializer, BandaEmergentelLegacySerializer, BandaLinkSerializer
 )
 
-# ViewSets normalizados
+#viewsets normalizados
 class IntegranteViewSet(viewsets.ModelViewSet):
-    """ViewSet para integrantes"""
+    """viewset para integrantes"""
     queryset = Integrante.objects.all()
     serializer_class = IntegranteSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 class BandaEmergenteViewSet(viewsets.ModelViewSet):
-    """ViewSet para bandas emergentes"""
+    """viewset para bandas emergentes"""
     queryset = BandaEmergente.objects.select_related(
         'genero', 'estado', 'usuario', 'comuna__ciudad__pais'
     ).prefetch_related('links', 'integrantes').all()
@@ -34,25 +34,25 @@ class BandaEmergenteViewSet(viewsets.ModelViewSet):
         return BandaEmergenteSerializer
     
     def get_queryset(self):
-        # Los usuarios solo pueden ver sus propias bandas, excepto staff
+        #los usuarios solo pueden ver sus propias bandas, excepto staff
         if self.request.user.is_staff:
             return self.queryset
         elif self.request.user.is_authenticated:
             return self.queryset.filter(usuario=self.request.user)
         else:
-            # Para usuarios anónimos, devolver queryset vacío
+            #para usuarios anónimos, devolver queryset vacío
             return self.queryset.none()
     
     @action(detail=False, methods=['get'])
     def por_estado(self, request):
-        """Obtener bandas por estado (paginado)"""
+        """obtener bandas por estado (paginado)"""
         estado_id = request.query_params.get('estado_id')
         if not estado_id:
             return Response([])
 
         queryset = self.queryset.filter(estado_id=estado_id)
 
-        # Aplicar paginación
+        #aplicar paginacion
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(queryset, request)
 
@@ -65,14 +65,14 @@ class BandaEmergenteViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def por_genero(self, request):
-        """Obtener bandas por género (paginado)"""
+        """obtener bandas por género (paginado)"""
         genero_id = request.query_params.get('genero_id')
         if not genero_id:
             return Response([])
 
         queryset = self.queryset.filter(genero_id=genero_id)
 
-        # Aplicar paginación
+        #aplicar paginacion
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(queryset, request)
 
@@ -83,9 +83,9 @@ class BandaEmergenteViewSet(viewsets.ModelViewSet):
         serializer = BandaEmergenteListSerializer(queryset, many=True)
         return Response(serializer.data)
 
-# Views de compatibilidad para el frontend existente
+#views de compatibilidad para el frontend existente
 class BandaEmergenteListCreateView(generics.ListCreateAPIView):
-    """Vista de compatibilidad para bandas emergentes"""
+    """vista de compatibilidad para bandas emergentes"""
     queryset = BandaEmergente.objects.all()
     serializer_class = BandaEmergentelLegacySerializer
     parser_classes = (MultiPartParser, FormParser)
@@ -93,14 +93,14 @@ class BandaEmergenteListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         if self.request.user and self.request.user.is_authenticated:
-            # Buscar género por defecto
+            #buscar género por defecto
             from apps.radio.models import GeneroMusical
             genero_default, created = GeneroMusical.objects.get_or_create(
                 nombre='Rock',
                 defaults={'descripcion': 'Género rock'}
             )
             
-            # Buscar estado pendiente
+            #buscar estado pendiente
             from apps.contact.models import Estado
             estado_pendiente = Estado.objects.filter(
                 nombre__icontains='pendiente',

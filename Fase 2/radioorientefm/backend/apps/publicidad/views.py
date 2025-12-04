@@ -2,14 +2,14 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Publicidad, PublicidadWeb, PublicidadRadial
+from .models import Publicidad, PublicidadWeb
 from .serializers import (
     PublicidadSerializer, PublicidadCreateSerializer, PublicidadListSerializer,
-    PublicidadWebSerializer, PublicidadRadialSerializer
+    PublicidadWebSerializer
 )
 
 class PublicidadViewSet(viewsets.ModelViewSet):
-    """ViewSet para publicidades"""
+    """viewset para publicidades"""
     queryset = Publicidad.objects.select_related('usuario').all()
     serializer_class = PublicidadSerializer
     permission_classes = [IsAuthenticated]
@@ -22,21 +22,21 @@ class PublicidadViewSet(viewsets.ModelViewSet):
         return PublicidadSerializer
     
     def get_queryset(self):
-        # Los usuarios solo pueden ver sus propias publicidades, excepto staff
+        #los usuarios solo pueden ver sus propias publicidades, excepto staff
         if self.request.user.is_staff:
             return self.queryset
         return self.queryset.filter(usuario=self.request.user)
     
     @action(detail=False, methods=['get'])
     def activas(self, request):
-        """Obtener publicidades activas"""
+        """obtener publicidades activas"""
         activas = self.queryset.filter(activo=True)
         serializer = PublicidadListSerializer(activas, many=True)
         return Response(serializer.data)
     
     @action(detail=False, methods=['get'])
     def por_tipo(self, request):
-        """Obtener publicidades por tipo"""
+        """obtener publicidades por tipo"""
         tipo = request.query_params.get('tipo')
         if tipo in ['WEB', 'RADIAL']:
             publicidades = self.queryset.filter(tipo=tipo)
@@ -46,7 +46,7 @@ class PublicidadViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def web_activas(self, request):
-        """Obtener publicidades web activas para mostrar en el sitio"""
+        """obtener publicidades web activas para mostrar en el sitio"""
         from django.utils import timezone
         today = timezone.now().date()
         

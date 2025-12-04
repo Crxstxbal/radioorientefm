@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Radio, Users, Music, Newspaper, Calendar, User, Tag, ArrowRight } from "lucide-react";
-import axios from "axios";
+import api from "../utils/api";
 import "./Home.css";
 import PublicidadCarousel from "../components/PublicidadCarousel";
 import CarruselLocutores from '../components/CarruselLocutores';
 import Typewriter from '../components/Typewriter';
 
-// Componente para contador animado
+//componentee para contador animado
 const CounterCard = ({ icon, endValue, suffix = "", label, duration = 2000 }) => {
   const [count, setCount] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
@@ -81,6 +81,9 @@ const calculateYearsSince = (startDate) => {
   return years;
 };
 
+//memoizar años calculados
+const yearsOnAir = calculateYearsSince(new Date(2011, 8, 21));
+
 const Home = () => {
   const navigate = useNavigate();
   const [featuredArticles, setFeaturedArticles] = useState([]);
@@ -91,8 +94,8 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const [articlesResponse, stationResponse] = await Promise.all([
-          axios.get("/api/articulos/api/articulos/"),
-          axios.get("/api/radio/station/"),
+          api.get("/api/articulos/api/articulos/"),
+          api.get("/api/radio/station/"),
         ]);
 
         const articles = articlesResponse.data.results || articlesResponse.data || [];
@@ -132,10 +135,9 @@ const Home = () => {
     fetchData();
   }, []);
 
-  const handleArticleClick = (articleId) => {
+  const handleArticleClick = useCallback((articleId) => {
     navigate('/articulos', { state: { selectedArticleId: articleId } });
-  };
-
+  }, [navigate]);
 
   const particleElements = useMemo(() => {
     const colors = [
@@ -149,24 +151,37 @@ const Home = () => {
     return [...Array(15)].map((_, i) => {
       const randomX = Math.random() * 100;
       const randomY = Math.random() * 100;
-      const randomDelay = Math.random() * -40; // Delay negativo para que empiecen en diferentes puntos
-      const randomDuration = 30 + Math.random() * 20; // 30-50 segundos (lento)
-      const randomSize = 2 + Math.random() * 2; // 2-4px pequeñas
+      const randomDelay = Math.random() * 15;
+      const randomSize = 3 + Math.random() * 3;
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+      //dirección aleatoria: arriba, abajo, izquierda o derecha
+      const directions = [
+        'floatUp',
+        'floatDown',
+        'floatLeft',
+        'floatRight',
+        'floatDiagonal1',
+        'floatDiagonal2',
+        'floatDiagonal3',
+        'floatDiagonal4'
+      ];
+      const randomDirection = directions[Math.floor(Math.random() * directions.length)];
 
       return (
         <div
           key={i}
-          className="particle"
+          className={`particle particle-${randomDirection}`}
           style={{
             left: `${randomX}%`,
             top: `${randomY}%`,
             width: `${randomSize}px`,
             height: `${randomSize}px`,
             backgroundColor: randomColor,
+            position: 'absolute',
+            borderRadius: '50%',
             animationDelay: `${randomDelay}s`,
-            animationDuration: `${randomDuration}s`,
-            color: randomColor
+            boxShadow: `0 0 10px ${randomColor}`
           }}
         />
       );
@@ -175,38 +190,10 @@ const Home = () => {
 
   return (
     <>
-      <style>{`
-        @keyframes radio-pulse {
-          0% {
-            transform: scale(0.8);
-            opacity: 1;
-          }
-          100% {
-            transform: scale(2.8);
-            opacity: 0;
-          }
-        }
-
-        @keyframes pulse-cursor {
-          0% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.3;
-            transform: scale(0.8);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-      `}</style>
-
       <div className="home-page">
-        {/* Hero Section */}
+        {/*hero section*/}
         <section className="hero">
-          {/* Partículas animadas */}
+          {/*partículas animadas*/}
           <div className="floating-particles">
             {particleElements}
           </div>
@@ -258,7 +245,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Secciones */}
+        {/*secciones*/}
         <section className="stats">
           <div className="container">
             <div className="stats-grid">
@@ -281,7 +268,7 @@ const Home = () => {
               </div>
               <CounterCard
                 icon={<Radio className="stat-icon" />}
-                endValue={calculateYearsSince(new Date(2011, 8, 21))}
+                endValue={yearsOnAir}
                 label="Años al Aire"
                 duration={2000}
               />
@@ -291,7 +278,7 @@ const Home = () => {
 
         <CarruselLocutores />
 
-        {/* Noticias */}
+        {/*noticias*/}
         <section className="featured-news">
           <div className="container">
             <h2 className="section-title">Últimos Artículos</h2>
@@ -310,7 +297,7 @@ const Home = () => {
               <>
                 <div className="news-grid">
                   {featuredArticles.map((article) => {
-                    // Función para obtener thumbnail
+                    //funcion para obtener thumbnail
                     const getThumbnail = (article) => {
                       return article.imagen_thumbnail || article.imagen_url || article.imagen_portada;
                     };
@@ -371,7 +358,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Publicidad Home 1920x1080 debajo de Últimos Artículos */}
+        {/*publicidad home 1920x1080 debajo de últimos artículos*/}
         <div className="container" style={{ margin: '24px auto' }}>
           <PublicidadCarousel dimensiones="1920x1080" position="top" autoPlayMs={8000} />
         </div>

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 from django.contrib import admin
 from .models import Notification
 
@@ -25,5 +25,5 @@ class NotificationAdmin(admin.ModelAdmin):
     )
 
     def has_add_permission(self, request):
-        # Las notificaciones se crean automaticamente con signals
+        #las notificaciones se crean automaticamente con signals
         return False

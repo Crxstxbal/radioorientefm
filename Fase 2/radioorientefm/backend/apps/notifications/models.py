@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 from django.db import models
 from django.conf import settings
 
 class Notification(models.Model):
-    """Modelo para notificaciones del sistema"""
+    """modelo para notificaciones del sistema"""
 
     TIPO_CHOICES = [
         ('contacto', 'Mensaje de Contacto'),
@@ -26,7 +26,7 @@ class Notification(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     enlace = models.CharField(max_length=255, blank=True, null=True)
 
-    # Referencia opcional al objeto que genero la notificacion
+    #referencia opcional al objeto que genero la notificacion
     content_type = models.CharField(max_length=50, blank=True, null=True)
     object_id = models.PositiveIntegerField(blank=True, null=True)
 
@@ -43,6 +43,6 @@ class Notification(models.Model):
         return f"{self.tipo} - {self.titulo} ({'Leida' if self.leido else 'No leida'})"
 
     def marcar_como_leido(self):
-        """Marca la notificacion como leida"""
+        """marca la notificacion como leida"""
         self.leido = True
         self.save(update_fields=['leido'])

@@ -1,14 +1,14 @@
-/* Importar fuentes modernas */
+/*importar fuentes modernas*/
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* Variables CSS personalizadas */
+/*variables css personalizadas*/
 :root {
   --color-red: #dc2626;
   --color-white: #ffffff;
   --color-black: #000000;
 }
 
-/* MANTENEMOS TU CONFIGURACIÓN DE PARTÍCULAS ORIGINAL */
+/*mantenemos configuracion de partículas original*/
 .fondoparticulas {
   position: absolute;
   width: 100%;
@@ -16,7 +16,7 @@
   z-index: 0;
 }
 
-/* Layout general - CONSERVAMOS TU CONFIGURACIÓN ORIGINAL */
+/*diseño general - conservamos configuracion original*/
 .reproductor-page {
   position: relative;
   height: 100vh;
@@ -32,7 +32,7 @@
   background: radial-gradient(circle, rgb(83, 3, 3) 29%, rgb(0, 0, 0) 100%);
 }
 
-/* Botón de volver */
+/*botón de volver*/
 .btn-back {
   position: fixed;
   top: 2rem;
@@ -72,7 +72,7 @@
   letter-spacing: 0.5px;
 }
 
-/* Animación de entrada para el botón */
+/*animación de entrada para el botón*/
 @keyframes slideInFromLeft {
   from {
     opacity: 0;
@@ -88,7 +88,7 @@
   animation: slideInFromLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
 }
 
-/* Overlay de transparencia - MANTENEMOS ORIGINAL */
+/*overlay de transparencia - mantenemos configuracion original*/
 .reproductor-background {
   position: absolute;
   inset: 0;
@@ -97,7 +97,7 @@
   backdrop-filter: blur(3px);
 }
 
-/* Contenido principal - MODERNIZADO CON GLASSMORPHISM */
+/*contenido principal - modernizado con glassmorphism - mantenemos configuracion original*/
 .reproductor-content {
   position: relative;
   z-index: 10;
@@ -108,7 +108,7 @@
   text-align: center;
   padding: 40px 35px;
   border-radius: 25px;
-  /* Glassmorphism moderno */
+  /*glassmorphism moderno*/
   background: 
     linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)),
     rgba(0, 0, 0, 0.4);
@@ -121,7 +121,7 @@
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Efecto hover para el contenedor */
+/*efecto hover para el contenedor*/
 .reproductor-content::before {
   content: '';
   position: absolute;
@@ -148,7 +148,7 @@
     inset 0 2px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Logo - MEJORADO CON EFECTOS 3D */
+/*logo - mejorado con efectos 3d*/
 .reproductor-logo {
   width: 280px;
   height: 280px;
@@ -161,7 +161,7 @@
   overflow: hidden;
 }
 
-/* Efecto de brillo deslizante en el logo */
+/*efecto de brillo deslizante en el logo*/
 .reproductor-logo::before {
   content: '';
   position: absolute;
@@ -177,7 +177,7 @@
   left: 100%;
 }
 
-/* Controles de reproducción - MANTENEMOS BASE PERO MODERNIZAMOS */
+/*controles de reproduccion - mantenemos base pero modernizamos*/
 .reproductor-controls {
   display: flex;
   justify-content: center;
@@ -206,7 +206,7 @@
   overflow: hidden;
 }
 
-/* Efecto de ondas en el botón play */
+/*efecto de ondas en el botón play*/
 .btn-play::before {
   content: '';
   position: absolute;
@@ -243,7 +243,7 @@
   transform: scale(1.1);
 }
 
-/* Controles de volumen - MODERNIZADOS */
+/*controles de volumen - modernizados*/
 .reproductor-volume {
   display: flex;
   align-items: center;
@@ -298,7 +298,7 @@
   transform: scale(1.2);
 }
 
-/* Slider de volumen mejorado */
+/*slider de volumen mejorado*/
 .volume-slider {
   width: 200px;
   height: 6px;
@@ -313,7 +313,7 @@
   overflow: hidden;
 }
 
-/* Progreso visual del slider */
+/*progreso visual del slider*/
 .volume-slider::before {
   content: '';
   position: absolute;
@@ -351,7 +351,7 @@
   box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
-/* Hora actual - MEJORADA */
+/*hora actual - mejorada*/
 .reproductor-time {
   font-size: 1.4rem;
   font-weight: 600;
@@ -375,7 +375,7 @@
   50% { background-position: 100% 50%; }
 }
 
-/* Estado de la transmisión - MEJORADO */
+/*estado de la transmision - mejorado*/
 .reproductor-status {
   font-size: 1.2rem;
   opacity: 0.9;
@@ -408,7 +408,7 @@
   }
 }
 
-/* Animación de entrada - MANTENEMOS ORIGINAL MEJORADA */
+/*animación de entrada - mantenemos original mejorada*/
 @keyframes fadeIn {
   from { 
     opacity: 0; 
@@ -420,7 +420,7 @@
   }
 }
 
-/* Responsivo - CONSERVAMOS TU CONFIGURACIÓN ORIGINAL */
+/*responsivo - conservamos tu configuracion original*/
 @media (max-width: 768px) {
   .btn-back {
     top: 1rem;
@@ -489,7 +489,7 @@
   }
 }
 
-/* Optimizaciones de rendimiento */
+/*optimizaciones de rendimiento*/
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -501,10 +501,10 @@
 .reproductor-content {
   position: relative;
   z-index: 10;
-  pointer-events: auto; /* reproductor funciona */
+  pointer-events: auto; /*reproductor funciona*/
 }
 
 #tsparticles {
-  pointer-events: none; /* partículas ignoran mouse */
+  pointer-events: none; /*partículas ignoran mouse*/
 }
 

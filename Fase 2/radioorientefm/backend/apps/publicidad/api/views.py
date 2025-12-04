@@ -1,4 +1,4 @@
-# API views para publicidad
+#api views para publicidad
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -26,32 +26,23 @@ from ..serializers import (
 
 
 class UbicacionPublicidadViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    ViewSet para catálogo de ubicaciones de publicidad.
-    Solo lectura - las ubicaciones se gestionan desde el admin.
-    """
+    """viewset para catálogo de ubicaciones de publicidad. solo lectura - las ubicaciones se gestionan desde el admin"""
     queryset = UbicacionPublicidadWeb.objects.filter(activo=True)
     serializer_class = UbicacionPublicidadWebSerializer
     permission_classes = [AllowAny]
     
     def get_queryset(self):
-        """Retornar solo ubicaciones activas ordenadas"""
+        """retornar solo ubicaciones activas ordenadas"""
         return UbicacionPublicidadWeb.objects.filter(activo=True).order_by('orden', 'nombre')
 
 
 class SolicitudPublicidadViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet para gestión de solicitudes de publicidad.
-    - list: Ver mis solicitudes
-    - create: Crear nueva solicitud
-    - retrieve: Ver detalle de una solicitud
-    - update/partial_update: Actualizar solicitud (solo si está pendiente)
-    """
+    """viewset para gestion de solicitudes de publicidad. - list: ver mis solicitudes - create: crear nueva solicitud - retrieve: ver detalle de una solicitud - update/partial_update: actualizar solicitud (solo si está pendiente)"""
     permission_classes = [IsAuthenticated]
     parser_classes = [JSONParser, MultiPartParser, FormParser]
     
     def get_queryset(self):
-        """Cada usuario solo ve sus propias solicitudes"""
+        """cada usuario solo ve sus propias solicitudes"""
         return SolicitudPublicidadWeb.objects.filter(usuario=self.request.user).prefetch_related(
             'items_web__ubicacion', 'items_web__imagenes_web'
         )
@@ -65,17 +56,17 @@ class SolicitudPublicidadViewSet(viewsets.ModelViewSet):
     
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        """Crear nueva solicitud de publicidad"""
+        """crear nueva solicitud de publicidad"""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         solicitud = serializer.save()
         
-        # Retornar con serializer completo
+        #retornar con serializer completo
         output_serializer = SolicitudPublicidadWebSerializer(solicitud)
         return Response(output_serializer.data, status=status.HTTP_201_CREATED)
     
     def update(self, request, *args, **kwargs):
-        """Solo permitir actualización si está pendiente"""
+        """solo permitir actualización si está pendiente"""
         instance = self.get_object()
         if instance.estado != 'pendiente':
             return Response(
@@ -87,7 +78,7 @@ class SolicitudPublicidadViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated], parser_classes=[JSONParser])
     @transaction.atomic
     def aprobar(self, request, pk=None):
-        """Aprobar y publicar una solicitud WEB creando Publicidad + PublicidadWeb"""
+        """aprobar y publicar una solicitud web creando publicidad + publicidadweb"""
         solicitud = self.get_object()
         if solicitud.estado not in ['pendiente', 'en_revision']:
             return Response({'error': 'La solicitud no está pendiente/en revisión'}, status=status.HTTP_400_BAD_REQUEST)
@@ -98,15 +89,15 @@ class SolicitudPublicidadViewSet(viewsets.ModelViewSet):
         if not items:
             return Response({'error': 'La solicitud no tiene ítems'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Calcular costo total desde los ítems
+        #calcular costo total desde los ítems
         costo_total = sum([i.precio_acordado for i in items])
 
-        # Definir rango a partir de la aprobación
+        #definir rango a partir de la aprobación
         from datetime import timedelta
         start_date = timezone.now().date()
         end_date = start_date + timedelta(days=30)
 
-        # Crear Publicidad base
+        #crear publicidad base
         pub = Publicidad.objects.create(
             nombre_cliente=solicitud.nombre_contacto or solicitud.usuario.email,
             descripcion=solicitud.mensaje_usuario,
@@ -117,7 +108,7 @@ class SolicitudPublicidadViewSet(viewsets.ModelViewSet):
             costo_total=costo_total,
         )
 
-        # Tomar ítem principal (primero) para configurar PublicidadWeb
+        #tomar ítem principal (primero) para configurar publicidadweb
         principal = items[0]
         PublicidadWeb.objects.create(
             publicidad=pub,
@@ -128,12 +119,12 @@ class SolicitudPublicidadViewSet(viewsets.ModelViewSet):
             archivo_media=None,
         )
 
-        # Actualizar solicitud como aprobada y enlazar publicación
+        #actualizar solicitud como aprobada y enlazar publicacion
         solicitud.estado = 'aprobada'
         solicitud.aprobado_por = request.user
         solicitud.fecha_aprobacion = timezone.now()
         solicitud.publicacion = pub
-        # Actualizar fechas solicitadas para reflejar el rango real
+        #actualizar fechas solicitadas para reflejar el rango real
         try:
             solicitud.fecha_inicio_solicitada = start_date
             solicitud.fecha_fin_solicitada = end_date
@@ -145,13 +136,10 @@ class SolicitudPublicidadViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'], parser_classes=[MultiPartParser, FormParser])
     def subir_imagen(self, request, pk=None):
-        """
-        Subir imagen para un item específico de la solicitud.
-        Requiere: item_id, imagen, descripcion (opcional), orden (opcional)
-        """
+        """subir imagen para un item especifico de la solicitud. requiere: item_id, imagen, descripcion (opcional), orden (opcional)"""
         solicitud = self.get_object()
         
-        # Validar que la solicitud esté pendiente
+        #validar que la solicitud esté pendiente
         if solicitud.estado not in ['pendiente', 'en_revision']:
             return Response(
                 {'error': 'No se pueden agregar imágenes a solicitudes aprobadas/rechazadas'},
@@ -173,7 +161,7 @@ class SolicitudPublicidadViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        # Crear imagen
+        #crear imagen
         imagen_data = {
             'item': item.id,
             'imagen': request.data.get('imagen'),
@@ -190,10 +178,7 @@ class SolicitudPublicidadViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['delete'])
     def eliminar_imagen(self, request, pk=None):
-        """
-        Eliminar una imagen de un item.
-        Requiere: imagen_id
-        """
+        """eliminar una imagen de un item. requiere: imagen_id"""
         solicitud = self.get_object()
         
         if solicitud.estado not in ['pendiente', 'en_revision']:
@@ -224,14 +209,14 @@ class SolicitudPublicidadViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def mis_solicitudes(self, request):
-        """Endpoint alternativo para obtener solicitudes del usuario actual"""
+        """endpoint alternativo para obtener solicitudes del usuario actual"""
         queryset = self.filter_queryset(self.get_queryset())
         serializer = SolicitudPublicidadWebListSerializer(queryset, many=True)
         return Response(serializer.data)
 
 
 class PublicidadWebCampaignViewSet(viewsets.ModelViewSet):
-    """Administración de campañas publicadas WEB desde el dashboard"""
+    """administración de campañas publicadas web desde el dashboard"""
     permission_classes = [IsAuthenticated]
     parser_classes = [JSONParser]
     serializer_class = PublicidadSerializer
@@ -241,7 +226,7 @@ class PublicidadWebCampaignViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'], parser_classes=[JSONParser])
     def actualizar_web(self, request, pk=None):
-        """Actualizar campos específicos de la config web (url_destino, formato, archivo_media)"""
+        """actualizar campos especificos de la config web (url_destino, formato, archivo_media)"""
         pub = self.get_object()
         config = getattr(pub, 'web_config', None)
         if not config:

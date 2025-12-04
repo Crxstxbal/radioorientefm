@@ -551,6 +551,7 @@
                         data-articulo-resumen="{{ articulo.resumen }}"
                         data-articulo-categoria="{{ articulo.categoria.id }}"
                         data-articulo-imagen="{{ articulo.imagen_url }}"
+                        data-articulo-video="{{ articulo.video_url }}"
                         data-articulo-publicado="{{ articulo.publicado }}"
                         title="Editar artículo">
                   <i class="fas fa-edit"></i>
@@ -687,21 +688,48 @@
           </div>
 
           <hr class="my-4">
-          <h6 class="mb-3 fw-bold"><i class="fas fa-image me-2" style="color: #6366F1;"></i>Imagen (Opcional)</h6>
+          <h6 class="mb-3 fw-bold"><i class="fas fa-image me-2" style="color: #6366F1;"></i>Imágenes (Opcional)</h6>
 
           <div class="row">
             <div class="col-md-6">
               <div class="mb-3">
-                <label class="form-label">Subir Imagen</label>
+                <label class="form-label">Banner Horizontal (imagen_portada)</label>
                 <input type="file" class="form-control search-box-modern" name="imagen_portada" accept="image/*">
+                <small class="text-muted">Recomendado: 1200x400</small>
+                <div class="mt-2">
+                  <img id="preview-imagen-portada" alt="Vista previa banner" style="display:none; max-width:100%; border-radius:8px; border:1px solid var(--border-color);" />
+                </div>
               </div>
             </div>
             <div class="col-md-6">
               <div class="mb-3">
-                <label class="form-label">O URL de Imagen</label>
+                <label class="form-label">URL de Imagen (alternativa)</label>
                 <input type="url" class="form-control search-box-modern" name="imagen_url" placeholder="https://ejemplo.com/imagen.jpg">
+                <div class="mt-2">
+                  <img id="preview-imagen-url" alt="Vista previa URL" style="display:none; max-width:100%; border-radius:8px; border:1px solid var(--border-color);" />
+                </div>
               </div>
             </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Miniatura Cuadrada (imagen_thumbnail)</label>
+                <input type="file" class="form-control search-box-modern" name="imagen_thumbnail" accept="image/*">
+                <small class="text-muted">Recomendado: 600x600</small>
+                <div class="mt-2">
+                  <img id="preview-imagen-thumbnail" alt="Vista previa miniatura" style="display:none; max-width:220px; border-radius:8px; border:1px solid var(--border-color);" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-video me-2"></i>URL de Video (YouTube/Vimeo)
+            </label>
+            <input type="url" class="form-control search-box-modern" name="video_url" placeholder="https://www.youtube.com/watch?v=...">
           </div>
 
           <div class="form-check p-3" style="background: var(--bg-tertiary); border-radius: 12px;">
@@ -771,21 +799,47 @@
           </div>
 
           <hr class="my-4">
-          <h6 class="mb-3 fw-bold"><i class="fas fa-image me-2" style="color: #6366F1;"></i>Actualizar Imagen (Opcional)</h6>
+          <h6 class="mb-3 fw-bold"><i class="fas fa-image me-2" style="color: #6366F1;"></i>Actualizar Imágenes (Opcional)</h6>
 
           <div class="row">
             <div class="col-md-6">
               <div class="mb-3">
-                <label class="form-label">Cambiar Imagen</label>
+                <label class="form-label">Cambiar Banner Horizontal (imagen_portada)</label>
                 <input type="file" class="form-control search-box-modern" name="imagen_portada" accept="image/*">
+                <div class="mt-2">
+                  <img id="edit-preview-imagen-portada" alt="Vista previa banner" style="display:none; max-width:100%; border-radius:8px; border:1px solid var(--border-color);" />
+                </div>
               </div>
             </div>
             <div class="col-md-6">
               <div class="mb-3">
-                <label class="form-label">O URL de Imagen</label>
+                <label class="form-label">URL de Imagen (alternativa)</label>
                 <input type="url" class="form-control search-box-modern" name="imagen_url" id="edit-imagen_url" placeholder="https://ejemplo.com/imagen.jpg">
+                <div class="mt-2">
+                  <img id="edit-preview-imagen-url" alt="Vista previa URL" style="display:none; max-width:100%; border-radius:8px; border:1px solid var(--border-color);" />
+                </div>
               </div>
             </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Cambiar Miniatura Cuadrada (imagen_thumbnail)</label>
+                <input type="file" class="form-control search-box-modern" name="imagen_thumbnail" accept="image/*">
+                <small class="text-muted">Recomendado: 600x600</small>
+                <div class="mt-2">
+                  <img id="edit-preview-imagen-thumbnail" alt="Vista previa miniatura" style="display:none; max-width:220px; border-radius:8px; border:1px solid var(--border-color);" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-video me-2"></i>URL de Video (YouTube/Vimeo)
+            </label>
+            <input type="url" class="form-control search-box-modern" name="video_url" id="edit-video_url" placeholder="https://www.youtube.com/watch?v=...">
           </div>
 
           <div class="form-check p-3" style="background: var(--bg-tertiary); border-radius: 12px;">
@@ -821,6 +875,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const resumen = this.getAttribute('data-articulo-resumen');
       const categoria = this.getAttribute('data-articulo-categoria');
       const imagenUrl = this.getAttribute('data-articulo-imagen');
+      const videoUrl = this.getAttribute('data-articulo-video');
       const publicado = this.getAttribute('data-articulo-publicado') === 'True';
 
       // Llenar el formulario
@@ -829,6 +884,7 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('edit-resumen').value = resumen || '';
       document.getElementById('edit-categoria').value = categoria || '';
       document.getElementById('edit-imagen_url').value = imagenUrl || '';
+      document.getElementById('edit-video_url').value = videoUrl || '';
       document.getElementById('edit-publicado').checked = publicado;
 
       // Actualizar la acción del formulario

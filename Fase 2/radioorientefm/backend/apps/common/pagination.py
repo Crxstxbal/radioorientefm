@@ -3,24 +3,13 @@ from rest_framework.response import Response
 
 
 class StandardResultsSetPagination(PageNumberPagination):
-    """
-    Paginación estándar para la mayoría de endpoints.
-
-    Parámetros de query:
-    - page: número de página (default: 1)
-    - page_size: tamaño de página (default: 20, max: 100)
-
-    Ejemplo de uso:
-    /api/articulos/?page=2&page_size=10
-    """
+    """paginacion estándar para la mayoría de endpoints. parametros de query: - page: número de pagina (default: 1) - page_size: tamaño de pagina (default: 20, max: 100) ejemplo de uso: /api/articulos/?page=2&page_size=10"""
     page_size = 20
     page_size_query_param = 'page_size'
     max_page_size = 100
 
     def get_paginated_response(self, data):
-        """
-        Respuesta personalizada con información adicional de paginación.
-        """
+        """respuesta personalizada con informacion adicional de paginacion"""
         return Response({
             'count': self.page.paginator.count,
             'next': self.get_next_link(),
@@ -33,20 +22,14 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 
 class LargeResultsSetPagination(PageNumberPagination):
-    """
-    Paginación para conjuntos de datos grandes.
-    Usada en endpoints administrativos o de reportes.
-    """
+    """paginacion para conjuntos de datos grandes. usada en endpoints administrativos o de reportes"""
     page_size = 50
     page_size_query_param = 'page_size'
     max_page_size = 200
 
 
 class SmallResultsSetPagination(PageNumberPagination):
-    """
-    Paginación para listas pequeñas o destacadas.
-    Usada para artículos destacados, programas del día, etc.
-    """
+    """paginacion para listas pequeñas o destacadas. usada para articulos destacados, programas del día, etc"""
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 50

@@ -15,7 +15,7 @@ class Notificacion(models.Model):
         ('sistema', 'Mensaje del Sistema'),
     ]
     
-    # Usamos related_name personalizado para evitar conflictos con la app notifications
+    #usamos related_name personalizado para evitar conflictos con la app notifications
     usuario = models.ForeignKey(
         User, 
         on_delete=models.CASCADE, 
@@ -36,7 +36,7 @@ class Notificacion(models.Model):
     def __str__(self):
         return f"{self.titulo} - {self.usuario.username}"
 
-# Señal para notificar cuando se crea un nuevo artículo
+#señal para notificar cuando se crea un nuevo artículo
 @receiver(post_save, sender=Articulo)
 def notificar_nuevo_articulo(sender, instance, created, **kwargs):
     if created:

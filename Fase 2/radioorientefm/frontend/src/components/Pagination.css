@@ -119,7 +119,7 @@
   user-select: none;
 }
 
-/* Responsive */
+/*responsivo*/
 @media (min-width: 640px) {
   .pagination-controls {
     flex-direction: row;
@@ -157,7 +157,7 @@
   }
 }
 
-/* Dark mode */
+/*dark mode*/
 [data-theme='dark'] .pagination-container {
   border-top-color: #334155;
 }

@@ -3,20 +3,20 @@ from pathlib import Path
 from decouple import config
 
 import dj_database_url
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+#build paths inside the project like this: base_dir / 'subdir'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
+#security warning: keep the secret key used in production secret
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+#security warning: don't run with debug turned on in production
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-# Configuración de hosts permitidos
+#configuracion de hosts permitidos
 ALLOWED_HOSTS_STR = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0')
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',') if host.strip()]
 
-# Application definition
+#application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -27,13 +27,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    # 'channels',  # Comentado temporalmente
-    
-    # Apps normalizadas
+    'channels',
+
+    #apps normalizadas
     'apps.ubicacion',
     'apps.users',
     'apps.radio',
-    'apps.articulos',  # Renombrado de apps.blog
+    'apps.articulos',
     'apps.chat',
     'apps.contact',
     'apps.emergente',
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -72,13 +73,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'radio_oriente.wsgi.application'
-# ASGI_APPLICATION = 'radio_oriente.asgi.application'  # Comentado temporalmente
+ASGI_APPLICATION = 'radio_oriente.asgi.application'
 
-# Database configuration
+#database configuration
 USE_SQLITE = config('USE_SQLITE', default=True, cast=bool)
 
 if USE_SQLITE:
-    # SQLite con estructura normalizada
+    #sqlite con estructura normalizada
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -86,24 +87,24 @@ if USE_SQLITE:
         }
     }
 else:
-    # Configuración para PostgreSQL (Producción con Supabase)
-    # Utiliza la variable de entorno DATABASE_URL que incluye el pooler de conexiones.
+    #configuracion para postgresql (producción con supabase)
+    #configuracion de base de datos
     DATABASES = {
         'default': dj_database_url.config(
-            # Lee la URL de la base de datos desde la variable de entorno DATABASE_URL.
+            #url de base de datos
             default=config('DATABASE_URL'),
-            # Mantiene las conexiones abiertas para reutilizarlas (importante para el pooler).
+            #reutilizar conexiones
             conn_max_age=600,
-            # Exige el uso de SSL para una conexión segura, requerido por Supabase.
+            #conexion ssl requerida
             ssl_require=True
         )
     }
 
-# Supabase configuration
+#supabase configuration
 SUPABASE_URL = config('SUPABASE_URL', default='')
 SUPABASE_KEY = config('SUPABASE_ANON_KEY', default='')
 
-# Password validation
+#password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -119,23 +120,27 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
+#internationalization
 LANGUAGE_CODE = 'es-es'
 TIME_ZONE = 'America/Caracas'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+#static files (css, javascript, images)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Default primary key field type
+#default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Django REST Framework
+#django rest framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -148,16 +153,16 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
-# CORS settings
-# En desarrollo, permitir todos los orígenes para facilitar el desarrollo
-CORS_ALLOW_ALL_ORIGINS = True  # Solo para desarrollo
+#cors settings
+#en desarrollo, permitir todos los orígenes para facilitar el desarrollo
+CORS_ALLOW_ALL_ORIGINS = True  #solo para desarrollo
 
-# Lista de orígenes permitidos (se puede configurar desde .env)
-# En producción, descomenta las siguientes líneas y configura los orígenes permitidos
-# ALLOWED_ORIGINS_STR = config('ALLOWED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000')
-# CORS_ALLOWED_ORIGINS = [origin.strip() for origin in ALLOWED_ORIGINS_STR.split(',') if origin.strip()]
+#lista de orígenes permitidos (se puede configurar desde .env)
+#en producción, descomenta las siguientes líneas y configura los orígenes permitidos
+#allowed_origins_str = config('allowed_origins', default='http://localhost:3000,http://127.0.0.1:3000')
+#cors_allowed_origins = [origin.strip() for origin in allowed_origins_str.split(',') if origin.strip()]
 
-# Métodos HTTP permitidos
+#metodos http permitidos
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
@@ -167,7 +172,7 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
-# Cabeceras permitidas
+#cabeceras permitidas
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -182,38 +187,35 @@ CORS_ALLOW_HEADERS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-# CSRF trusted origins (para permitir peticiones desde el frontend en desarrollo)
+#csrf trusted origins (para permitir peticiones desde el frontend en desarrollo)
 CSRF_TRUSTED_ORIGINS_STR = config(
     'CSRF_TRUSTED_ORIGINS',
     default='http://localhost:3000,http://127.0.0.1:3000'
 )
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in CSRF_TRUSTED_ORIGINS_STR.split(',') if o.strip()]
 
-# Cookies en desarrollo
+#cookies en desarrollo
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
 
-# Channels configuration (comentado temporalmente)
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             "hosts": [('127.0.0.1', 6379)],
-#         },
-#     },
-# }
+#channels configuration (desarrollo: capa en memoria)
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
-# Custom user model
+#custom user model
 AUTH_USER_MODEL = 'users.User'
 
-# Login URLs
+#login urls
 LOGIN_URL = '/dashboard/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/dashboard/login/'
 
-# Email Configuration
+#email configuration
 EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
@@ -222,5 +224,5 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@radiooriente.com')
 
-# Frontend URL (para enlaces en emails)
+#frontend url (para enlaces en emails)
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000')

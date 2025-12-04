@@ -7,25 +7,25 @@ from datetime import datetime
 
 
 def upload_to_articulos_imagen(instance, filename):
-    """Guarda imágenes en: MEDIA_ROOT/articulos/imagenes/YYYY/MM/filename"""
+    """guarda imágenes en: media_root/articulos/imagenes/yyyy/mm/filename"""
     ext = filename.split('.')[-1]
-    # Usar el slug si existe, o un timestamp si aún no se ha generado
+    #usar el slug si existe, o un timestamp si aún no se ha generado
     slug = instance.slug if instance.slug else f"articulo-{timezone.now().timestamp()}"
     filename = f"{slug}.{ext}"
-    # Usar la fecha actual en lugar de fecha_creacion que puede no existir aún
+    #usar la fecha actual en lugar de fecha_creacion que puede no existir aún
     now = timezone.now()
     return os.path.join('articulos', 'imagenes', now.strftime('%Y/%m'), filename)
 
 
 def upload_to_articulos_archivo(instance, filename):
-    """Guarda archivos adjuntos en: MEDIA_ROOT/articulos/archivos/YYYY/MM/filename"""
-    # Usar la fecha actual en lugar de fecha_creacion que puede no existir aún
+    """guarda archivos adjuntos en: media_root/articulos/archivos/yyyy/mm/filename"""
+    #usar la fecha actual en lugar de fecha_creacion que puede no existir aún
     now = timezone.now()
     return os.path.join('articulos', 'archivos', now.strftime('%Y/%m'), filename)
 
 
 class Categoria(models.Model):
-    """Categorías de artículos normalizadas"""
+    """categorias de articulos normalizadas"""
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.TextField(blank=True, null=True)
     slug = models.SlugField(max_length=60, unique=True, blank=True)
@@ -46,13 +46,13 @@ class Categoria(models.Model):
 
 
 class Articulo(models.Model):
-    """Artículos con soporte para multimedia"""
+    """articulos con soporte para multimedia"""
     titulo = models.CharField(max_length=200, verbose_name='Título')
     slug = models.SlugField(max_length=250, unique=True, blank=True)
     contenido = models.TextField(verbose_name='Contenido')
     resumen = models.TextField(blank=True, null=True, verbose_name='Resumen')
     
-    # Campos multimedia
+    #campos multimedia
     imagen_portada = models.ImageField(
         upload_to=upload_to_articulos_imagen,
         null=True,
@@ -88,7 +88,7 @@ class Articulo(models.Model):
         help_text='PDF, Word, Excel, etc. (opcional, máx 10MB)'
     )
     
-    # Relaciones
+    #relaciones
     autor = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
@@ -104,16 +104,16 @@ class Articulo(models.Model):
         verbose_name='Categoría'
     )
     
-    # Estados
+    #estados
     publicado = models.BooleanField(default=False, verbose_name='Publicado')
     destacado = models.BooleanField(default=False, verbose_name='Destacado')
     
-    # Fechas
+    #fechas
     fecha_publicacion = models.DateTimeField(blank=True, null=True, verbose_name='Fecha de publicación')
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')
     fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name='Última actualización')
     
-    # Metadatos
+    #metadatos
     vistas = models.PositiveIntegerField(default=0, verbose_name='Vistas')
     usuarios_que_vieron = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
@@ -142,14 +142,14 @@ class Articulo(models.Model):
     
     @property
     def imagen_destacada(self):
-        """Retorna la URL de la imagen, priorizando imagen subida sobre URL externa"""
+        """retorna la url de la imagen, priorizando imagen subida sobre url externa"""
         if self.imagen_portada:
             return self.imagen_portada.url
         return self.imagen_url
     
     @property
     def tiene_multimedia(self):
-        """Verifica si el artículo tiene contenido multimedia"""
+        """verifica si el artículo tiene contenido multimedia"""
         return bool(self.imagen_portada or self.imagen_url or self.video_url or self.archivo_adjunto)
 
     def __str__(self):

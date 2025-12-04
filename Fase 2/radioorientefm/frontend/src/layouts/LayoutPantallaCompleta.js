@@ -1,4 +1,4 @@
-// src/layouts/LayoutPantallaCompleta.jsx
+//src/diseños/diseñopantallacompleta.jsx
 import React from "react";
 import { Outlet } from "react-router-dom";
 

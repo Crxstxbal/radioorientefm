@@ -10,16 +10,16 @@ from .serializers import (
     ArticuloCreateSerializer, BlogPostLegacySerializer
 )
 
-# ViewSets normalizados
+#viewsets normalizados
 class CategoriaViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet para categorías (solo lectura)"""
+    """viewset para categorias (solo lectura)"""
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     lookup_field = 'slug'
 
 class ArticuloViewSet(viewsets.ModelViewSet):
-    """ViewSet para artículos con soporte multimedia"""
+    """viewset para articulos con soporte multimedia"""
     queryset = Articulo.objects.select_related('autor', 'categoria').filter(publicado=True)
     serializer_class = ArticuloSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -33,10 +33,10 @@ class ArticuloViewSet(viewsets.ModelViewSet):
         return ArticuloSerializer
     
     def retrieve(self, request, *args, **kwargs):
-        """Incrementa vistas al obtener un artículo (solo una vez por usuario)"""
+        """incrementa vistas al obtener un artículo (solo una vez por usuario)"""
         instance = self.get_object()
 
-        # Solo incrementar si el usuario está autenticado y no ha visto el artículo antes
+        #solo incrementar si el usuario está autenticado y no ha visto el artículo antes
         if request.user.is_authenticated:
             if not instance.usuarios_que_vieron.filter(id=request.user.id).exists():
                 instance.usuarios_que_vieron.add(request.user)
@@ -48,10 +48,10 @@ class ArticuloViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def destacados(self, request):
-        """Obtener artículos destacados (paginado)"""
+        """obtener articulos destacados (paginado)"""
         queryset = self.queryset.filter(destacado=True).order_by('-fecha_publicacion')
 
-        # Usar paginación pequeña para destacados
+        #usar paginacion pequeña para destacados
         paginator = SmallResultsSetPagination()
         page = paginator.paginate_queryset(queryset, request)
 
@@ -64,14 +64,14 @@ class ArticuloViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def por_categoria(self, request):
-        """Obtener artículos por categoría (paginado)"""
+        """obtener articulos por categoría (paginado)"""
         categoria_slug = request.query_params.get('categoria')
         if not categoria_slug:
             return Response([])
 
         queryset = self.queryset.filter(categoria__slug=categoria_slug)
 
-        # Aplicar paginación
+        #aplicar paginacion
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(queryset, request)
 
@@ -84,10 +84,10 @@ class ArticuloViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def mas_vistos(self, request):
-        """Obtener artículos más vistos (paginado)"""
+        """obtener articulos mas vistos (paginado)"""
         queryset = self.queryset.order_by('-vistas')
 
-        # Usar paginación pequeña para más vistos
+        #usar paginacion pequeña para mas vistos
         paginator = SmallResultsSetPagination()
         page = paginator.paginate_queryset(queryset, request)
 
@@ -98,15 +98,15 @@ class ArticuloViewSet(viewsets.ModelViewSet):
         serializer = ArticuloListSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
-# Views de compatibilidad para el frontend existente
+#views de compatibilidad para el frontend existente
 class BlogPostListView(generics.ListCreateAPIView):
-    """Vista de compatibilidad para artículos"""
+    """vista de compatibilidad para articulos"""
     queryset = Articulo.objects.filter(publicado=True)
     serializer_class = BlogPostLegacySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        # Buscar o crear categoría por defecto
+        #buscar o crear categoría por defecto
         categoria_default, created = Categoria.objects.get_or_create(
             nombre='General',
             defaults={'descripcion': 'Categoría general'}
@@ -117,7 +117,7 @@ class BlogPostListView(generics.ListCreateAPIView):
         )
 
 class BlogPostDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """Vista de compatibilidad para detalle de artículo"""
+    """vista de compatibilidad para detalle de artículo"""
     queryset = Articulo.objects.filter(publicado=True)
     serializer_class = BlogPostLegacySerializer
     lookup_field = 'id'

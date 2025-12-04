@@ -5,26 +5,26 @@ import time
 
 from apps.ubicacion.models import Pais, Ciudad, Comuna
 
-# Replicamos las funciones de la API aquí para que el comando sea independiente
+#replicamos las funciones de la api aquí para que el comando sea independiente
 DIVPA_BASE = "https://apis.digital.gob.cl/dpa"
 
-# Añadimos un User-Agent para simular un navegador y evitar bloqueos.
+#añadimos un user-agent para simular un navegador y evitar bloqueos
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 }
 
 def _fetch_divpa_regiones(verify_ssl=True):
-    """Obtiene regiones desde API DIVPA. Lanza excepción si falla."""
+    """obtiene regiones desde api divpa. lanza excepción si falla"""
     url = f"{DIVPA_BASE}/regiones"
-    # Usamos el encabezado User-Agent en la petición
+    #usamos el encabezado user-agent en la petición
     resp = requests.get(url, timeout=30, verify=verify_ssl, headers=HEADERS)
     resp.raise_for_status()
     return resp.json()
 
 def _fetch_divpa_comunas_por_region(codigo_region, verify_ssl=True):
-    """Obtiene comunas por código de región desde API DIVPA. Lanza excepción si falla."""
+    """obtiene comunas por codigo de región desde api divpa. lanza excepción si falla"""
     url = f"{DIVPA_BASE}/regiones/{codigo_region}/comunas"
-    # Usamos el encabezado User-Agent en la petición
+    #usamos el encabezado user-agent en la petición
     resp = requests.get(url, timeout=30, verify=verify_ssl, headers=HEADERS)
     resp.raise_for_status()
     return resp.json()
@@ -70,7 +70,7 @@ class Command(BaseCommand):
                 Ciudad.objects.bulk_create(ciudades_para_crear)
                 self.stdout.write(self.style.SUCCESS(f'   - {len(ciudades_para_crear)} regiones guardadas como ciudades.'))
 
-                # Mapear nombres de ciudades a objetos para la creación de comunas
+                #mapear nombres de ciudades a objetos para la creacion de comunas
                 ciudades_map = {c.nombre: c for c in Ciudad.objects.filter(pais=chile)}
                 comunas_para_crear = []
                 total_comunas = 0

@@ -1338,7 +1338,7 @@ async function loadProhibitedWords() {
                         <strong>${escapeHtml(palabra.palabra)}</strong>
                         <span class="badge bg-${color} ms-2">${palabra.severidad}</span>
                     </div>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteProhibitedWord(${palabra.id})">
+                    <button class="btn btn-sm btn-outline-danger" onclick="mostrarModalEliminarPalabra(${palabra.id}, '${escapeHtml(palabra.palabra)}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -1385,9 +1385,16 @@ async function addProhibitedWord() {
     }
 }
 
-async function deleteProhibitedWord(id) {
-    if (!confirm('¿Estás seguro de eliminar esta palabra?')) return;
+// Variables globales para el modal de eliminación
+let palabraIdPendiente = null;
 
+// Función para mostrar modal de eliminación de palabra prohibida
+function mostrarModalEliminarPalabra(palabraId, palabraTexto) {
+    palabraIdPendiente = palabraId;
+    showDeleteModal(`Palabra prohibida: "${palabraTexto}"`, null, 1);
+}
+
+async function deleteProhibitedWord(id) {
     try {
         const response = await fetch('/api/chat/filter/palabras/', {
             method: 'DELETE',
@@ -1542,5 +1549,20 @@ async function loadInfractions() {
         container.innerHTML = '<div class="text-center text-danger py-3">Error al cargar infracciones</div>';
     }
 }
+
+// Configurar el botón de confirmar eliminación del modal global para palabras prohibidas
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmDeleteBtn) {
+        // Agregar listener específico para palabras prohibidas
+        confirmDeleteBtn.addEventListener('click', async function() {
+            if (palabraIdPendiente !== null) {
+                await deleteProhibitedWord(palabraIdPendiente);
+                palabraIdPendiente = null;
+                closeDeleteModal();
+            }
+        });
+    }
+});
 </script>
 {% endblock %}

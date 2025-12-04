@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 
 class Integrante(models.Model):
-    """Integrantes de bandas normalizados"""
+    """integrantes de bandas normalizados"""
     nombre = models.CharField(max_length=150)
     
     class Meta:
@@ -14,20 +14,20 @@ class Integrante(models.Model):
         return self.nombre
 
 class BandaEmergente(models.Model):
-    """Bandas emergentes normalizadas"""
+    """bandas emergentes normalizadas"""
     nombre_banda = models.CharField(max_length=150)
     email_contacto = models.EmailField(max_length=254)
     telefono_contacto = models.CharField(max_length=20, blank=True, null=True)
     mensaje = models.TextField()
     documento_presentacion = models.URLField(max_length=500, blank=True, null=True)
     
-    # Relaciones normalizadas
+    #relaciones normalizadas
     genero = models.ForeignKey('radio.GeneroMusical', on_delete=models.CASCADE, related_name='bandas_emergentes')
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='bandas_emergentes')
     estado = models.ForeignKey('contact.Estado', on_delete=models.CASCADE, related_name='bandas_emergentes')
     comuna = models.ForeignKey('ubicacion.Comuna', on_delete=models.SET_NULL, null=True, blank=True, related_name='bandas_emergentes')
     
-    # Fechas y seguimiento
+    #fechas y seguimiento
     fecha_envio = models.DateTimeField(auto_now_add=True)
     fecha_revision = models.DateTimeField(blank=True, null=True)
     revisado_por = models.ForeignKey(
@@ -52,7 +52,7 @@ class BandaEmergente(models.Model):
         return f"{self.nombre_banda} - {self.genero.nombre}"
 
 class BandaLink(models.Model):
-    """Links de bandas emergentes"""
+    """links de bandas emergentes"""
     banda = models.ForeignKey(BandaEmergente, on_delete=models.CASCADE, related_name='links')
     tipo = models.CharField(max_length=50)  # 'spotify', 'youtube', 'instagram', etc.
     url = models.URLField(max_length=500)
@@ -66,7 +66,7 @@ class BandaLink(models.Model):
         return f"{self.banda.nombre_banda} - {self.tipo}"
 
 class BandaIntegrante(models.Model):
-    """Relación muchos a muchos entre bandas e integrantes"""
+    """relación muchos a muchos entre bandas e integrantes"""
     banda = models.ForeignKey(BandaEmergente, on_delete=models.CASCADE, related_name='integrantes')
     integrante = models.ForeignKey(Integrante, on_delete=models.CASCADE, related_name='bandas')
     

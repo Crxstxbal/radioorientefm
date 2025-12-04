@@ -18,20 +18,20 @@ class ChatMessageListView(generics.ListCreateAPIView):
     serializer_class = ChatMessageSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
-    pagination_class = None  # Desactivar paginación - se maneja en el frontend
+  #desactivar paginación - se maneja en el frontend
 
     def get_queryset(self):
         sala = self.kwargs.get('sala', 'radio-oriente')
         return ChatMessage.objects.filter(
             sala=sala
-        ).order_by('-fecha_envio')[:200]  # Aumentado a 200 para soportar paginación
+        ).order_by('-fecha_envio')[:200]
 
     def perform_create(self, serializer):
-        # Verificar si el usuario está bloqueado
+        #verificar si el usuario está bloqueado
         if self.request.user.chat_bloqueado:
             raise ValidationError({'detail': 'Has sido bloqueado del chat. Contacta con un administrador.'})
 
-        # Verificar si la radio está online
+        #verificar si la radio está online
         try:
             radio = EstacionRadio.objects.first()
             if not radio or not radio.activo:
@@ -39,7 +39,7 @@ class ChatMessageListView(generics.ListCreateAPIView):
         except EstacionRadio.DoesNotExist:
             raise ValidationError({'detail': 'No se pudo verificar el estado de la radio'})
 
-        # Analizar contenido con Machine Learning
+        #analizar contenido con machine learning
         contenido = serializer.validated_data.get('contenido', '')
         analysis = content_analyzer.analyze_message(
             contenido=contenido,
@@ -47,9 +47,9 @@ class ChatMessageListView(generics.ListCreateAPIView):
             usuario_nombre=self.request.user.username
         )
 
-        # Si el mensaje no está permitido, bloquear
+        #si el mensaje no está permitido, bloquear
         if not analysis['allowed']:
-            # Si fue auto-bloqueado, actualizar el estado del usuario
+            #si fue auto-bloqueado, actualizar el estado del usuario
             if analysis.get('auto_blocked'):
                 self.request.user.chat_bloqueado = True
                 self.request.user.save()
@@ -60,7 +60,7 @@ class ChatMessageListView(generics.ListCreateAPIView):
                 'infraction_type': analysis['infraction_type']
             })
 
-        # Si hay advertencia, incluirla en la respuesta
+        #si hay advertencia, incluirla en la respuesta
         warning = analysis.get('warning')
 
         sala = self.kwargs.get('sala', 'radio-oriente')
@@ -71,19 +71,19 @@ class ChatMessageListView(generics.ListCreateAPIView):
             tipo='user'
         )
 
-        # Agregar advertencia al contexto si existe
+        #agregar advertencia al contexto si existe
         if warning:
             self.warning_message = warning
 
 class ChatMessageDeleteView(generics.DestroyAPIView):
-    """Vista para que los administradores eliminen mensajes del chat"""
+    """vista para que los administradores eliminen mensajes del chat"""
     serializer_class = ChatMessageSerializer
     permission_classes = [IsAdminUser]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     queryset = ChatMessage.objects.all()
 
 class RadioStatusView(APIView):
-    """Vista para verificar si la radio está online"""
+    """vista para verificar si la radio está online"""
     permission_classes = []
 
     def get(self, request):
@@ -103,7 +103,7 @@ class RadioStatusView(APIView):
 @authentication_classes([TokenAuthentication, SessionAuthentication])
 @permission_classes([IsAdminUser])
 def toggle_user_block(request, user_id):
-    """Bloquear o desbloquear usuario del chat"""
+    """bloquear o desbloquear usuario del chat"""
     try:
         User = settings.AUTH_USER_MODEL
         from django.apps import apps
@@ -125,7 +125,7 @@ def toggle_user_block(request, user_id):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 class ClearAllMessagesView(generics.GenericAPIView):
-    """Vista para limpiar todos los mensajes del chat"""
+    """vista para limpiar todos los mensajes del chat"""
     serializer_class = ChatMessageSerializer
     permission_classes = [IsAdminUser]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
@@ -137,7 +137,7 @@ class ClearAllMessagesView(generics.GenericAPIView):
         print(f"Is staff: {request.user.is_staff if request.user.is_authenticated else 'N/A'}")
 
         try:
-            # Obtener sala del request
+            #obtener sala del request
             sala = request.data.get('sala', 'radio-oriente') if request.data else 'radio-oriente'
             print(f"Eliminando mensajes de sala: {sala}")
 
@@ -160,13 +160,13 @@ class ClearAllMessagesView(generics.GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ============== FILTRO DE CONTENIDO ML ==============
+#============== filtro de contenido ml ==============
 
 @api_view(['GET', 'POST'])
 @authentication_classes([TokenAuthentication, SessionAuthentication])
 @permission_classes([IsAdminUser])
 def manage_filter_config(request):
-    """Obtener o actualizar configuración del filtro ML"""
+    """obtener o actualizar configuracion del filtro ml"""
     config = ContentFilterConfig.get_config()
 
     if request.method == 'GET':
@@ -209,7 +209,7 @@ def manage_filter_config(request):
 @authentication_classes([TokenAuthentication, SessionAuthentication])
 @permission_classes([IsAdminUser])
 def manage_prohibited_words(request):
-    """Gestionar palabras prohibidas"""
+    """gestionar palabras prohibidas"""
 
     if request.method == 'GET':
         palabras = PalabraProhibida.objects.all().order_by('palabra')
@@ -233,7 +233,7 @@ def manage_prohibited_words(request):
                     'message': 'Debes proporcionar una palabra'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Verificar si ya existe
+            #verificar si ya existe
             if PalabraProhibida.objects.filter(palabra=palabra).exists():
                 return Response({
                     'success': False,
@@ -284,7 +284,7 @@ def manage_prohibited_words(request):
 @authentication_classes([TokenAuthentication, SessionAuthentication])
 @permission_classes([IsAdminUser])
 def get_infractions(request):
-    """Obtener lista de infracciones registradas"""
+    """obtener lista de infracciones registradas"""
     infracciones = InfraccionUsuario.objects.all().order_by('-fecha_infraccion')[:100]
 
     return Response({
@@ -305,21 +305,21 @@ def get_infractions(request):
 @authentication_classes([TokenAuthentication, SessionAuthentication])
 @permission_classes([IsAdminUser])
 def get_blocked_users(request):
-    """Obtener lista de todos los usuarios bloqueados del chat"""
+    """obtener lista de todos los usuarios bloqueados del chat"""
     try:
         User = settings.AUTH_USER_MODEL
         from django.apps import apps
         UserModel = apps.get_model(User)
 
-        # Obtener todos los usuarios bloqueados
+        #obtener todos los usuarios bloqueados
         blocked_users = UserModel.objects.filter(chat_bloqueado=True).order_by('username')
 
-        # Para cada usuario, contar sus infracciones
+        #para cada usuario, contar sus infracciones
         users_data = []
         for user in blocked_users:
             infracciones_count = InfraccionUsuario.objects.filter(usuario_id=user.id).count()
 
-            # Obtener última infracción
+            #obtener ultima infracción
             ultima_infraccion = InfraccionUsuario.objects.filter(
                 usuario_id=user.id
             ).order_by('-fecha_infraccion').first()

@@ -427,12 +427,11 @@
                   <td><strong>{{ genero.nombre }}</strong></td>
                   <td class="table-text-secondary">{{ genero.descripcion|default:"Sin descripción" }}</td>
                   <td>
-                    <form method="post" action="{% url 'eliminar_genero' genero.id %}" class="d-inline form-eliminar-genero">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-action-emergente btn-action-delete">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </form>
+                    <button type="button"
+                            class="btn btn-action-emergente btn-action-delete"
+                            onclick="deleteItem('{% url 'eliminar_genero' genero.id %}', '{{ genero.nombre|escapejs }}')">
+                      <i class="fas fa-trash"></i>
+                    </button>
                   </td>
                 </tr>
                 {% empty %}
@@ -516,13 +515,12 @@
                     </span>
                   </td>
                   <td>
-                    <form method="post" action="{% url 'eliminar_estado' estado.id %}" class="d-inline form-eliminar-estado">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-action-emergente btn-action-delete"
-                              {% if estado.contactos.exists or estado.bandas.exists %}disabled title="No se puede eliminar porque tiene elementos asociados"{% endif %}>
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </form>
+                    <button type="button"
+                            class="btn btn-action-emergente btn-action-delete"
+                            onclick="deleteItem('{% url 'eliminar_estado' estado.id %}', '{{ estado.nombre|escapejs }}')"
+                            {% if estado.contactos.exists or estado.bandas.exists %}disabled title="No se puede eliminar porque tiene elementos asociados"{% endif %}>
+                      <i class="fas fa-trash"></i>
+                    </button>
                   </td>
                 </tr>
                 {% empty %}
@@ -617,13 +615,12 @@
                           title="Ver detalles">
                     <i class="fas fa-search-plus"></i>
                   </button>
-                  <form method="POST" action="{% url 'eliminar_banda_emergente' banda.id %}" class="d-inline"
-                        onsubmit="return confirm('¿Estás seguro de eliminar esta banda?');">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-action-emergente btn-action-delete" title="Eliminar">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </form>
+                  <button type="button"
+                          class="btn btn-action-emergente btn-action-delete"
+                          title="Eliminar"
+                          onclick="deleteItem('{% url 'eliminar_banda_emergente' banda.id %}', '{{ banda.nombre_banda|escapejs }}')">
+                    <i class="fas fa-trash"></i>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -858,12 +855,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td style="border: none;"><strong>${genero.nombre}</strong></td>
                     <td style="border: none; color: #6B7280;">${genero.descripcion || 'Sin descripción'}</td>
                     <td style="border: none;">
-                        <form method="post" action="${deleteUrl}" class="d-inline form-eliminar-genero">
-                            <input type="hidden" name="csrfmiddlewaretoken" value="${formData.get('csrfmiddlewaretoken')}">
-                            <button type="submit" class="btn btn-action-emergente btn-action-delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-action-emergente btn-action-delete"
+                                onclick="deleteItem('${deleteUrl}', '${genero.nombre.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </td>
                 `;
                 const noGenerosRow = document.getElementById('no-generos-row');
@@ -880,46 +875,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Eliminar Género
-    generosBody.addEventListener('submit', function(e) {
-        if (e.target.classList.contains('form-eliminar-genero')) {
-            e.preventDefault();
-            if (!confirm('¿Estás seguro de eliminar este género?')) return;
-
-            const formEliminar = e.target;
-            const formData = new FormData(formEliminar);
-            const url = formEliminar.action;
-
-            fetch(url, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showNotification(data.message, 'success');
-                    const row = formEliminar.closest('tr');
-                    row.remove();
-                    if (generosBody.children.length === 0) {
-                        const emptyRow = document.createElement('tr');
-                        emptyRow.id = 'no-generos-row';
-                        emptyRow.innerHTML = '<td colspan="3" class="text-center py-4" style="border: none;"><i class="fas fa-music fa-3x text-muted mb-2"></i><p class="text-muted mb-0">No hay géneros registrados</p></td>';
-                        generosBody.appendChild(emptyRow);
-                    }
-                } else {
-                    showNotification(data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Ocurrió un error de red.', 'error');
-            });
-        }
-    });
+    // Eliminación de géneros ahora se maneja con el modal global deleteItem
 
     // Agregar Estado
     const formAgregarEstado = document.getElementById('form-agregar-estado');
@@ -953,12 +909,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         </span>
                     </td>
                     <td style="border: none;">
-                        <form method="post" action="${deleteUrl}" class="d-inline form-eliminar-estado">
-                            <input type="hidden" name="csrfmiddlewaretoken" value="${formData.get('csrfmiddlewaretoken')}">
-                            <button type="submit" class="btn btn-action-emergente btn-action-delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-action-emergente btn-action-delete"
+                                onclick="deleteItem('${deleteUrl}', '${estado.nombre.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </td>
                 `;
                 const noEstadosRow = document.getElementById('no-estados-row');
@@ -975,51 +929,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Eliminar Estado
-    estadosBody.addEventListener('submit', function(e) {
-        if (e.target.classList.contains('form-eliminar-estado')) {
-            e.preventDefault();
-            const button = e.target.querySelector('button');
-            if (button.disabled) {
-                showNotification('No se puede eliminar este estado porque tiene elementos asociados.', 'error', notificationContainerEstados);
-                return;
-            }
-            if (!confirm('¿Estás seguro de eliminar este estado?')) return;
-
-            const formEliminar = e.target;
-            const formData = new FormData(formEliminar);
-            const url = formEliminar.action;
-
-            fetch(url, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showNotification(data.message, 'success', notificationContainerEstados);
-                    const row = formEliminar.closest('tr');
-                    row.remove();
-                    if (estadosBody.children.length === 0) {
-                        const emptyRow = document.createElement('tr');
-                        emptyRow.id = 'no-estados-row';
-                        emptyRow.innerHTML = '<td colspan="4" class="text-center py-4" style="border: none;"><i class="fas fa-tasks fa-3x text-muted mb-2"></i><p class="text-muted mb-0">No hay estados registrados</p></td>';
-                        estadosBody.appendChild(emptyRow);
-                    }
-                } else {
-                    showNotification(data.message, 'error', notificationContainerEstados);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Ocurrió un error de red.', 'error', notificationContainerEstados);
-            });
-        }
-    });
+    // Eliminación de estados ahora se maneja con el modal global deleteItem
 });
 </script>
 {% endblock %}

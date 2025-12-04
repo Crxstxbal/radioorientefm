@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 from rest_framework import serializers
 from .models import Notification
 
 class NotificationSerializer(serializers.ModelSerializer):
-    """Serializer para notificaciones"""
+    """serializer para notificaciones"""
 
     tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
     tiempo_transcurrido = serializers.SerializerMethodField()
@@ -26,7 +26,7 @@ class NotificationSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'fecha_creacion', 'tipo_display', 'tiempo_transcurrido']
 
     def get_tiempo_transcurrido(self, obj):
-        """Retorna tiempo transcurrido en formato legible"""
+        """retorna tiempo transcurrido en formato legible"""
         from django.utils import timezone
         from datetime import timedelta
 
@@ -48,7 +48,7 @@ class NotificationSerializer(serializers.ModelSerializer):
             return obj.fecha_creacion.strftime("%d/%m/%Y %H:%M")
 
 class NotificationCreateSerializer(serializers.ModelSerializer):
-    """Serializer para crear notificaciones"""
+    """serializer para crear notificaciones"""
 
     class Meta:
         model = Notification

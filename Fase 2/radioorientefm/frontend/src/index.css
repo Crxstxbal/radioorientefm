@@ -23,7 +23,7 @@
   --color-gray-800: #1f2937;
   --color-gray-900: #111827;
   
-  /* Light mode (default) */
+  /*light mode (default)*/
   --bg-primary: #ffffff;
   --bg-secondary: #f9fafb;
   --bg-tertiary: #f3f4f6;
@@ -35,6 +35,11 @@
   --card-border: #e5e7eb;
   --input-bg: #ffffff;
   --input-border: #d1d5db;
+}
+
+html {
+  /* Previene el salto de la scrollbar al cargar/recargar */
+  overflow-y: scroll;
 }
 
 body {
@@ -53,11 +58,11 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Dark mode support */
+/*dark mode support*/
 html.dark {
   color-scheme: dark;
   
-  /* Dark mode variables - gris oscuro en lugar de negro */
+  /*dark mode variables - gris oscuro en lugar de negro*/
   --bg-primary: #2a2a2a;
   --bg-secondary: #333333;
   --bg-tertiary: #3d3d3d;
@@ -76,7 +81,7 @@ html.dark body {
   color: var(--text-primary);
 }
 
-/* Inputs, textareas y selects en dark mode */
+/*inputs, textareas y selects en dark mode*/
 html.dark input,
 html.dark textarea,
 html.dark select {
@@ -100,7 +105,7 @@ html.dark select:focus {
   outline: none;
 }
 
-/* Inputs deshabilitados en dark mode */
+/*inputs deshabilitados en dark mode*/
 html.dark input:disabled,
 html.dark textarea:disabled,
 html.dark select:disabled {
@@ -109,7 +114,38 @@ html.dark select:disabled {
   opacity: 0.6;
 }
 
-/* Autofill en dark mode */
+/*opciones de select en dark mode*/
+html.dark select option {
+  background-color: #2a2a2a !important;
+  background-image: none !important;
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+html.dark select option:checked,
+html.dark select option:hover {
+  background-color: #404040 !important;
+  background: #404040 !important;
+  background-image: none !important;
+}
+
+/*forzar estilo en opciones - light mode*/
+select option {
+  background-color: #ffffff;
+  background-image: none !important;
+  color: #000000;
+}
+
+select option:checked,
+select option:hover {
+  background-color: #f3f4f6;
+  background-image: none !important;
+}
+
+/*autofill en dark mode*/
 html.dark input:-webkit-autofill,
 html.dark input:-webkit-autofill:hover,
 html.dark input:-webkit-autofill:focus,
@@ -125,19 +161,19 @@ html.dark select:-webkit-autofill:focus {
   border-color: var(--input-border) !important;
 }
 
-/* Labels de formularios en dark mode */
+/*labels de formularios en dark mode*/
 html.dark label {
   color: var(--text-primary) !important;
 }
 
-/* Textos de ayuda y descripciones en formularios */
+/*textos de ayuda y descripciones en formularios*/
 html.dark .form-text,
 html.dark .help-text,
 html.dark small {
   color: var(--text-secondary) !important;
 }
 
-/* Legends en fieldsets */
+/*legends en fieldsets*/
 html.dark legend {
   color: var(--text-primary) !important;
 }
@@ -147,7 +183,7 @@ code {
     monospace;
 }
 
-/* Utility Classes */
+/*utility classes*/
 .text-red { color: var(--color-red); }
 .text-black { color: var(--color-black); }
 .text-white { color: var(--color-white); }
@@ -265,11 +301,9 @@ code {
 .shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
 .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
 
-/* ============================================
-   RESPONSIVE DESIGN - Global Styles
-   ============================================ */
+/*============================================ responsivo design - global estilos ============================================*/
 
-/* Base responsive */
+/*base responsivo*/
 * {
   box-sizing: border-box;
 }
@@ -280,7 +314,7 @@ img {
   display: block;
 }
 
-/* Container responsive */
+/*container responsivo*/
 .container {
   width: 100%;
   max-width: 1200px;
@@ -300,7 +334,7 @@ img {
   }
 }
 
-/* Typography responsive */
+/*typography responsivo*/
 @media (max-width: 768px) {
   h1 { font-size: 2rem; }
   h2 { font-size: 1.75rem; }
@@ -324,7 +358,7 @@ img {
   }
 }
 
-/* Spacing responsive */
+/*spacing responsivo*/
 @media (max-width: 768px) {
   .mt-8, .py-8 { margin-top: 1.5rem; padding-top: 1.5rem; }
   .mb-8, .py-8 { margin-bottom: 1.5rem; padding-bottom: 1.5rem; }
@@ -337,7 +371,7 @@ img {
   .gap-4 { gap: 0.75rem; }
 }
 
-/* Buttons responsive */
+/*buttons responsivo*/
 @media (max-width: 480px) {
   .btn {
     padding: 0.625rem 1.25rem;
@@ -351,7 +385,7 @@ img {
   }
 }
 
-/* Grid responsive */
+/*grid responsivo*/
 @media (max-width: 1024px) {
   .grid-cols-3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -369,8 +403,8 @@ img {
   }
 }
 
-/* Utility classes responsive */
-/* Animaciones globales */
+/*utility classes responsivo*/
+/*animaciones globales*/
 @keyframes radio-pulse {
   0% {
     transform: scale(0.8);
@@ -413,17 +447,15 @@ img {
   }
 }
 
-/* ============================================
-   VAPI WIDGET - Forzar posición en mobile
-   ============================================ */
+/*============================================ vapi widget - forzar posición en movil ============================================*/
 
-/* Desktop - normal */
+/*escritorio - normal*/
 vapi-widget {
   z-index: 1400 !important;
   position: fixed !important;
 }
 
-/* Mobile - mover arriba del reproductor */
+/*movil - mover arriba del reproductor*/
 @media (max-width: 768px) {
   vapi-widget {
     bottom: 90px !important;

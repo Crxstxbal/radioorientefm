@@ -3,12 +3,12 @@ from django.conf import settings
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 
-# ==========================
-# Base Models
-# ==========================
+#==========================
+#base models
+#==========================
 
 class Publicidad(models.Model):
-    """Modelo base para todas las publicidades"""
+    """modelo base para todas las publicidades"""
     TIPO_CHOICES = [
         ('WEB', 'Web'),
         ('RADIAL', 'Radial'),
@@ -17,6 +17,15 @@ class Publicidad(models.Model):
     nombre_cliente = models.CharField(max_length=150, verbose_name="Nombre del Cliente")
     descripcion = models.TextField(blank=True, null=True, verbose_name="Descripción")
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, verbose_name="Tipo de Publicidad")
+    # relación opcional hacia la solicitud web de origen (1 solicitud -> N campañas)
+    solicitud_web_origen = models.ForeignKey(
+        'SolicitudPublicidadWeb',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='campanias_web',
+        verbose_name="Solicitud Web de origen"
+    )
     fecha_inicio = models.DateField(verbose_name="Fecha de Inicio")
     fecha_fin = models.DateField(verbose_name="Fecha de Finalización")
     activo = models.BooleanField(default=True, verbose_name="¿Activo?")
@@ -50,12 +59,12 @@ class Publicidad(models.Model):
     def __str__(self):
         return f"{self.nombre_cliente} - {self.get_tipo_display()}"
 
-# ==========================
-# Modelos para Publicidad Web
-# ==========================
+#==========================
+#modelos para publicidad web
+#==========================
 
 class PublicidadWeb(models.Model):
-    """Información específica para publicidad web"""
+    """informacion específica para publicidad web"""
     publicidad = models.OneToOneField(
         Publicidad, 
         on_delete=models.CASCADE, 
@@ -90,7 +99,7 @@ class PublicidadWeb(models.Model):
         return f"Web - {self.publicidad.nombre_cliente}"
 
 class TipoUbicacion(models.Model):
-    """Tipos de ubicaciones disponibles para publicidad"""
+    """tipos de ubicaciones disponibles para publicidad"""
     codigo = models.SlugField(
         max_length=50,
         unique=True,
@@ -125,7 +134,7 @@ class TipoUbicacion(models.Model):
         return self.nombre
 
 class UbicacionPublicidadWeb(models.Model):
-    """Catálogo de ubicaciones disponibles para publicidad web"""
+    """catálogo de ubicaciones disponibles para publicidad web"""
     
     nombre = models.CharField(
         max_length=100, 
@@ -175,7 +184,7 @@ class UbicacionPublicidadWeb(models.Model):
         return f"{self.nombre} ({self.dimensiones})"
 
 class SolicitudPublicidadWeb(models.Model):
-    """Solicitud de publicidad web enviada por un usuario"""
+    """solicitud de publicidad web enviada por un usuario"""
     ESTADO_CHOICES = [
         ('pendiente', 'Pendiente'),
         ('en_revision', 'En Revisión'),
@@ -192,7 +201,7 @@ class SolicitudPublicidadWeb(models.Model):
         verbose_name="Usuario"
     )
     
-    # Datos de contacto del solicitante
+    #datos de contacto del solicitante
     nombre_contacto = models.CharField(max_length=150, verbose_name="Nombre de Contacto")
     email_contacto = models.EmailField(verbose_name="Email de Contacto")
     telefono_contacto = models.CharField(
@@ -214,7 +223,7 @@ class SolicitudPublicidadWeb(models.Model):
         verbose_name="Preferencia de Contacto"
     )
     
-    # Estado y seguimiento
+    #estado y seguimiento
     estado = models.CharField(
         max_length=20, 
         choices=ESTADO_CHOICES, 
@@ -246,11 +255,11 @@ class SolicitudPublicidadWeb(models.Model):
         verbose_name="Campaña Publicada"
     )
     
-    # Fechas de publicación solicitadas
+    #fechas de publicacion solicitadas
     fecha_inicio_solicitada = models.DateField(verbose_name="Fecha de Inicio Solicitada")
     fecha_fin_solicitada = models.DateField(verbose_name="Fecha de Finalización Solicitada")
     
-    # Notas y observaciones
+    #notas y observaciones
     mensaje_usuario = models.TextField(
         blank=True, 
         null=True, 
@@ -269,7 +278,7 @@ class SolicitudPublicidadWeb(models.Model):
         verbose_name="Motivo de Rechazo"
     )
     
-    # Totales
+    #totales
     costo_total_estimado = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -298,7 +307,7 @@ class SolicitudPublicidadWeb(models.Model):
         return f"Solicitud Web #{self.id} - {self.usuario.email} ({self.get_estado_display()})"
 
 class ItemSolicitudWeb(models.Model):
-    """Cada ubicación/espacio publicitario web dentro de una solicitud"""
+    """cada ubicacion/espacio publicitario web dentro de una solicitud"""
     solicitud = models.ForeignKey(
         SolicitudPublicidadWeb, 
         on_delete=models.CASCADE, 
@@ -343,7 +352,7 @@ class ItemSolicitudWeb(models.Model):
         return f"{self.ubicacion.nombre} - {self.formato} (${self.precio_acordado})"
 
 class ImagenPublicidadWeb(models.Model):
-    """Imágenes asociadas a cada item de solicitud web"""
+    """imágenes asociadas a cada item de solicitud web"""
     item = models.ForeignKey(
         ItemSolicitudWeb, 
         on_delete=models.CASCADE, 
@@ -379,51 +388,3 @@ class ImagenPublicidadWeb(models.Model):
     
     def __str__(self):
         return f"Imagen {self.id} - {self.item}"
-
-# ==========================
-# Modelos para Publicidad Radial
-# ==========================
-
-class PublicidadRadial(models.Model):
-    """Información específica para publicidad radial"""
-    publicidad = models.OneToOneField(
-        Publicidad,
-        on_delete=models.CASCADE,
-        related_name='radial_config',
-        limit_choices_to={'tipo': 'RADIAL'}
-    )
-    
-    # Información del spot radial
-    duracion = models.IntegerField(
-        verbose_name="Duración en segundos",
-        help_text="Duración del spot en segundos"
-    )
-    
-    # Frecuencia de reproducción
-    repeticiones_diarias = models.IntegerField(
-        default=1,
-        validators=[MinValueValidator(1)],
-        verbose_name="Repeticiones diarias"
-    )
-    
-    # Archivo de audio
-    archivo_audio = models.FileField(
-        upload_to='publicidad/radial/audios/%Y/%m/',
-        verbose_name="Archivo de Audio",
-        help_text="Archivo de audio para la publicidad radial"
-    )
-    
-    # Estadísticas
-    reproducciones = models.IntegerField(
-        default=0,
-        validators=[MinValueValidator(0)],
-        verbose_name="Número de Reproducciones"
-    )
-    
-    class Meta:
-        db_table = 'publicidad_radial'
-        verbose_name = 'Configuración Radial'
-        verbose_name_plural = 'Configuraciones Radiales'
-    
-    def __str__(self):
-        return f"Radial - {self.publicidad.nombre_cliente}"

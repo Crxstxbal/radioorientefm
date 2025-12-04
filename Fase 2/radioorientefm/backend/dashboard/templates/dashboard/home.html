@@ -18,9 +18,9 @@
         --home-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --home-gradient-users: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --home-gradient-posts: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        --home-gradient-programs: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --home-gradient-programs: linear-gradient(135deg, #4285f4 0%, #00398a 100%);
         --home-gradient-subs: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        --home-welcome-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --home-welcome-bg: linear-gradient(135deg, #4285f4 0%, #00398a 100%);
         --home-welcome-text: #ffffff;
     }
 
@@ -37,9 +37,9 @@
         --home-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --home-gradient-users: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --home-gradient-posts: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        --home-gradient-programs: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --home-gradient-programs: linear-gradient(135deg, #4285f4 0%, #1967d2 100%);
         --home-gradient-subs: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        --home-welcome-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --home-welcome-bg: linear-gradient(135deg, #4285f4 0%, #00398a 100%);
         --home-welcome-text: #ffffff;
     }
 
@@ -713,7 +713,16 @@
         <p class="card-text small">Revisa los eventos y programas agendados.</p>
 
         <a href="{% url 'dashboard_calendario' %}" class="btn text-white">
-          <i class="fas fa-calendar-alt me-2"></i>Ir al Calendario
+          <svg class="me-2" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle;">
+            <rect x="3" y="4" width="18" height="18" rx="2" fill="white"/>
+            <rect x="3" y="4" width="18" height="7" rx="2" fill="#4285f4"/>
+            <path d="M7 2V6M17 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <rect x="6" y="13" width="3" height="3" rx="0.5" fill="#4285f4"/>
+            <rect x="10.5" y="13" width="3" height="3" rx="0.5" fill="#4285f4"/>
+            <rect x="15" y="13" width="3" height="3" rx="0.5" fill="#4285f4"/>
+            <rect x="6" y="17" width="3" height="3" rx="0.5" fill="#4285f4"/>
+            <rect x="10.5" y="17" width="3" height="3" rx="0.5" fill="#4285f4"/>
+          </svg>Ir al Calendario
         </a>
       </div>
     </div>

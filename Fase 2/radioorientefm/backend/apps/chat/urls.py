@@ -22,7 +22,7 @@ urlpatterns = [
     path('users/<int:user_id>/toggle-block/', views.toggle_user_block, name='chat-toggle-user-block'),
     path('radio-status/', views.RadioStatusView.as_view(), name='radio-status'),
 
-    # Filtro ML de contenido
+    #filtro ml de contenido
     path('filter/config/', views.manage_filter_config, name='chat-filter-config'),
     path('filter/palabras/', views.manage_prohibited_words, name='chat-prohibited-words'),
     path('filter/infracciones/', views.get_infractions, name='chat-infractions'),

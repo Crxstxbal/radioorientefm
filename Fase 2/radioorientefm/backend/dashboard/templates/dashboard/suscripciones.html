@@ -159,9 +159,12 @@
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0 modern-table">
+                <table class="table table-hover align-middle mb-0 modern-table" id="suscripcionesTable">
                     <thead class="table-dark">
                         <tr>
+                            <th class="px-3 py-3" style="width: 40px;">
+                                <input type="checkbox" class="select-all-checkbox" onchange="toggleSelectAll(this, 'suscripcionesTable')">
+                            </th>
                             <th class="px-3 py-3">#</th>
                             <th class="px-3 py-3">Suscriptor</th>
                             <th class="px-3 py-3">Usuario</th>
@@ -174,6 +177,12 @@
                     <tbody>
                         {% for suscripcion in suscripciones %}
                         <tr class="table-row-hover">
+                            <td class="px-3 py-2">
+                                <input type="checkbox" class="row-checkbox"
+                                       data-id="{{ suscripcion.id }}"
+                                       data-name="{{ suscripcion.nombre }}"
+                                       onchange="updateBulkActions('suscripcionesTable')">
+                            </td>
                             <td class="px-3 py-2">
                                 <span class="badge bg-light text-dark fw-normal">{{ suscripcion.id }}</span>
                             </td>
@@ -249,20 +258,17 @@
                                     </form>
 
                                     <!-- Delete -->
-                                    <form method="POST" action="{% url 'delete_suscripcion' suscripcion.id %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-danger"
-                                                title="Eliminar permanentemente"
-                                                onclick="return confirm('⚠️ ¿Eliminar PERMANENTEMENTE la suscripción de {{ suscripcion.nombre }}?\n\n{{ suscripcion.email }}\n\nEsta acción NO se puede deshacer.')">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                            title="Eliminar permanentemente"
+                                            onclick="deleteItem('{% url 'delete_suscripcion' suscripcion.id %}', '{{ suscripcion.nombre|escapejs }}')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="text-center py-5">
+                            <td colspan="8" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
                                     <h5 class="text-muted">No hay suscripciones</h5>
@@ -577,4 +583,16 @@
         font-weight: 600;
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar el botón de eliminación masiva para suscripciones
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    if (bulkDeleteBtn) {
+        bulkDeleteBtn.onclick = function() {
+            deleteSelected('/dashboard/suscripciones/__ID__/delete/');
+        };
+    }
+});
+</script>
 {% endblock %}

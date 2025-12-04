@@ -8,7 +8,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('Iniciando creación de datos base para Contactos...'))
 
-        # Crear Estados para Contacto
+        #crear estados para contacto
         estados_contacto = [
             {'nombre': 'Recibida', 'descripcion': 'Mensaje recibido, pendiente de revisión'},
             {'nombre': 'En Revisión', 'descripcion': 'Mensaje en proceso de revisión'},
@@ -33,7 +33,7 @@ class Command(BaseCommand):
                     self.style.WARNING(f'  - Estado ya existe: {estado.nombre}')
                 )
 
-        # Crear Tipos de Asunto
+        #crear tipos de asunto
         tipos_asunto = [
             'Consulta General',
             'Publicidad',

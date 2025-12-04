@@ -261,12 +261,10 @@ select::-webkit-scrollbar-thumb:hover {
                     </a>
                     {% endif %}
 
-                    <form method="post" action="{% url 'eliminar_notificacion' notificacion.id %}" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" style="width: 32px; height: 32px; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: white; background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);" title="Eliminar" onclick="return confirm('¿Eliminar esta notificación?')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
+                    <button type="button" style="width: 32px; height: 32px; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: white; background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);" title="Eliminar"
+                            onclick="deleteItem('{% url 'eliminar_notificacion' notificacion.id %}', '{{ notificacion.titulo|escapejs }}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </div>
             {% endfor %}
@@ -355,21 +353,94 @@ nav[aria-label="Paginación de notificaciones"] a:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive para móviles */
+/* Responsive para tablets y móviles */
 @media (max-width: 768px) {
-    .notif-page {
-        padding: 12px !important;
+    .notif-container {
+        padding: 16px !important;
     }
-    .notif-stats {
-        grid-template-columns: 1fr !important;
+
+    /* Header responsive */
+    .notif-container > div:first-child {
+        padding: 20px 24px !important;
+        margin-bottom: 20px !important;
     }
-    .notif-filters-form {
+
+    .notif-container > div:first-child h1 {
+        font-size: 22px !important;
+    }
+
+    .notif-container > div:first-child p {
+        font-size: 14px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .notif-container > div:first-child button {
+        font-size: 12px !important;
+        padding: 8px 16px !important;
+    }
+
+    /* Stats grid - cambiar a 1 columna */
+    .notif-container > div:nth-child(2) {
         grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .notif-stat-card {
+        padding: 16px !important;
+    }
+
+    .notif-stat-value {
+        font-size: 28px !important;
+    }
+
+    .notif-stat-card > div > div:last-child {
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 20px !important;
+    }
+
+    /* Filtros - cambiar a 1 columna */
+    .notif-filters-card form {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    .notif-filters-card form > div:last-child {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .notif-filters-card form > div:last-child button,
+    .notif-filters-card form > div:last-child a {
+        width: 100% !important;
+    }
+
+    /* Notificaciones list */
+    .notif-item {
+        grid-template-columns: auto 1fr !important;
+        gap: 12px !important;
+        padding: 14px 16px !important;
+    }
+
+    .notif-item > div:first-child {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 16px !important;
+    }
+
+    .notif-item > div:last-child {
+        grid-column: 1 / -1 !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        margin-top: 8px !important;
     }
 
     /* Paginación responsive */
     nav[aria-label="Paginación de notificaciones"] ul {
         gap: 4px !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
     }
 
     nav[aria-label="Paginación de notificaciones"] a,
@@ -384,6 +455,90 @@ nav[aria-label="Paginación de notificaciones"] a:hover {
     nav[aria-label="Paginación de notificaciones"] li:first-child,
     nav[aria-label="Paginación de notificaciones"] li:last-child {
         display: none;
+    }
+}
+
+/* Responsive para móviles pequeños */
+@media (max-width: 480px) {
+    .notif-container {
+        padding: 12px !important;
+    }
+
+    .notif-container > div:first-child {
+        padding: 16px 20px !important;
+    }
+
+    .notif-container > div:first-child h1 {
+        font-size: 20px !important;
+        gap: 8px !important;
+    }
+
+    .notif-container > div:first-child h1 i {
+        font-size: 18px !important;
+    }
+
+    .notif-container > div:first-child p {
+        font-size: 13px !important;
+    }
+
+    .notif-stat-card {
+        padding: 14px !important;
+    }
+
+    .notif-stat-label {
+        font-size: 11px !important;
+    }
+
+    .notif-stat-value {
+        font-size: 24px !important;
+    }
+
+    .notif-stat-card > div > div:last-child {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 18px !important;
+    }
+
+    .notif-filters-card {
+        padding: 16px !important;
+    }
+
+    .notif-filter-label {
+        font-size: 11px !important;
+    }
+
+    select {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+    }
+
+    .notif-filters-card form button,
+    .notif-filters-card form a {
+        font-size: 12px !important;
+        padding: 8px 16px !important;
+    }
+
+    .notif-item {
+        padding: 12px 14px !important;
+    }
+
+    .notif-title {
+        font-size: 13px !important;
+    }
+
+    .notif-message {
+        font-size: 12px !important;
+    }
+
+    .notif-time {
+        font-size: 10px !important;
+    }
+
+    .notif-item > div:last-child button,
+    .notif-item > div:last-child a {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 12px !important;
     }
 }
 </style>

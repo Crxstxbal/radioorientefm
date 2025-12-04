@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 
 class ChatMessage(models.Model):
-    # Relación con Usuario
+    #relación con usuario
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -30,12 +30,12 @@ class ChatMessage(models.Model):
 
     @property
     def id_usuario(self):
-        """Propiedad de compatibilidad para código existente"""
+        """propiedad de compatibilidad para codigo existente"""
         return self.usuario_id
 
 
 class ContentFilterConfig(models.Model):
-    """Configuración del filtro automático de contenido ofensivo"""
+    """configuracion del filtro automatico de contenido ofensivo"""
     activo = models.BooleanField(default=True, help_text="Activar/desactivar filtro automático")
     umbral_toxicidad = models.FloatField(
         default=0.7,
@@ -69,13 +69,13 @@ class ContentFilterConfig(models.Model):
 
     @classmethod
     def get_config(cls):
-        """Obtener o crear configuración única"""
+        """obtener o crear configuracion única"""
         config, created = cls.objects.get_or_create(pk=1)
         return config
 
 
 class PalabraProhibida(models.Model):
-    """Lista de palabras prohibidas personalizada"""
+    """lista de palabras prohibidas personalizada"""
     palabra = models.CharField(max_length=100, unique=True)
     severidad = models.CharField(
         max_length=10,
@@ -100,8 +100,8 @@ class PalabraProhibida(models.Model):
 
 
 class InfraccionUsuario(models.Model):
-    """Registro de infracciones de usuarios"""
-    # Relación con Usuario (SIEMPRE necesaria)
+    """registro de infracciones de usuarios"""
+    #relación con usuario (siempre necesaria)
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -109,7 +109,7 @@ class InfraccionUsuario(models.Model):
         db_column='id_usuario',
         help_text="Usuario que cometió la infracción"
     )
-    # Relación con Mensaje (OPCIONAL: null si fue bloqueado antes de guardarse)
+    #relacion con mensaje opcional
     mensaje = models.ForeignKey(
         ChatMessage,
         on_delete=models.SET_NULL,
@@ -118,7 +118,7 @@ class InfraccionUsuario(models.Model):
         related_name='infracciones',
         help_text="Mensaje que causó la infracción (null si fue bloqueado)"
     )
-    # Relación con Palabra Prohibida (OPCIONAL: solo si tipo_infraccion='palabra_prohibida')
+    #relacion con palabra prohibida
     palabra_prohibida = models.ForeignKey(
         'PalabraProhibida',
         on_delete=models.SET_NULL,
@@ -159,5 +159,5 @@ class InfraccionUsuario(models.Model):
 
     @property
     def id_usuario(self):
-        """Propiedad de compatibilidad para código existente"""
+        """propiedad de compatibilidad para codigo existente"""
         return self.usuario_id

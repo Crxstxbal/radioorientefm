@@ -11,14 +11,15 @@ export const AudioProvider = ({ children }) => {
   });
   const [streamUrl, setStreamUrl] = useState(null);
 
-  // Traer URL del backend SOLO UNA VEZ al cargar el componente
+  //traer url del backend solo una vez al cargar el componentee
   useEffect(() => {
     const fetchStream = async () => {
       try {
-        const res = await fetch("/api/radio/station/");
+        const base = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        const res = await fetch(`${base}/api/radio/station/`);
         const data = await res.json();
 
-        // Asegurarse de que streamUrl sea un string
+        //asegurarse de que streamurl sea un string
         const url = typeof data.stream_url === "string"
           ? data.stream_url
           : data.stream_url?.src || null;
@@ -37,7 +38,7 @@ export const AudioProvider = ({ children }) => {
     fetchStream();
   }, []); // SIN 'volume' aquí - solo se ejecuta una vez
 
-  // Mantener volumen sincronizado - ESTE useEffect SÍ debe tener volume como dependencia
+  //mantener volumen sincronizado - este useefecto sí debe tener volume como dependencia
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;

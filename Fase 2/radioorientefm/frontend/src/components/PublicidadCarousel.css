@@ -1,0 +1,87 @@
+/*estilos responsivos para publicidadcarousel*/
+
+.publicidad-container-top {
+  width: 100%;
+  max-width: 1200px;
+  height: 200px;
+  display: flex;
+  margin: 10px auto;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  border: none;
+  height: auto;
+  aspect-ratio: 16/9;
+  overflow: visible;
+}
+
+@media (max-width: 768px) {
+  .publicidad-container-top {
+    width: 96%;
+    padding: 0;
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .publicidad-container-top {
+    width: 85%;
+    max-width: 1000px;
+    padding: 0;
+  }
+}
+
+.publicidad-container-bottom {
+  display: flex;
+  margin: 10px auto 20px;
+  padding: 0;
+  width: 100%;
+  max-width: 1200px;
+  height: 200px;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  border: none;
+  overflow: hidden;
+}
+
+@media (max-width: 1240px) {
+  .publicidad-container-bottom {
+    width: 95%;
+    height: auto;
+    aspect-ratio: 1200/200;
+    max-height: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .publicidad-container-bottom {
+    display: none; /*ocultar en móviles*/
+  }
+}
+
+.publicidad-banner-bottom {
+  width: 100%;
+  max-width: 1200px;
+  height: 200px;
+}
+
+@media (max-width: 1240px) {
+  .publicidad-banner-bottom {
+    width: 95%;
+    height: auto;
+    aspect-ratio: 1200/200;
+    max-height: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .publicidad-banner-bottom {
+    display: none;
+  }
+}

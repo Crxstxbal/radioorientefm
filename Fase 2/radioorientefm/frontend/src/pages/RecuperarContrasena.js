@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 import toast from 'react-hot-toast';
 import './Auth.css';
 
@@ -15,7 +15,7 @@ const RecuperarContrasena = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/password-reset/', {
+      const response = await api.post('/api/auth/password-reset/', {
         email: email
       });
 
@@ -35,7 +35,7 @@ const RecuperarContrasena = () => {
     return (
       <div className="auth-page">
         <div className="container">
-          <div className="auth-container">
+          <div className="auth-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <div className="auth-card">
               <div className="auth-header">
                 <CheckCircle className="auth-icon" style={{ color: '#10b981' }} />
@@ -62,7 +62,7 @@ const RecuperarContrasena = () => {
   return (
     <div className="auth-page">
       <div className="container">
-        <div className="auth-container">
+        <div className="auth-container" style={{ width: '500px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <div className="auth-card">
             <div className="auth-header">
               <Mail className="auth-icon" />

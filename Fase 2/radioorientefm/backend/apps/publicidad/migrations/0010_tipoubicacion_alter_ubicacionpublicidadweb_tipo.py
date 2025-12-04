@@ -6,14 +6,14 @@ def populate_tipo_ubicacion(apps, schema_editor):
     TipoUbicacion = apps.get_model('publicidad', 'TipoUbicacion')
     UbicacionPublicidadWeb = apps.get_model('publicidad', 'UbicacionPublicidadWeb')
 
-    # Crear tipos a partir de los códigos existentes en el campo CharField 'tipo'
+    #crear tipos a partir de los codigos existentes en el campo charfield 'tipo'
     existentes = (
         UbicacionPublicidadWeb.objects
         .values_list('tipo', flat=True)
         .distinct()
     )
 
-    # Mapeo opcional para nombres amigables
+    #mapeo opcional para nombres amigables
     nombres_map = {
         'panel_izquierdo': 'Panel Lateral Izquierdo',
         'panel_derecho': 'Panel Lateral Derecho',
@@ -36,11 +36,11 @@ def populate_tipo_ubicacion(apps, schema_editor):
         )
         codigo_to_obj[codigo] = obj
 
-    # Poblar el campo temporal FK con el id correspondiente
+    #poblar el campo temporal fk con el id correspondiente
     for u in UbicacionPublicidadWeb.objects.all():
         tipo_fk = codigo_to_obj.get(u.tipo)
         if tipo_fk:
-            # Asignar al campo temporal
+            #asignar al campo temporal
             setattr(u, 'tipo_temp_id', tipo_fk.id)
             u.save(update_fields=['tipo_temp'])
 
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # 1) Crear el nuevo modelo
+        #1) crear el nuevo modelo
         migrations.CreateModel(
             name='TipoUbicacion',
             fields=[
@@ -71,30 +71,30 @@ class Migration(migrations.Migration):
             },
         ),
 
-        # 2) Agregar un campo temporal FK
+        #2) agregar un campo temporal fk
         migrations.AddField(
             model_name='ubicacionpublicidadweb',
             name='tipo_temp',
             field=models.ForeignKey(null=True, blank=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to='publicidad.tipoubicacion'),
         ),
 
-        # 3) Migrar datos del CharField al FK temporal
+        #3) migrar datos del charfield al fk temporal
         migrations.RunPython(populate_tipo_ubicacion, migrations.RunPython.noop),
 
-        # 4) Eliminar el campo CharField original
+        #4) eliminar el campo charfield original
         migrations.RemoveField(
             model_name='ubicacionpublicidadweb',
             name='tipo',
         ),
 
-        # 5) Renombrar el campo temporal a definitivo
+        #5) renombrar el campo temporal a definitivo
         migrations.RenameField(
             model_name='ubicacionpublicidadweb',
             old_name='tipo_temp',
             new_name='tipo',
         ),
 
-        # 6) Ajustar opciones del campo definitivo
+        #6) ajustar opciones del campo definitivo
         migrations.AlterField(
             model_name='ubicacionpublicidadweb',
             name='tipo',

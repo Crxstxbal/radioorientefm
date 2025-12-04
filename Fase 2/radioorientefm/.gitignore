@@ -1,33 +1,33 @@
-# ===== ARCHIVOS DE ENTORNO Y CONFIGURACIÓN =====
+#===== ARCHIVOS DE ENTORNO Y CONFIGURACIÓN =====
 
-# Variables de entorno
+#Variables de entorno
 .env
 .env.local
 .env.development
 .env.test
 .env.production
 
-# Configuración de IDEs
+#Configuración de IDEs
 .vscode/
 .idea/
 *.sublime-workspace
 *.sublime-project
 
-# Archivos de configuración de editores
+#Archivos de configuración de editores
 *.swn
 *.swo
 *~
 
-# ===== BACKEND (Python/Django) =====
+#===== BACKEND (Python/Django) =====
 
-# Entornos virtuales
+#Entornos virtuales
 backend/venv/
 backend/env/
 backend/.venv/
 ENV/
 .venv/
 
-# Archivos de Python
+#Archivos de Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -49,23 +49,25 @@ wheels/
 .installed.cfg
 *.egg
 
-# Archivos de base de datos
+#Archivos de base de datos
 *.sqlite3
 *.db
 *.sql
 
-# Archivos de Django
+#Archivos de Django
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
 backend/google-credentials.json
 
-# Media y archivos estáticos
+#Archivo de credenciales de Google para el calendario
+backend/google-credentials.json
 
+#Media y archivos estáticos
 backend/staticfiles/
 
-# Archivos de cobertura
+#Archivos de cobertura
 htmlcov/
 .tox/
 .nox/
@@ -81,40 +83,40 @@ coverage.xml
 .mypy_cache/
 .ruff_cache/
 
-# ===== FRONTEND (Node.js/React) =====
+#===== FRONTEND (Node.js/React) =====
 
-# Dependencias
+#Dependencias
 node_modules/
 .pnp
 .pnp.js
 
-# Testing
+#Testing
 coverage/
 
-# Producción
+#Producción
 build/
 dist/
 .next/
 out/
 
-# Archivos de desarrollo
+#Archivos de desarrollo
 .cache/
 .temp/
 .tmp/
 
-# Variables de entorno
+#Variables de entorno
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Logs
+#Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# Editor directories and files
+#Editor directories and files
 .idea
 .DS_Store
 *.suo
@@ -123,7 +125,7 @@ yarn-error.log*
 *.sln
 *.sw?
 
-# ===== ARCHIVOS DEL SISTEMA OPERATIVO =====
+#===== ARCHIVOS DEL SISTEMA OPERATIVO =====
 
 # macOS
 .DS_Store
@@ -131,26 +133,26 @@ yarn-error.log*
 .LSOverride
 Icon
 
-# Windows
+#Windows
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
-# Linux
+#Linux
 .Trash-*
 
-# ===== ARCHIVOS TEMPORALES =====
+#===== ARCHIVOS TEMPORALES =====
 *.swp
 *.swo
 *~
 
-# ===== ARCHIVOS DE BACKUP =====
+#===== ARCHIVOS DE BACKUP =====
 *.bak
 *.backup
 *~
 
-# ===== OTROS =====
+#===== OTROS =====
 .vercel
 .netlify
 .sass-cache/

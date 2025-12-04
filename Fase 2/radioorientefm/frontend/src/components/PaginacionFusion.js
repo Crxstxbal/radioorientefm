@@ -34,21 +34,93 @@ function PaginacionFusion({ currentPage, totalPages, totalItems, itemsPerPage, o
   };
 
   return (
-    <div className="pf-wrapper" style={{display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", marginTop: "2rem", flexWrap: "wrap"}}>
-      <div className="pf-info" style={{color: "var(--color-gray-600)", fontSize: ".9rem"}}>
+    <div style={{width: '100%', margin: '1.25rem 0 0.75rem'}}>
+      <div className="pf-info" style={{textAlign: 'center', marginBottom: '1rem', fontSize: '.9rem'}}>
         {totalItems} resultados • Página {currentPage} de {totalPages}
       </div>
-      <div className="pf-controls" style={{display: "flex", alignItems: "center", gap: ".5rem", flexWrap: "wrap"}}>
-        <button className="pf-nav" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1} style={{padding: ".4rem .7rem", borderRadius: ".4rem", border: "1px solid var(--color-gray-200)", background: "white", cursor: currentPage === 1 ? "not-allowed" : "pointer"}}>Anterior</button>
+      <div style={{display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap'}}>
+        <button 
+          className="pf-nav" 
+          onClick={() => goToPage(currentPage - 1)} 
+          disabled={currentPage === 1} 
+          style={{
+            padding: '.4rem .7rem', 
+            borderRadius: '.4rem', 
+            border: '1px solid var(--border-color, #e2e8f0)', 
+            background: 'var(--bg-primary, #ffffff)',
+            color: 'var(--text-primary, #1e293b)',
+            cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+            opacity: currentPage === 1 ? 0.6 : 1,
+            transition: 'all 0.2s ease'
+          }}
+        >
+          Anterior
+        </button>
         {renderPages()}
-        <button className="pf-nav" onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages} style={{padding: ".4rem .7rem", borderRadius: ".4rem", border: "1px solid var(--color-gray-200)", background: "white", cursor: currentPage === totalPages ? "not-allowed" : "pointer"}}>Siguiente</button>
+        <button 
+          className="pf-nav" 
+          onClick={() => goToPage(currentPage + 1)} 
+          disabled={currentPage === totalPages} 
+          style={{
+            padding: '.4rem .7rem', 
+            borderRadius: '.4rem', 
+            border: '1px solid var(--border-color, #e2e8f0)', 
+            background: 'var(--bg-primary, #ffffff)',
+            color: 'var(--text-primary, #1e293b)',
+            cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+            opacity: currentPage === totalPages ? 0.6 : 1,
+            transition: 'all 0.2s ease'
+          }}
+        >
+          Siguiente
+        </button>
       </div>
       <style>
         {`
-          .pf-page { padding: .4rem .7rem; border-radius: .4rem; border: 1px solid var(--color-gray-200); background: white; cursor: pointer; }
-          .pf-page.active { background: var(--color-red); color: white; border-color: var(--color-red); }
-          .pf-page:hover { border-color: var(--color-gray-300); }
-          .pf-ellipsis { padding: 0 .25rem; color: var(--color-gray-500); }
+          .pf-info {
+            color: var(--text-primary, #1e293b);
+          }
+          .pf-page { 
+            padding: .4rem .7rem; 
+            border-radius: .4rem; 
+            border: 1px solid var(--border-color, #e2e8f0); 
+            background: var(--bg-primary, #ffffff);
+            color: var(--text-primary, #1e293b);
+            cursor: pointer;
+            transition: all 0.2s ease;
+          }
+          .pf-page:hover:not(.active) { 
+            background: var(--bg-secondary, #f8fafc);
+            border-color: var(--border-color, #e2e8f0);
+          }
+          .pf-page.active { 
+            background: var(--color-red); 
+            color: white !important; 
+            border-color: var(--color-red); 
+          }
+          .pf-ellipsis { 
+            padding: 0 .25rem; 
+            color: var(--text-secondary, #64748b);
+            display: flex;
+            align-items: center;
+          }
+          
+          /*dark mode estilos aligned with app*/
+          [data-theme='dark'] .pf-info {
+            color: #ffffff;
+          }
+          [data-theme='dark'] .pf-page {
+            border-color: #334155;
+            background: #1e293b;
+            color: #e2e8f0;
+          }
+          [data-theme='dark'] .pf-page:hover:not(.active) {
+            background: #334155;
+            border-color: #334155;
+          }
+          [data-theme='dark'] .pf-ellipsis {
+            color: #94a3b8;
+          }
         `}
       </style>
     </div>

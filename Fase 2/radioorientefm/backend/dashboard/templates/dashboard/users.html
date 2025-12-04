@@ -63,9 +63,9 @@
   }
 
   .user-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -307,9 +307,12 @@
   <div class="card user-card">
     <div class="card-body p-0">
       <div class="table-responsive p-3">
-        <table class="table table-modern mb-0">
+        <table class="table table-modern mb-0" id="usersTable">
           <thead>
             <tr>
+              <th style="width: 40px;">
+                <input type="checkbox" class="select-all-checkbox" onchange="toggleSelectAll(this, 'usersTable')">
+              </th>
               <th>Usuario</th>
               <th>Correo</th>
               <th>Nombre Completo</th>
@@ -322,6 +325,12 @@
           <tbody>
             {% for user in users %}
             <tr>
+              <td>
+                <input type="checkbox" class="row-checkbox"
+                       data-id="{{ user.id }}"
+                       data-name="{{ user.username }}"
+                       onchange="updateBulkActions('usersTable')">
+              </td>
               <td>
                 <div class="d-flex align-items-center">
                   <div class="user-avatar me-3" style="background: linear-gradient(135deg, #{{ user.id|stringformat:'03d'|slice:':2' }}a5fa 0%, #{{ user.id|stringformat:'03d'|slice:'1:3' }}82f6 100%);">
@@ -395,7 +404,7 @@
             </tr>
             {% empty %}
             <tr>
-              <td colspan="7" class="text-center py-5">
+              <td colspan="8" class="text-center py-5">
                 <i class="fas fa-users fa-4x text-muted mb-3 d-block"></i>
                 <p class="text-muted mb-0">
                   {% if search_query %}
@@ -554,13 +563,6 @@
             </label>
             <input type="email" class="form-control search-box" name="correo" id="edit-correo" required>
           </div>
-          <div class="mb-3">
-            <label for="edit-password" class="form-label fw-bold">
-              <i class="fas fa-lock me-2 text-muted"></i>Nueva Contraseña (opcional)
-            </label>
-            <input type="password" class="form-control search-box" name="password" id="edit-password">
-            <small class="form-text text-muted">Dejar vacío para mantener la contraseña actual</small>
-          </div>
           <div class="form-check mb-3 p-3" style="background: #F3F4F6; border-radius: 12px;">
             <input class="form-check-input" type="checkbox" name="is_staff" id="edit-is_staff">
             <label class="form-check-label fw-bold" for="edit-is_staff">
@@ -613,6 +615,14 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('editUserForm').action = `/dashboard/users/edit/${userId}/`;
     });
   });
+
+  // Configurar el botón de eliminación masiva
+  const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+  if (bulkDeleteBtn) {
+    bulkDeleteBtn.onclick = function() {
+      deleteSelected('/dashboard/users/delete/__ID__/');
+    };
+  }
 });
 </script>
 {% endblock %}

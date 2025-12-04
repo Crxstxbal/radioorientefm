@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Newspaper, Calendar, User, Eye } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 import './Pages.css';
 
 const News = () => {
@@ -11,7 +11,7 @@ const News = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await axios.get('/api/radio/news/');
+        const response = await api.get('/api/radio/news/');
         setNews(response.data.results || response.data);
       } catch (error) {
         console.error('Error fetching news:', error);
@@ -59,7 +59,7 @@ const News = () => {
           </div>
         ) : (
           <div className="news-container">
-            {/* Featured News */}
+            {/*featured news*/}
             {news.filter(item => item.is_featured).length > 0 && (
               <section className="featured-section">
                 <h2 className="section-title">Noticias Destacadas</h2>
@@ -99,7 +99,7 @@ const News = () => {
               </section>
             )}
 
-            {/* All News */}
+            {/*all news*/}
             <section className="all-news-section">
               <h2 className="section-title">Todas las Noticias</h2>
               <div className="news-grid">
@@ -143,7 +143,7 @@ const News = () => {
           </div>
         )}
 
-        {/* News Modal */}
+        {/*news modal*/}
         {selectedNews && (
           <div className="news-modal-overlay" onClick={closeModal}>
             <div className="news-modal" onClick={(e) => e.stopPropagation()}>

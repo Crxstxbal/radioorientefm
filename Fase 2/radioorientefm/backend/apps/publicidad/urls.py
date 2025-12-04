@@ -6,7 +6,7 @@ from .api.views import (
     PublicidadWebCampaignViewSet,
 )
 
-# Router para API REST
+#router para api rest
 router = DefaultRouter()
 router.register(r'ubicaciones', UbicacionPublicidadViewSet, basename='ubicacion')
 router.register(r'solicitudes', SolicitudPublicidadViewSet, basename='solicitud')

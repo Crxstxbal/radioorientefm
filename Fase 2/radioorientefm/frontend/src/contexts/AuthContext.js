@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
@@ -17,22 +17,22 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
 
-  // NO configurar axios.defaults globalmente
-  // Esto causaba problemas en páginas públicas como /contacto y /emergente
-  // useEffect(() => {
-  //   if (token) {
-  //     axios.defaults.headers.common['Authorization'] = `Token ${token}`;
-  //   } else {
-  //     delete axios.defaults.headers.common['Authorization'];
-  //   }
-  // }, [token]);
+  //no configurar axios.defaults globalmente
+  //esto causaba problemas en páginas públicas como /contacto y /emergente
+  //useefecto(() => {
+  //if (token) {
+  //axios.defaults.headers.common['authorization'] = `token ${token}`
+  //} else {
+  //delete axios.defaults.headers.common['authorization']
+  //}
+  //}, [token])
 
-  // Check if user is logged in on mount
+  //check if user is logged in on montar
   useEffect(() => {
     const checkAuth = async () => {
       if (token) {
         try {
-          const response = await axios.get('/api/auth/profile/', {
+          const response = await api.get('/api/auth/profile/', {
             headers: { Authorization: `Token ${token}` }
           });
           setUser(response.data);
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/api/auth/login/', {
+      const response = await api.post('/api/auth/login/', {
         email,
         password
       });
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('/api/auth/register/', userData);
+      const response = await api.post('/api/auth/register/', userData);
       const { user, token } = response.data;
       localStorage.setItem('token', token);
       setToken(token);
@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       if (token) {
-        await axios.post('/api/auth/logout/', {}, {
+        await api.post('/api/auth/logout/', {}, {
           headers: { Authorization: `Token ${token}` }
         });
       }
@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (userData) => {
     try {
-      const response = await axios.put('/api/auth/profile/update/', userData, {
+      const response = await api.put('/api/auth/profile/update/', userData, {
         headers: token ? { Authorization: `Token ${token}` } : {}
       });
       setUser(response.data);

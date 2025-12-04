@@ -58,9 +58,9 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'email', 'username', 'first_name', 'last_name', 'full_name', 'is_active', 'is_staff', 'fecha_creacion')
         read_only_fields = ('id', 'is_active', 'is_staff', 'fecha_creacion')
 
-# Serializers de compatibilidad para el frontend existente
+#serializers de compatibilidad para el frontend existente
 class UserLegacySerializer(serializers.ModelSerializer):
-    """Serializer para mantener compatibilidad con el frontend existente"""
+    """serializer para mantener compatibilidad con el frontend existente"""
     correo = serializers.CharField(source='email', read_only=True)
     usuario = serializers.CharField(source='username', read_only=True)
     nombre = serializers.CharField(source='full_name', read_only=True)
@@ -70,18 +70,14 @@ class UserLegacySerializer(serializers.ModelSerializer):
         fields = ('id', 'correo', 'usuario', 'nombre', 'first_name', 'last_name', 'is_active', 'is_staff', 'fecha_creacion')
 
 class PasswordResetRequestSerializer(serializers.Serializer):
-    """Serializer para solicitar el reseteo de contraseña"""
+    """serializer para solicitar el reseteo de contraseña"""
     email = serializers.EmailField()
 
-    def validate_email(self, value):
-        try:
-            user = User.objects.get(email=value)
-        except User.DoesNotExist:
-            raise serializers.ValidationError("No existe un usuario con este correo electrónico.")
-        return value
+    #nota de seguridad: no validamos si el email existe en la base de datos
+    #para prevenir user enumeration attacks. la vista manejará esto de forma segura
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
-    """Serializer para confirmar el reseteo de contraseña con token"""
+    """serializer para confirmar el reseteo de contraseña con token"""
     new_password = serializers.CharField(write_only=True, min_length=8)
     new_password_confirm = serializers.CharField(write_only=True)
     uid = serializers.CharField()

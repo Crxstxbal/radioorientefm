@@ -17,25 +17,22 @@ class UserManager(BaseUserManager):
         return self.create_user(email, username, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """
-    Usuario personalizado que sigue la estructura de PostgreSQL normalizada
-    pero mantiene compatibilidad con Django Auth
-    """
-    # Campos principales (siguiendo el esquema PostgreSQL)
+    """usuario personalizado que sigue la estructura de postgresql normalizada pero mantiene compatibilidad con django auth"""
+    #campos principales (siguiendo el esquema postgresql)
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(max_length=254, unique=True)
     first_name = models.CharField(max_length=150, blank=True, default='')
     last_name = models.CharField(max_length=150, blank=True, default='')
     
-    # Campos de Django Auth
+    #campos de django auth
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
-    # Campo para bloquear chat
+    #campo para bloquear chat
     chat_bloqueado = models.BooleanField(default=False, verbose_name='Chat Bloqueado')
     
-    # Manager personalizado
+    #manager personalizado
     objects = UserManager()
     
     USERNAME_FIELD = 'email'
@@ -53,14 +50,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     def full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
     
-    # Propiedades para compatibilidad con código anterior
+    #propiedades para compatibilidad con codigo anterior
     @property
     def correo(self):
         return self.email
 
     @correo.setter
     def correo(self, value):
-        # Permitir asignar correo desde código antiguo (e.g., user.correo = ...)
+        #permitir asignar correo desde codigo antiguo (e.g., user.correo = ...)
         if value is None:
             self.email = ''
         else:
@@ -72,7 +69,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @usuario.setter
     def usuario(self, value):
-        # Permitir asignar username desde código antiguo (e.g., user.usuario = ...)
+        #permitir asignar username desde codigo antiguo (e.g., user.usuario = ...)
         if value is None:
             self.username = ''
         else:
@@ -84,8 +81,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @nombre.setter
     def nombre(self, value):
-        # Permitir asignar el nombre completo (e.g., user.nombre = "Juan Pérez")
-        # Se divide en first_name y last_name: primer token -> first_name, resto -> last_name
+        #permitir asignar el nombre completo (e.g., user.nombre = "juan pérez")
+        #se divide en first_name y last_name: primer token -> first_name, resto -> last_name
         if not value:
             self.first_name = ''
             self.last_name = ''

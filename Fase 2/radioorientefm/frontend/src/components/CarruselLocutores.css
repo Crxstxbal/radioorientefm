@@ -1,12 +1,12 @@
-/* frontend/src/components/CarruselLocutores.css */
+/*frontend/src/componentes/carrusellocutores.css*/
 
 .locutores-carrusel-container {
   width: 90%;
   max-width: 1200px;
-  margin: 40px auto; /* Espacio arriba y abajo */
+  margin: 40px auto; /*espacio arriba y abajo*/
 }
 
-/* Contenedor para el título - Mismo estilo que Últimos Artículos */
+/*contenedor para el título - mismo estilo que últimos artículos*/
 .locutores-carrusel-container .title-container {
   width: 100%;
   text-align: center;
@@ -24,7 +24,7 @@
   text-align: center;
 }
 
-/* Línea decorativa debajo del título */
+/*línea decorativa debajo del título*/
 .locutores-carrusel-container h2::after {
   content: '';
   position: absolute;
@@ -33,17 +33,17 @@
   transform: translateX(-50%);
   width: 80px;
   height: 3px;
-  background-color: #dc2626; /* Color rojo de la radio */
+  background-color: #dc2626; /*color rojo de la radio*/
   border-radius: 3px;
 }
 
-/* Efecto hover sutil */
+/*efecto hover sutil*/
 .locutores-carrusel-container h2 {
   transition: color 0.3s ease;
 }
 
 .locutores-carrusel-container h2:hover {
-  color: #dc2626; /* Rojo al hacer hover */
+  color: #dc2626; /*rojo al hacer hover*/
 }
 
 .locutores-carrusel-container h2::after {
@@ -52,41 +52,41 @@
 
 .locutores-carrusel-container h2:hover::after {
   width: 100px;
-  background-color: #b91c1c; /* Rojo más oscuro al hacer hover */
+  background-color: #b91c1c; /*rojo más oscuro al hacer hover*/
 }
 
-/* Modo oscuro */
+/*modo oscuro*/
 @media (prefers-color-scheme: dark) {
   .locutores-carrusel-container h2 {
-    color: #f3f4f6 !important; /* Blanco en modo oscuro */
+    color: #f3f4f6 !important; /*blanco en modo oscuro*/
   }
   
   .locutores-carrusel-container h2:hover {
-    color: #f87171 !important; /* Rojo más claro en modo oscuro al hacer hover */
+    color: #f87171 !important; /*rojo más claro en modo oscuro al hacer hover*/
   }
 }
 
-/* Compatibilidad con temas que usan clase .dark */
+/*compatibilidad con temas que usan clase .dark*/
 html.dark .locutores-carrusel-container h2 {
-  color: #f3f4f6 !important; /* Blanco cuando el sitio fuerza modo oscuro */
+  color: #f3f4f6 !important; /*blanco cuando el sitio fuerza modo oscuro*/
 }
 
 html.dark .locutores-carrusel-container h2:hover {
-  color: #f87171 !important; /* Rojo más claro en modo oscuro al hacer hover */
+  color: #f87171 !important; /*rojo más claro en modo oscuro al hacer hover*/
 }
 
 html:not(.dark) .locutores-carrusel-container h2 {
-  color: #111827 !important; /* Negro cuando el sitio fuerza modo claro */
+  color: #111827 !important; /*negro cuando el sitio fuerza modo claro*/
 }
 
-/* Slide tipo card minimal */
+/*slide tipo card minimal*/
 .locutor-slide {
   text-align: center;
   background: transparent;
   border-radius: 12px;
-  padding: 8px 0 16px; /* sin card, solo separación vertical */
-  border: none; /* sin borde de tarjeta */
-  box-shadow: none; /* sin sombra de tarjeta */
+  padding: 8px 0 16px; /*sin card, solo separación vertical*/
+  border: none; /*sin borde de tarjeta*/
+  box-shadow: none; /*sin sombra de tarjeta*/
   transition: none;
 }
 
@@ -96,7 +96,7 @@ html:not(.dark) .locutores-carrusel-container h2 {
   filter: none;
 }
 
-/* Avatar circular con anillo degradado multicolor */
+/*avatar circular con anillo degradado multicolor*/
 .avatar-wrap {
   display: flex;
   align-items: center;
@@ -108,19 +108,19 @@ html:not(.dark) .locutores-carrusel-container h2 {
 .avatar-ring {
   padding: 4px;
   border-radius: 9999px;
-  /* Degradado vibrante: cyan → magenta → azul → cyan */
+  /*degradado vibrante: rojo → negro*/
   background: conic-gradient(
     from 0deg,
-    #9e2a2a 0%,
-    #aa1010 25%,
-    #501818 50%,
-    #a12121 75%,
-    #000000 100%
+    #7f1d1d 0%,
+    #b91c1c 25%,
+    #000000 50%,
+    #dc2626 75%,
+    #0b0b0b 100%
   );
   box-shadow:
-    0 0 30px rgba(6, 182, 212, 0.4),
-    0 0 60px rgba(139, 92, 246, 0.3),
-    0 8px 32px rgba(0, 0, 0, 0.2);
+    0 0 30px rgba(220, 38, 38, 0.35),
+    0 0 60px rgba(153, 27, 27, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.35);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
@@ -128,9 +128,9 @@ html:not(.dark) .locutores-carrusel-container h2 {
 .avatar-ring:hover {
   transform: scale(1.05);
   box-shadow:
-    0 0 40px rgba(6, 182, 212, 0.6),
-    0 0 80px rgba(139, 92, 246, 0.4),
-    0 12px 40px rgba(0, 0, 0, 0.3);
+    0 0 40px rgba(220, 38, 38, 0.55),
+    0 0 80px rgba(153, 27, 27, 0.4),
+    0 12px 40px rgba(0, 0, 0, 0.35);
 }
 
 .avatar-inner {
@@ -138,8 +138,8 @@ html:not(.dark) .locutores-carrusel-container h2 {
   height: 240px;
   border-radius: 9999px;
   overflow: hidden;
-  /* Fondo del avatar: gradiente suave */
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /*fondo del avatar: gradiente suave*/
+  background: linear-gradient(135deg, #1a0000 0%, #7f1d1d 40%, #dc2626 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -159,7 +159,7 @@ html:not(.dark) .locutores-carrusel-container h2 {
   transform: scale(1.08);
 }
 
-/* Iconos de redes sociales flotantes */
+/*iconos de redes sociales flotantes*/
 .social-icons {
   position: absolute;
   width: 100%;
@@ -190,7 +190,7 @@ html:not(.dark) .locutores-carrusel-container h2 {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
-/* Posicionamiento de cada icono alrededor del avatar */
+/*posicionamiento de cada icono alrededor del avatar*/
 .social-icon-1 {
   top: 10%;
   right: 8%;
@@ -219,7 +219,7 @@ html:not(.dark) .locutores-carrusel-container h2 {
   color: white;
 }
 
-/* Animación de entrada para los iconos */
+/*animación de entrada para los iconos*/
 @keyframes fadeInIcon {
   from {
     opacity: 0;
@@ -256,187 +256,114 @@ html:not(.dark) .locutores-carrusel-container h2 {
   margin-top: 16px;
   font-size: 22px;
   font-weight: 800;
-  color: #111827; /* Negro por defecto (modo claro) */
+  color: #111827; /*negro por defecto (modo claro)*/
 }
 
-/* Modo oscuro: texto blanco */
+/*modo oscuro: texto blanco*/
 @media (prefers-color-scheme: dark) {
   .locutor-slide .locutor-nombre {
-    color: #f3f4f6; /* Blanco en modo oscuro */
+    color: #f3f4f6; /*blanco en modo oscuro*/
   }
   .locutor-slide .locutor-rol {
-    color: #f3f4f6; /* Blanco en modo oscuro */
+    color: #f3f4f6; /*blanco en modo oscuro*/
   }
 }
 
-/* Modo claro: texto negro/gris oscuro */
+/*modo claro: texto negro/gris oscuro*/
 @media (prefers-color-scheme: light) {
   .locutor-slide .locutor-nombre {
-    color: #111827; /* Negro en modo claro */
+    color: #111827; /*negro en modo claro*/
   }
   .locutor-slide .locutor-rol {
-    color: #111827; /* Negro en modo claro */
+    color: #111827; /*negro en modo claro*/
   }
 }
 
 .locutor-slide .locutor-rol {
   margin-top: 4px;
   font-size: 14px;
-  color: #111827; /* Negro por defecto (modo claro) */
+  color: #111827; /*negro por defecto (modo claro)*/
 }
 
-/* Reset genérico de h3/p dentro del slide para no interferir con clases personalizadas */
+/*reset genérico de h3/p dentro del slide para no interferir con clases personalizadas*/
 .locutor-slide h3,
 .locutor-slide p {
   margin: 0;
 }
 
-/* ====================================
-   ESTILOS MEJORADOS PARA NAVEGACIÓN
-   ==================================== */
+/*==================================== estilos mejorados para navegacion (slick carousel) ====================================*/
 
-/* Contenedor de navegación */
-.locutores-carrusel-container .swiper {
+/*contenedor de navegacion*/
+.locutores-carrusel-container .locutores-slider {
   position: relative;
-  padding: 0 60px; /* Más espacio para los botones */
+  padding: 0 70px;
 }
 
-/* Botones de navegación - Diseño minimalista y elegante */
-.locutores-carrusel-container .swiper-button-next,
-.locutores-carrusel-container .swiper-button-prev {
-  --swiper-navigation-size: 24px;
-  --btn-size: 40px;
-  width: var(--btn-size);
-  height: var(--btn-size);
-  border-radius: 50px; /* Bordes redondeados suaves, no círculo */
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: none;
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.12),
-    0 2px 4px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  color: #1e293b;
+/*botones de navegacion personalizados para slick - diseño minimalista*/
+.locutores-carrusel-container .slick-prev,
+.locutores-carrusel-container .slick-next {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: none;
   z-index: 10;
-  margin: 0;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
-/* Posicionamiento específico para cada botón */
-.locutores-carrusel-container .swiper-button-prev {
-  left: 0;
-}
-
-.locutores-carrusel-container .swiper-button-next {
-  right: 0;
-}
-
-/* Efecto hover elegante con rebote */
-.locutores-carrusel-container .swiper-button-next:hover,
-.locutores-carrusel-container .swiper-button-prev:hover {
-  background: rgba(255, 255, 255, 1);
-  transform: translateY(-50%) scale(1.08);
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.18),
-    0 4px 8px rgba(0, 0, 0, 0.12);
-  color: #dc2626; /* Rojo de la marca */
-}
-
-/* Efecto al hacer clic con rebote hacia adentro */
-.locutores-carrusel-container .swiper-button-next:active,
-.locutores-carrusel-container .swiper-button-prev:active {
-  transform: translateY(-50%) scale(0.95);
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.12),
-    0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-/* Flechas personalizadas - Limpias y modernas */
-.locutores-carrusel-container .swiper-button-next::after,
-.locutores-carrusel-container .swiper-button-prev::after {
-  font-size: var(--swiper-navigation-size);
+.locutores-carrusel-container .slick-prev::before,
+.locutores-carrusel-container .slick-next::before {
+  font-size: 18px;
   font-weight: 700;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: #374151;
+  opacity: 1;
 }
 
-/* Efecto hover en las flechas con desplazamiento suave */
-.locutores-carrusel-container .swiper-button-next:hover::after {
-  transform: translateX(2px);
+/*posicionamiento específico para cada botón*/
+.locutores-carrusel-container .slick-prev {
+  left: 10px;
 }
 
-.locutores-carrusel-container .swiper-button-prev:hover::after {
-  transform: translateX(-2px);
+.locutores-carrusel-container .slick-next {
+  right: 10px;
 }
 
-/* Estado deshabilitado sutil */
-.locutores-carrusel-container .swiper-button-disabled {
-  opacity: 0.3 !important;
-  transform: translateY(-50%) scale(0.9);
+/*sin hover efecto - estático*/
+.locutores-carrusel-container .slick-prev:hover,
+.locutores-carrusel-container .slick-next:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/*estado deshabilitado*/
+.locutores-carrusel-container .slick-disabled {
+  opacity: 0.3;
   cursor: not-allowed;
-  pointer-events: none;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(200, 200, 200, 0.5) !important;
 }
 
-/* Paginación mejorada */
-.swiper-pagination {
+/*paginación mejorada para slick*/
+.locutores-carrusel-container .slick-dots {
   position: relative;
   margin-top: 20px;
   bottom: 0 !important;
 }
 
-.swiper-pagination-bullet {
-  width: 10px;
-  height: 10px;
-  background: rgba(0, 0, 0, 0.2);
+.locutores-carrusel-container .slick-dots li button:before {
+  font-size: 10px;
+  color: rgba(0, 0, 0, 0.2);
   opacity: 1;
-  transition: all 0.3s ease;
-  margin: 0 5px !important;
 }
 
-.swiper-pagination-bullet-active {
-  width: 30px;
-  height: 10px;
-  border-radius: 5px;
-  background: #dc2626 !important;
-  transform: scale(1);
+.locutores-carrusel-container .slick-dots li.slick-active button:before {
+  color: #c62828;
+  opacity: 1;
 }
 
-/* Modo oscuro para navegación */
-@media (prefers-color-scheme: dark) {
-  .locutores-carrusel-container .swiper-button-next,
-  .locutores-carrusel-container .swiper-button-prev {
-    background: rgba(30, 30, 30, 0.85);
-    color: #f3f4f6;
-    box-shadow:
-      0 4px 16px rgba(0, 0, 0, 0.4),
-      0 2px 4px rgba(0, 0, 0, 0.2);
-  }
 
-  .locutores-carrusel-container .swiper-button-next:hover,
-  .locutores-carrusel-container .swiper-button-prev:hover {
-    background: rgba(40, 40, 40, 0.95);
-    color: #f87171; /* Rojo más claro para modo oscuro */
-    box-shadow:
-      0 8px 24px rgba(0, 0, 0, 0.5),
-      0 4px 8px rgba(0, 0, 0, 0.3);
-  }
-
-  .swiper-pagination-bullet {
-    background: rgba(255, 255, 255, 0.2);
-  }
-}
-
-/* Efecto de foco para accesibilidad */
-.swiper-button-next:focus-visible,
-.swiper-button-prev:focus-visible {
-  outline: 2px solid #dc2626;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.3);
-}
-
-/* Responsivo: ajustar tamaño del avatar en pantallas pequeñas */
+/*responsivo: ajustar tamaño del avatar en pantallas pequeñas*/
 @media (max-width: 768px) {
   .avatar-inner {
     width: 160px;
@@ -444,27 +371,213 @@ html:not(.dark) .locutores-carrusel-container h2 {
   }
 }
 
-/* Fuerza colores con mayor especificidad (por si hay estilos globales) */
+/*fuerza colores con mayor especificidad (por si hay estilos globales)*/
 @media (prefers-color-scheme: light) {
   .locutores-carrusel-container .locutor-slide .locutor-nombre,
   .locutores-carrusel-container .locutor-slide .locutor-rol {
-    color: #111827 !important; /* Negro en modo claro */
+    color: #111827 !important; /*negro en modo claro*/
   }
 }
 
 @media (prefers-color-scheme: dark) {
   .locutores-carrusel-container .locutor-slide .locutor-nombre,
   .locutores-carrusel-container .locutor-slide .locutor-rol {
-    color: #f3f4f6 !important; /* Blanco en modo oscuro */
+    color: #f3f4f6 !important; /*blanco en modo oscuro*/
   }
 }
 
-/* Compatibilidad con temas que usan clase .dark en <html> (e.g., Tailwind) */
+/*compatibilidad con temas que usan clase .dark en <html> (e.g., tailwind)*/
 html.dark .locutores-carrusel-container .locutor-slide .locutor-nombre,
 html.dark .locutores-carrusel-container .locutor-slide .locutor-rol {
-  color: #f3f4f6 !important; /* Blanco cuando el sitio fuerza modo oscuro */
+  color: #f3f4f6 !important; /*blanco cuando el sitio fuerza modo oscuro*/
 }
 html:not(.dark) .locutores-carrusel-container .locutor-slide .locutor-nombre,
 html:not(.dark) .locutores-carrusel-container .locutor-slide .locutor-rol {
-  color: #111827 !important; /* Negro cuando el sitio fuerza modo claro */
+  color: #111827 !important; /*negro cuando el sitio fuerza modo claro*/
+}
+
+/*==================================== swiper slide widths ====================================*/
+
+.locutor-slide {
+  width: 300px !important;
+}
+
+@media (max-width: 768px) {
+  .locutor-slide {
+    width: 200px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .locutor-slide {
+    width: 180px !important;
+  }
+}
+
+/*==================================== scroll infinito continuo con css ====================================*/
+
+.infinite-scroll-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 20px 0;
+}
+
+.infinite-scroll-track {
+  display: flex;
+  gap: 30px;
+  animation: scroll-infinito 60s linear infinite;
+  width: max-content;
+}
+
+/*animación de scroll continuo*/
+@keyframes scroll-infinito {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%); /*mueve 1/3 ya que duplicamos 3 veces*/
+  }
+}
+
+/*pausar animación al hacer hover*/
+.infinite-scroll-track:hover {
+  animation-play-state: paused;
+}
+
+/*ajustar slides para scroll horizontal*/
+.infinite-scroll-track .locutor-slide {
+  flex-shrink: 0;
+  width: 300px;
+}
+
+@media (max-width: 768px) {
+  .infinite-scroll-track {
+    gap: 20px;
+  }
+
+  .infinite-scroll-track .locutor-slide {
+    width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .infinite-scroll-track {
+    gap: 15px;
+  }
+
+  .infinite-scroll-track .locutor-slide {
+    width: 180px;
+  }
+}
+
+/*==================================== estilos para splide carousel ====================================*/
+
+/*estilo para las flechas de splide*/
+.splide-locutores .splide__arrow {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.splide-locutores .splide__arrow svg {
+  fill: #374151;
+  width: 18px;
+  height: 18px;
+}
+
+.splide-locutores .splide__arrow:hover {
+  background: rgba(255, 255, 255, 1) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.splide-locutores .splide__arrow--prev {
+  left: 10px;
+}
+
+.splide-locutores .splide__arrow--next {
+  right: 10px;
+}
+
+/*estado deshabilitado*/
+.splide-locutores .splide__arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/*ajustar ancho de los slides de splide*/
+.splide-locutores .splide__slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/*efecto de desvanecido en los bordes del carrusel*/
+.splide-locutores {
+  position: relative;
+}
+
+.splide-locutores .splide__track {
+  overflow: visible; /*permitir que el anillo no se corte*/
+  padding: 0 24px;   /*un pequeño margen interno para el fade*/
+  /*soporte estándar*/
+  mask-image: linear-gradient(
+    to right,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,0.85) 8%,
+    #000 16%,
+    #000 84%,
+    rgba(0,0,0,0.85) 92%,
+    rgba(0,0,0,0) 100%
+  );
+  /*webkit/safari*/
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,0.85) 8%,
+    #000 16%,
+    #000 84%,
+    rgba(0,0,0,0.85) 92%,
+    rgba(0,0,0,0) 100%
+  );
+}
+
+@media (max-width: 768px) {
+  .splide-locutores .splide__track {
+    padding: 0 12px;
+    mask-image: linear-gradient(
+      to right,
+      rgba(0,0,0,0) 0%,
+      rgba(0,0,0,0.85) 12%,
+      #000 22%,
+      #000 78%,
+      rgba(0,0,0,0.85) 88%,
+      rgba(0,0,0,0) 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      rgba(0,0,0,0) 0%,
+      rgba(0,0,0,0.85) 12%,
+      #000 22%,
+      #000 78%,
+      rgba(0,0,0,0.85) 88%,
+      rgba(0,0,0,0) 100%
+    );
+  }
+}
+
+@media (max-width: 768px) {
+  .splide-locutores .splide__arrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .splide-locutores .splide__arrow svg {
+    width: 16px;
+    height: 16px;
+  }
 }

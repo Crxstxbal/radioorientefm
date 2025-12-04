@@ -1,2 +1,2 @@
-# Serializers para publicidad
-# Los modelos de self-service fueron removidos para revisión futura
+#serializers para publicidad
+#los modelos de self-service fueron removidos para revisión futura

@@ -27,7 +27,7 @@ class BandaEmergenteSerializer(serializers.ModelSerializer):
     pais_nombre = serializers.CharField(source='comuna.ciudad.pais.nombre', read_only=True)
     revisado_por_nombre = serializers.CharField(source='revisado_por.full_name', read_only=True)
     
-    # Relaciones anidadas
+    #relaciones anidadas
     links = BandaLinkSerializer(many=True, read_only=True)
     integrantes = BandaIntegranteSerializer(many=True, read_only=True)
     
@@ -43,7 +43,7 @@ class BandaEmergenteSerializer(serializers.ModelSerializer):
         read_only_fields = ('fecha_envio', 'fecha_revision', 'revisado_por')
 
 class BandaEmergenteCreateSerializer(serializers.ModelSerializer):
-    """Serializer para crear bandas emergentes"""
+    """serializer para crear bandas emergentes"""
     links_data = serializers.ListField(
         child=serializers.DictField(),
         write_only=True,
@@ -66,10 +66,10 @@ class BandaEmergenteCreateSerializer(serializers.ModelSerializer):
         links_data = validated_data.pop('links_data', [])
         integrantes_data = validated_data.pop('integrantes_data', [])
         
-        # Asignar usuario actual y estado por defecto
+        #asignar usuario actual y estado por defecto
         validated_data['usuario'] = self.context['request'].user
         
-        # Buscar primer estado disponible para bandas
+        #buscar primer estado disponible para bandas
         from apps.contact.models import Estado
         estado_inicial = Estado.objects.filter(
             tipo_entidad='banda'
@@ -79,11 +79,11 @@ class BandaEmergenteCreateSerializer(serializers.ModelSerializer):
         
         banda = super().create(validated_data)
         
-        # Crear links
+        #crear links
         for link_data in links_data:
             BandaLink.objects.create(banda=banda, **link_data)
         
-        # Crear integrantes
+        #crear integrantes
         for integrante_nombre in integrantes_data:
             integrante, created = Integrante.objects.get_or_create(nombre=integrante_nombre)
             BandaIntegrante.objects.create(banda=banda, integrante=integrante)
@@ -91,7 +91,7 @@ class BandaEmergenteCreateSerializer(serializers.ModelSerializer):
         return banda
 
 class BandaEmergenteListSerializer(serializers.ModelSerializer):
-    """Serializer simplificado para listas"""
+    """serializer simplificado para listas"""
     genero_nombre = serializers.CharField(source='genero.nombre', read_only=True)
     estado_nombre = serializers.CharField(source='estado.nombre', read_only=True)
     
@@ -102,9 +102,9 @@ class BandaEmergenteListSerializer(serializers.ModelSerializer):
             'fecha_envio', 'email_contacto'
         ]
 
-# Serializers de compatibilidad para el frontend existente
+#serializers de compatibilidad para el frontend existente
 class BandaEmergentelLegacySerializer(serializers.ModelSerializer):
-    """Serializer para mantener compatibilidad con el frontend existente"""
+    """serializer para mantener compatibilidad con el frontend existente"""
     genero = serializers.CharField(source='genero.nombre', read_only=True)
     ciudad = serializers.CharField(source='comuna.ciudad.nombre', read_only=True)
     estado = serializers.CharField(source='estado.nombre', read_only=True)

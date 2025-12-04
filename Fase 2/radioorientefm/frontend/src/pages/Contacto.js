@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, User, MessageSquare, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 import './Pages.css';
+import './Contacto.css';
 
 const Contacto = () => {
   const [formData, setFormData] = useState({
@@ -14,26 +16,29 @@ const Contacto = () => {
   const [loading, setLoading] = useState(false);
   const [tiposAsunto, setTiposAsunto] = useState([]);
   const [estacionInfo, setEstacionInfo] = useState(null);
+  const [focusedField, setFocusedField] = useState(null);
+  const [errors, setErrors] = useState({});
 
-  // Cargar tipos de asunto y información de la estación
+  //cargar tipos de asunto y informacion de la estación
   useEffect(() => {
     const cargarDatos = async () => {
       try {
-        // Usar fetch en lugar de axios para evitar problemas con headers globales
-        const tiposResponse = await fetch('/api/contact/api/tipos-asunto/');
+        //usar obtener en lugar de axios para evitar problemas con headers globales
+        const base = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        const tiposResponse = await fetch(`${base}/api/contact/api/tipos-asunto/`);
         if (!tiposResponse.ok) {
           throw new Error('Error al cargar tipos de asunto');
         }
         const tiposData = await tiposResponse.json();
-        // Los endpoints DRF devuelven objetos paginados con { results: [] }
+        //los endpoints drf devuelven objetos paginados con { results: [] }
         const tiposArray = tiposData.results || (Array.isArray(tiposData) ? tiposData : []);
         setTiposAsunto(tiposArray);
 
-        // Cargar información de la estación
-        const estacionResponse = await fetch('/api/radio/api/estaciones/');
+        //cargar informacion de la estación
+        const estacionResponse = await fetch(`${base}/api/radio/api/estaciones/`);
         if (estacionResponse.ok) {
           const estacionData = await estacionResponse.json();
-          // Los endpoints DRF devuelven objetos paginados con { results: [] }
+          //los endpoints drf devuelven objetos paginados con { results: [] }
           const estacionArray = estacionData.results || (Array.isArray(estacionData) ? estacionData : []);
           if (estacionArray.length > 0) {
             setEstacionInfo(estacionArray[0]);
@@ -41,7 +46,7 @@ const Contacto = () => {
         }
       } catch (error) {
         console.error('Error al cargar datos:', error);
-        // Fallback con tipos de asunto por defecto
+        //fallback con tipos de asunto por defecto
         setTiposAsunto([
           { id: 1, nombre: 'Consulta General' },
           { id: 2, nombre: 'Publicidad' },
@@ -54,10 +59,35 @@ const Contacto = () => {
     cargarDatos();
   }, []);
 
+  const validatePhone = (phone) => {
+    //permitir solo números, espacios, guiones y paréntesis
+    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+    return phoneRegex.test(phone) || phone === '';
+  };
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    //validacion especial para teléfono
+    if (name === 'telefono') {
+      //permitir solo números y algunos caracteres especiales
+      if (value && !validatePhone(value)) {
+        setErrors({
+          ...errors,
+          telefono: 'Solo se permiten números y caracteres + - ( )'
+        });
+        return; // No actualizar si no es válido
+      } else {
+        //limpiar error si es válido
+        const newErrors = { ...errors };
+        delete newErrors.telefono;
+        setErrors(newErrors);
+      }
+    }
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
   };
 
@@ -66,8 +96,9 @@ const Contacto = () => {
     setLoading(true);
 
     try {
-      // Usar fetch para enviar sin autenticación (formulario público)
-      const response = await fetch('/api/contact/api/contactos/', {
+      //usar obtener para enviar sin autenticacion (formulario público)
+      const base = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${base}/api/contact/api/contactos/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,13 +186,23 @@ const Contacto = () => {
             </div>
           </div>
 
-          <div className="contact-form-container">
+          <motion.div
+            className="contact-form-container"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <h2 className="section-title">Envíanos un Mensaje</h2>
-            
-            <form onSubmit={handleSubmit} className="contact-form">
+            <p className="form-description">Completa el formulario y nos pondremos en contacto contigo pronto</p>
+
+            <form onSubmit={handleSubmit} className="contact-form-modern">
               <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="nombre" className="form-label">
+                <motion.div
+                  className={`form-field ${focusedField === 'nombre' ? 'focused' : ''} ${formData.nombre ? 'filled' : ''}`}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <label htmlFor="nombre" className="floating-label">
+                    <User size={18} />
                     Nombre Completo *
                   </label>
                   <input
@@ -170,13 +211,20 @@ const Contacto = () => {
                     name="nombre"
                     value={formData.nombre}
                     onChange={handleChange}
-                    className="form-input"
+                    onFocus={() => setFocusedField('nombre')}
+                    onBlur={() => setFocusedField(null)}
+                    className="modern-input"
                     required
                   />
-                </div>
+                  <div className="input-border"></div>
+                </motion.div>
 
-                <div className="form-group">
-                  <label htmlFor="email" className="form-label">
+                <motion.div
+                  className={`form-field ${focusedField === 'email' ? 'focused' : ''} ${formData.email ? 'filled' : ''}`}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <label htmlFor="email" className="floating-label">
+                    <Mail size={18} />
                     Correo Electrónico *
                   </label>
                   <input
@@ -185,16 +233,23 @@ const Contacto = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="form-input"
+                    onFocus={() => setFocusedField('email')}
+                    onBlur={() => setFocusedField(null)}
+                    className="modern-input"
                     required
                   />
-                </div>
+                  <div className="input-border"></div>
+                </motion.div>
               </div>
 
               <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="telefono" className="form-label">
-                    Teléfono
+                <motion.div
+                  className={`form-field ${focusedField === 'telefono' ? 'focused' : ''} ${formData.telefono ? 'filled' : ''} ${errors.telefono ? 'error' : ''}`}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <label htmlFor="telefono" className="floating-label">
+                    <Phone size={18} />
+                    Teléfono *
                   </label>
                   <input
                     type="tel"
@@ -202,12 +257,31 @@ const Contacto = () => {
                     name="telefono"
                     value={formData.telefono}
                     onChange={handleChange}
-                    className="form-input"
+                    onFocus={() => setFocusedField('telefono')}
+                    onBlur={() => setFocusedField(null)}
+                    className="modern-input"
+                    placeholder="+56 9 1234 5678"
+                    required
                   />
-                </div>
+                  <div className="input-border"></div>
+                  {errors.telefono && (
+                    <motion.div
+                      className="error-message"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <AlertCircle size={14} />
+                      {errors.telefono}
+                    </motion.div>
+                  )}
+                </motion.div>
 
-                <div className="form-group">
-                  <label htmlFor="tipo_asunto" className="form-label">
+                <motion.div
+                  className={`form-field ${focusedField === 'tipo_asunto' ? 'focused' : ''} ${formData.tipo_asunto ? 'filled' : ''}`}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <label htmlFor="tipo_asunto" className="floating-label">
+                    <MessageSquare size={18} />
                     Tipo de Asunto *
                   </label>
                   <select
@@ -215,21 +289,28 @@ const Contacto = () => {
                     name="tipo_asunto"
                     value={formData.tipo_asunto}
                     onChange={handleChange}
-                    className="form-select"
+                    onFocus={() => setFocusedField('tipo_asunto')}
+                    onBlur={() => setFocusedField(null)}
+                    className="modern-select"
                     required
                   >
-                    <option value="">Selecciona un tipo de asunto</option>
+                    <option value="">Selecciona un tipo</option>
                     {tiposAsunto.map((tipo) => (
                       <option key={tipo.id} value={tipo.id}>
                         {tipo.nombre}
                       </option>
                     ))}
                   </select>
-                </div>
+                  <div className="input-border"></div>
+                </motion.div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="mensaje" className="form-label">
+              <motion.div
+                className={`form-field full-width ${focusedField === 'mensaje' ? 'focused' : ''} ${formData.mensaje ? 'filled' : ''}`}
+                whileTap={{ scale: 0.98 }}
+              >
+                <label htmlFor="mensaje" className="floating-label">
+                  <MessageSquare size={18} />
                   Mensaje *
                 </label>
                 <textarea
@@ -237,22 +318,27 @@ const Contacto = () => {
                   name="mensaje"
                   value={formData.mensaje}
                   onChange={handleChange}
-                  className="form-textarea"
+                  onFocus={() => setFocusedField('mensaje')}
+                  onBlur={() => setFocusedField(null)}
+                  className="modern-textarea"
                   rows="6"
                   required
                 ></textarea>
-              </div>
+                <div className="input-border"></div>
+              </motion.div>
 
-              <button
+              <motion.button
                 type="submit"
-                className="btn btn-primary submit-btn"
-                disabled={loading}
+                className="btn btn-primary submit-btn-modern"
+                disabled={loading || Object.keys(errors).length > 0}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <Send size={20} />
                 {loading ? 'Enviando...' : 'Enviar Mensaje'}
-              </button>
+              </motion.button>
             </form>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

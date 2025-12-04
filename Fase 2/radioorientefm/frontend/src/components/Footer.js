@@ -10,14 +10,14 @@ const Footer = () => {
   const logoRef = useRef(null);
 
   useEffect(() => {
-    // Simulamos GSAP con CSS animations y JavaScript
+    //simulamos gsap con css animations y javascript
     const piePagina = piePaginaRef.current;
     const onda = ondaRef.current;
     const enlacesSociales = enlacesSocialesRef.current;
     const texto = textoRef.current;
     const logo = logoRef.current;
 
-    // Animación de entrada del pie de página
+    //animación de entrada del pie de página
     if (piePagina) {
       piePagina.style.transform = 'translateY(50px)';
       piePagina.style.opacity = '0';
@@ -29,12 +29,12 @@ const Footer = () => {
       }, 100);
     }
 
-    // Animación de onda
+    //animación de onda
     if (onda) {
       onda.style.animation = 'animacionOnda 3s ease-in-out infinite';
     }
 
-    // Animación del logo
+    //animación del logo
     if (logo) {
       setTimeout(() => {
         logo.style.transform = 'scale(1) rotate(0deg)';
@@ -42,7 +42,7 @@ const Footer = () => {
       }, 400);
     }
 
-    // Animación escalonada de redes sociales
+    //animación escalonada de redes sociales
     enlacesSociales.forEach((enlace, indice) => {
       if (enlace) {
         enlace.style.transform = 'translateY(30px) scale(0.8)';
@@ -56,7 +56,7 @@ const Footer = () => {
       }
     });
 
-    // Animación del texto
+    //animación del texto
     if (texto) {
       texto.style.transform = 'translateX(-30px)';
       texto.style.opacity = '0';
@@ -68,7 +68,7 @@ const Footer = () => {
       }, 300);
     }
 
-    // Animación de hover para las redes sociales
+    //animación de hover para las redes sociales
     enlacesSociales.forEach(enlace => {
       if (enlace) {
         enlace.addEventListener('mouseenter', () => {

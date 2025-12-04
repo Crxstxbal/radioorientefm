@@ -1,7 +1,4 @@
-"""
-Datos de regiones y comunas de Chile
-Fuente: División Político-Administrativa de Chile
-"""
+"""datos de regiones y comunas de chile fuente: división político-administrativa de chile"""
 
 REGIONES_COMUNAS = {
     "Región de Arica y Parinacota": [

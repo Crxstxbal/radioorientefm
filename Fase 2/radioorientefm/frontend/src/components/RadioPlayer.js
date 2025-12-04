@@ -29,7 +29,15 @@ const RadioPlayer = () => {
 
   const handleVolumeChange = (e) => setVolume(Number(e.target.value));
   const handleToggleMute = () => setVolume(isMuted ? (lastVolume || 1) : 0);
-  const toggleCollapse = () => setIsCollapsed(prev => !prev);
+  const toggleCollapse = () => {
+    setIsCollapsed(prev => !prev);
+    //esperar a que termine la animación y ajustar el widget
+    setTimeout(() => {
+      if (window.forceVapiPosition) {
+        window.forceVapiPosition();
+      }
+    }, 350);
+  };
 
   const handleExpand = () => {
     if (isExpanding) return;
@@ -42,7 +50,7 @@ const RadioPlayer = () => {
     expandOverlay.className = 'expand-animation-overlay';
     document.body.appendChild(expandOverlay);
 
-    // Exactamente centrado horizontal y abajo
+    //exactamente centrado horizontal y abajo
     expandOverlay.style.cssText = `
       position: fixed;
       left: 50%;
@@ -56,10 +64,10 @@ const RadioPlayer = () => {
       box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
     `;
 
-    // Forzar repaint
+    //forzar repaint
     void expandOverlay.offsetHeight;
 
-    // Animación a pantalla completa
+    //animación a pantalla completa
     setTimeout(() => {
       expandOverlay.style.cssText += `
         top: 0;

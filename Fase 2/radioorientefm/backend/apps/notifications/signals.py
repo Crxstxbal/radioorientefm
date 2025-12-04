@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
@@ -7,7 +7,7 @@ from .models import Notification
 User = get_user_model()
 
 def crear_notificacion_para_staff(tipo, titulo, mensaje, enlace=None, content_type=None, object_id=None):
-    """Crea notificaciones para todos los usuarios staff"""
+    """crea notificaciones para todos los usuarios staff"""
     usuarios_staff = User.objects.filter(is_staff=True)
 
     notificaciones = []
@@ -25,10 +25,10 @@ def crear_notificacion_para_staff(tipo, titulo, mensaje, enlace=None, content_ty
 
     return notificaciones
 
-# Signal para Contactos
+#signal para contactos
 @receiver(post_save, sender='contact.Contacto')
 def notificar_nuevo_contacto(sender, instance, created, **kwargs):
-    """Notificar cuando se crea un nuevo mensaje de contacto"""
+    """notificar cuando se crea un nuevo mensaje de contacto"""
     if created:
         titulo = f"Nuevo mensaje de contacto de {instance.nombre}"
         mensaje = f"{instance.nombre} ({instance.email}) envio un mensaje de tipo '{instance.tipo_asunto.nombre}'"
@@ -43,10 +43,10 @@ def notificar_nuevo_contacto(sender, instance, created, **kwargs):
             object_id=instance.id
         )
 
-# Signal para Solicitudes de Publicidad Web
+#signal para solicitudes de publicidad web
 @receiver(post_save, sender='publicidad.SolicitudPublicidadWeb')
 def notificar_nueva_solicitud_publicidad(sender, instance, created, **kwargs):
-    """Notificar cuando se crea una nueva solicitud de publicidad web"""
+    """notificar cuando se crea una nueva solicitud de publicidad web"""
     if created:
         titulo = f"Nueva solicitud de publicidad: {instance.nombre_contacto or instance.usuario.email}"
         mensaje = (
@@ -64,13 +64,13 @@ def notificar_nueva_solicitud_publicidad(sender, instance, created, **kwargs):
             object_id=instance.id
         )
 
-# Signal para Bandas Emergentes
+#signal para bandas emergentes
 @receiver(post_save, sender='emergente.BandaEmergente')
 def notificar_nueva_banda(sender, instance, created, **kwargs):
-    """Notificar cuando se registra una nueva banda emergente"""
+    """notificar cuando se registra una nueva banda emergente"""
     if created:
         titulo = f"Nueva banda registrada: {instance.nombre_banda}"
-        # El modelo tiene comuna, no ciudad. La comuna tiene una relación con ciudad
+        #el modelo tiene comuna, no ciudad. la comuna tiene una relación con ciudad
         ubicacion = 'ubicación no especificada'
         if instance.comuna:
             ubicacion = f"{instance.comuna.nombre}, {instance.comuna.ciudad.nombre}"
@@ -86,16 +86,16 @@ def notificar_nueva_banda(sender, instance, created, **kwargs):
             object_id=instance.id
         )
 
-# Signal para Articulos
+#signal para articulos
 @receiver(post_save, sender='articulos.Articulo')
 def notificar_nuevo_articulo(sender, instance, created, **kwargs):
-    """Notificar a otros admins cuando se crea un articulo"""
+    """notificar a otros admins cuando se crea un articulo"""
     if created and instance.autor:
         titulo = f"Nuevo articulo: {instance.titulo}"
         mensaje = f"{instance.autor.email} creo el articulo '{instance.titulo}'"
         enlace = f"/dashboard/articulos/?id={instance.id}"
 
-        # Notificar a todos los staff excepto al autor
+        #notificar a todos los staff excepto al autor
         usuarios_staff = User.objects.filter(is_staff=True).exclude(id=instance.autor.id)
 
         for usuario in usuarios_staff:
@@ -109,10 +109,10 @@ def notificar_nuevo_articulo(sender, instance, created, **kwargs):
                 object_id=instance.id
             )
 
-# Signal para Programas
+#signal para programas
 @receiver(post_save, sender='radio.Programa')
 def notificar_cambio_programa(sender, instance, created, **kwargs):
-    """Notificar cuando se crea o modifica un programa"""
+    """notificar cuando se crea o modifica un programa"""
     if created:
         titulo = f"Nuevo programa: {instance.nombre}"
         mensaje = f"Se creo el programa '{instance.nombre}' en el horario de programacion"
@@ -131,10 +131,10 @@ def notificar_cambio_programa(sender, instance, created, **kwargs):
         object_id=instance.id
     )
 
-# Signal para Horarios de Programas
+#signal para horarios de programas
 @receiver(post_save, sender='radio.HorarioPrograma')
 def notificar_cambio_horario(sender, instance, created, **kwargs):
-    """Notificar cuando se crea o modifica un horario de programa"""
+    """notificar cuando se crea o modifica un horario de programa"""
     if created:
         titulo = f"Nuevo horario para: {instance.programa.nombre}"
         mensaje = f"Se anadio un nuevo horario ({instance.get_dia_semana_display()}, {instance.hora_inicio.strftime('%H:%M')}) para el programa '{instance.programa.nombre}'"
@@ -153,10 +153,10 @@ def notificar_cambio_horario(sender, instance, created, **kwargs):
         object_id=instance.id
     )
 
-# Signal para Suscripciones
+#signal para suscripciones
 @receiver(post_save, sender='contact.Suscripcion')
 def notificar_nueva_suscripcion(sender, instance, created, **kwargs):
-    """Notificar cuando hay una nueva suscripcion"""
+    """notificar cuando hay una nueva suscripcion"""
     if created:
         titulo = f"Nueva suscripcion: {instance.email}"
         mensaje = f"{instance.nombre or 'Usuario'} ({instance.email}) se suscribio al newsletter"

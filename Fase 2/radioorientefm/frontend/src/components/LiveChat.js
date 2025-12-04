@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { MessageCircle, Send, X, Users, Minimize2, Maximize2, Radio, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../utils/api';
@@ -13,17 +13,69 @@ const LiveChat = () => {
   const [onlineUsers, setOnlineUsers] = useState(0);
   const [error, setError] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isPlayerCollapsed, setIsPlayerCollapsed] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const messagesEndRef = useRef(null);
   const pollingIntervalRef = useRef(null);
+  const wsRef = useRef(null);
 
-  // Verificar estado de la radio
+  // --- LOGICA DE NOMBRE SEGURO (PRIVACIDAD) ---
+  // 1. Calculamos tu nombre para mostrar en mensajes nuevos
+  const displayName = useMemo(() => {
+    if (!user) return '';
+    
+    // Prioridad 1: Nombre guardado por GoogleAuth
+    const localName = localStorage.getItem('user_name');
+    if (localName && localName !== 'undefined') return localName;
+
+    // Prioridad 2: Nombre del objeto user
+    if (user.first_name) return user.first_name;
+
+    // Prioridad 3: Username cortado si es correo
+    const username = user.username || '';
+    if (username.includes('@')) {
+        return username.split('@')[0]; 
+    }
+    return username;
+  }, [user]);
+
+  // 2. Función para limpiar nombres en el historial del chat (Otros usuarios)
+  const formatAuthorName = (name) => {
+    if (!name) return 'Anónimo';
+    // Si el nombre parece un correo, lo cortamos
+    if (name.includes('@')) {
+        return name.split('@')[0]; 
+    }
+    return name;
+  };
+  // ---------------------------------------------
+
+  //detectar si el reproductor está colapsado
+  useEffect(() => {
+    const checkPlayerCollapsed = () => {
+      const radioPlayer = document.querySelector('.radio-player-wrapper');
+      setIsPlayerCollapsed(radioPlayer?.classList.contains('collapsed') || false);
+    };
+
+    checkPlayerCollapsed();
+
+    //observer para detectar cambios
+    const observer = new MutationObserver(checkPlayerCollapsed);
+    const radioPlayer = document.querySelector('.radio-player-wrapper');
+
+    if (radioPlayer) {
+      observer.observe(radioPlayer, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  //verificar estado de la radio
   useEffect(() => {
     const checkRadioStatus = async () => {
       try {
         const response = await api.get('/api/chat/radio-status/');
         setIsRadioOnline(response.data.is_online);
-        setOnlineUsers(response.data.listeners_count || 0);
       } catch (error) {
         console.error('Error checking radio status:', error);
         setIsRadioOnline(false);
@@ -36,7 +88,7 @@ const LiveChat = () => {
     return () => clearInterval(statusInterval);
   }, []);
 
-  // Cargar mensajes cuando se abre el chat
+  //cargar mensajes cuando se abre el chat
   useEffect(() => {
     if (isOpen && isAuthenticated) {
       loadMessages();
@@ -52,11 +104,65 @@ const LiveChat = () => {
     scrollToBottom();
   }, [messages]);
 
+  //websocket para presencia en tiempo real (usuarios activos en la sala)
+  useEffect(() => {
+    try {
+      const rawBase = (import.meta.env.VITE_WS_URL || import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').toString();
+      const toWs = (u) => {
+        let s = u.trim();
+        if (!/^https?:\/\//i.test(s) && !/^wss?:\/\//i.test(s)) s = 'http://' + s;
+        s = s.replace(/^http:/i, 'ws:').replace(/^https:/i, 'wss:');
+        return s.replace(/\/$/, '') + '/ws/chat/radio-oriente/';
+      };
+      const wsUrl = toWs(rawBase);
+      
+      console.log('🔌 Conectando WebSocket a:', wsUrl);
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        console.log('✅ WebSocket conectado');
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log('📨 Mensaje WebSocket recibido:', data);
+          
+          if (data && data.type === 'presence' && typeof data.users_online === 'number') {
+            console.log('👥 Actualizando usuarios conectados:', data.users_online);
+            setOnlineUsers(data.users_online);
+          }
+        } catch (error) {
+          console.error('❌ Error parseando mensaje WS:', error);
+        }
+      };
+
+      ws.onclose = (event) => {
+        console.log('🔌 WebSocket cerrado:', event.code, event.reason);
+        wsRef.current = null;
+      };
+
+      ws.onerror = (error) => {
+        console.error('❌ Error WebSocket:', error);
+      };
+
+      return () => {
+        try { 
+          console.log('🔌 Cerrando WebSocket');
+          ws.close(); 
+        } catch (_) {}
+      };
+    } catch (error) {
+      console.error('❌ Error creando WebSocket:', error);
+    }
+  }, []);
+
   const loadMessages = async () => {
     try {
       const response = await api.get('/api/chat/messages/radio-oriente/');
 
-      // La API puede devolver un array directo o un objeto con 'results'
+      //la api puede devolver un array directo o un objeto con 'results'
       const messagesData = Array.isArray(response.data) ? response.data : (response.data.results || []);
 
       const loadedMessages = messagesData.map(msg => ({
@@ -74,7 +180,7 @@ const LiveChat = () => {
   };
 
   const startPolling = () => {
-    // Actualizar mensajes cada 3 segundos
+    //actualizar mensajes cada 3 segundos
     pollingIntervalRef.current = setInterval(() => {
       loadMessages();
     }, 3000);
@@ -102,12 +208,13 @@ const LiveChat = () => {
     setError('');
     setNewMessage(''); // Limpiar input inmediatamente
 
-    // Optimistic update: agregar mensaje inmediatamente
+    //optimistic actualizar: agregar mensaje inmediatamente
     const tempMessage = {
       id: `temp-${Date.now()}`,
       message: messageContent,
-      user_name: user?.username,
-      username: user?.username,
+      // AQUI EL CAMBIO 1: Usamos displayName en vez de user.username
+      user_name: displayName,
+      username: displayName,
       timestamp: new Date().toISOString(),
       isOwn: true
     };
@@ -117,19 +224,19 @@ const LiveChat = () => {
       await api.post('/api/chat/messages/radio-oriente/', {
         contenido: messageContent
       });
-      // Recargar mensajes para obtener el mensaje real del servidor
+      //recargar mensajes para obtener el mensaje real del servidor
       await loadMessages();
     } catch (error) {
       console.error('Error sending message:', error);
       console.error('Error response:', error.response?.data);
 
-      // Remover el mensaje temporal si falla
+      //remover mensaje temporal
       setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id));
 
       if (error.response?.data?.detail) {
         setError(error.response.data.detail);
       } else if (error.response?.data) {
-        // Mostrar el primer error que encuentre
+        //mostrar el primer error que encuentre
         const firstError = Object.values(error.response.data)[0];
         setError(Array.isArray(firstError) ? firstError[0] : firstError);
       } else {
@@ -165,9 +272,9 @@ const LiveChat = () => {
 
   return (
     <>
-      {/* Chat Toggle Button */}
+      {/*chat toggle button*/}
       <button
-        className={`chat-toggle ${isOpen ? 'active' : ''}`}
+        className={`chat-toggle ${isOpen ? 'active' : ''} ${isPlayerCollapsed ? 'player-collapsed' : ''}`}
         onClick={toggleChat}
         title="Chat en vivo"
       >
@@ -180,9 +287,9 @@ const LiveChat = () => {
         )}
       </button>
 
-      {/* Chat Window */}
+      {/*chat window*/}
       <div className={`chat-window ${isMinimized ? 'minimized' : ''} ${isOpen ? 'open' : ''}`}>
-          {/* Chat Header */}
+          {/*chat header*/}
           <div className="chat-header">
             <div className="chat-title">
               <MessageCircle size={20} />
@@ -215,13 +322,13 @@ const LiveChat = () => {
 
           {!isMinimized && (
             <>
-              {/* Online Users */}
+              {/*online users*/}
               <div className="online-users">
                 <Users size={16} />
-                <span>{onlineUsers} oyentes conectados</span>
+                <span>{onlineUsers} usuarios conectados</span>
               </div>
 
-              {/* Messages Area */}
+              {/*messages area*/}
               <div className="messages-container">
                 {!isAuthenticated ? (
                   <div className="auth-required">
@@ -257,7 +364,8 @@ const LiveChat = () => {
                             <div className="message-content">
                               <div className="message-header">
                                 <span className="message-author">
-                                  {message.user_name || message.username}
+                                  {/* AQUI EL CAMBIO 2: Aplicamos el filtro al mostrar el nombre */}
+                                  {formatAuthorName(message.user_name || message.username)}
                                 </span>
                                 <span className="message-time">
                                   {formatTime(message.timestamp)}
@@ -273,7 +381,7 @@ const LiveChat = () => {
                       <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Error Message */}
+                    {/*error message*/}
                     {error && (
                       <div className="chat-error">
                         <AlertCircle size={14} />
@@ -281,7 +389,7 @@ const LiveChat = () => {
                       </div>
                     )}
 
-                    {/* Message Input */}
+                    {/*message input*/}
                     <form onSubmit={sendMessage} className="message-form">
                       <input
                         type="text"

@@ -6,5 +6,5 @@ class NotificationsConfig(AppConfig):
     verbose_name = 'Notificaciones'
 
     def ready(self):
-        """Importar signals cuando la app este lista"""
+        """importar signals cuando la app este lista"""
         import apps.notifications.signals

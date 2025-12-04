@@ -29,26 +29,26 @@ class ContactoSerializer(serializers.ModelSerializer):
         read_only_fields = ('fecha_envio', 'fecha_respuesta', 'respondido_por')
 
 class ContactoCreateSerializer(serializers.ModelSerializer):
-    """Serializer para crear contactos"""
+    """serializer para crear contactos"""
     
     class Meta:
         model = Contacto
         fields = ['nombre', 'email', 'telefono', 'tipo_asunto', 'mensaje']
     
     def create(self, validated_data):
-        # Asignar usuario actual y estado por defecto
+        #asignar usuario actual y estado por defecto
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             validated_data['usuario'] = request.user
         else:
-            # Para usuarios anónimos, usar el usuario admin o crear uno por defecto
+            #para usuarios anónimos, usar el usuario admin o crear uno por defecto
             from django.contrib.auth import get_user_model
             User = get_user_model()
             admin_user = User.objects.filter(is_staff=True).first()
             if admin_user:
                 validated_data['usuario'] = admin_user
         
-        # Buscar estado "Pendiente" para contactos (primer estado por defecto)
+        #buscar estado "pendiente" para contactos (primer estado por defecto)
         estado_pendiente = Estado.objects.filter(
             tipo_entidad='contacto'
         ).first()  # Toma el primer estado disponible
@@ -70,18 +70,18 @@ class SuscripcionSerializer(serializers.ModelSerializer):
         read_only_fields = ('fecha_suscripcion', 'fecha_baja', 'token_unsuscribe')
 
 class SuscripcionCreateSerializer(serializers.ModelSerializer):
-    """Serializer para crear suscripciones"""
+    """serializer para crear suscripciones"""
 
     class Meta:
         model = Suscripcion
         fields = ['email', 'nombre']
 
     def validate_email(self, value):
-        """Validar que el email no esté ya suscrito activamente"""
-        # Convertir a minúsculas para comparación case-insensitive
+        """validar que el email no esté ya suscrito activamente"""
+        #convertir a minúsculas para comparación case-insensitive
         email_lower = value.lower()
 
-        # Verificar si existe una suscripción activa con este email
+        #verificar si existe una suscripcion activa con este email
         suscripcion_existente = Suscripcion.objects.filter(email__iexact=email_lower).first()
 
         if suscripcion_existente:
@@ -90,7 +90,7 @@ class SuscripcionCreateSerializer(serializers.ModelSerializer):
                     'Este email ya está suscrito a nuestro newsletter. '
                     '¡Gracias por tu interés!'
                 )
-            # Si existe pero está inactiva, se puede reactivar (se maneja en create)
+            #si existe pero está inactiva, se puede reactivar (se maneja en create)
 
         return value
 
@@ -98,17 +98,17 @@ class SuscripcionCreateSerializer(serializers.ModelSerializer):
         email = validated_data['email']
         nombre = validated_data.get('nombre', '')
 
-        # Verificar si existe una suscripción inactiva para reactivarla
+        #verificar si existe una suscripcion inactiva para reactivarla
         suscripcion_existente = Suscripcion.objects.filter(email__iexact=email).first()
 
         if suscripcion_existente and not suscripcion_existente.activa:
-            # Reactivar suscripción existente
+            #reactivar suscripcion existente
             suscripcion_existente.activa = True
             suscripcion_existente.fecha_baja = None
             if nombre:
                 suscripcion_existente.nombre = nombre
 
-            # Actualizar usuario si es necesario
+            #actualizar usuario si es necesario
             request = self.context.get('request')
             if request and request.user.is_authenticated:
                 suscripcion_existente.usuario = request.user
@@ -116,12 +116,12 @@ class SuscripcionCreateSerializer(serializers.ModelSerializer):
             suscripcion_existente.save()
             return suscripcion_existente
 
-        # Crear nueva suscripción
+        #crear nueva suscripcion
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             validated_data['usuario'] = request.user
         else:
-            # Para usuarios anónimos, usar el usuario admin o crear uno por defecto
+            #para usuarios anónimos, usar el usuario admin o crear uno por defecto
             from django.contrib.auth import get_user_model
             User = get_user_model()
             admin_user = User.objects.filter(is_staff=True).first()
@@ -130,9 +130,9 @@ class SuscripcionCreateSerializer(serializers.ModelSerializer):
 
         return super().create(validated_data)
 
-# Serializers de compatibilidad para el frontend existente
+#serializers de compatibilidad para el frontend existente
 class ContactMessageLegacySerializer(serializers.ModelSerializer):
-    """Serializer para mantener compatibilidad con el frontend existente"""
+    """serializer para mantener compatibilidad con el frontend existente"""
     correo = serializers.CharField(source='email', read_only=True)
     asunto = serializers.CharField(source='tipo_asunto.nombre', read_only=True)
     estado = serializers.CharField(source='estado.nombre', read_only=True)
@@ -142,7 +142,7 @@ class ContactMessageLegacySerializer(serializers.ModelSerializer):
         fields = ['id', 'nombre', 'correo', 'telefono', 'asunto', 'mensaje', 'fecha_envio', 'estado']
 
 class SubscriptionLegacySerializer(serializers.ModelSerializer):
-    """Serializer para mantener compatibilidad con el frontend existente"""
+    """serializer para mantener compatibilidad con el frontend existente"""
     correo = serializers.CharField(source='email', read_only=True)
     
     class Meta:

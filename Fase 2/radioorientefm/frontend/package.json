@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-oauth/google": "^0.12.2",
+    "@splidejs/react-splide": "^0.7.12",
+    "@splidejs/splide-extension-auto-scroll": "^0.5.3",
     "@supabase/supabase-js": "^2.38.4",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -12,6 +15,8 @@
     "color-thief-react": "^2.1.0",
     "colorthief": "^2.6.0",
     "framer-motion": "^12.23.24",
+    "hls.js": "^1.6.15",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-colorful": "^5.6.1",
@@ -20,7 +25,9 @@
     "react-icons": "^5.5.0",
     "react-router-dom": "^6.30.1",
     "react-scripts": "5.0.1",
+    "react-slick": "^0.31.0",
     "react-tsparticles": "^2.12.2",
+    "slick-carousel": "^1.8.1",
     "swiper": "^12.0.3",
     "tsparticles": "^2.12.0",
     "web-vitals": "^2.1.4"

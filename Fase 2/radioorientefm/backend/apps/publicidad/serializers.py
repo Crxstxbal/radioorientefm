@@ -23,7 +23,7 @@ class PublicidadSerializer(serializers.ModelSerializer):
         read_only_fields = ('fecha_creacion',)
 
 class PublicidadCreateSerializer(serializers.ModelSerializer):
-    """Serializer para crear publicidades"""
+    """serializer para crear publicidades"""
     
     class Meta:
         model = Publicidad
@@ -36,7 +36,7 @@ class PublicidadCreateSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 class PublicidadListSerializer(serializers.ModelSerializer):
-    """Serializer simplificado para listas"""
+    """serializer simplificado para listas"""
     tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
     
     class Meta:
@@ -46,12 +46,12 @@ class PublicidadListSerializer(serializers.ModelSerializer):
             'fecha_fin', 'activo', 'costo_total'
         ]
 
-# ==========================
-# Serializers para modelos WEB
-# ==========================
+#==========================
+#serializers para modelos web
+#==========================
 
 class UbicacionPublicidadWebSerializer(serializers.ModelSerializer):
-    """Serializer para catálogo de ubicaciones"""
+    """serializer para catálogo de ubicaciones"""
     tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
     
     class Meta:
@@ -63,7 +63,7 @@ class UbicacionPublicidadWebSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 class ImagenPublicidadWebSerializer(serializers.ModelSerializer):
-    """Serializer para imágenes de publicidad"""
+    """serializer para imágenes de publicidad"""
     imagen_url = serializers.SerializerMethodField()
     
     class Meta:
@@ -80,7 +80,7 @@ class ImagenPublicidadWebSerializer(serializers.ModelSerializer):
         return None
 
 class ItemSolicitudWebSerializer(serializers.ModelSerializer):
-    """Serializer para items de solicitud"""
+    """serializer para items de solicitud"""
     ubicacion_detalle = UbicacionPublicidadWebSerializer(source='ubicacion', read_only=True)
     imagenes = ImagenPublicidadWebSerializer(source='imagenes_web', many=True, read_only=True)
     
@@ -93,14 +93,14 @@ class ItemSolicitudWebSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 class ItemSolicitudWebCreateSerializer(serializers.ModelSerializer):
-    """Serializer para crear items de solicitud"""
+    """serializer para crear items de solicitud"""
     
     class Meta:
         model = ItemSolicitudWeb
         fields = ['ubicacion', 'url_destino', 'formato', 'precio_acordado', 'notas']
 
 class SolicitudPublicidadWebSerializer(serializers.ModelSerializer):
-    """Serializer completo para solicitudes"""
+    """serializer completo para solicitudes"""
     usuario_email = serializers.EmailField(source='usuario.email', read_only=True)
     estado_display = serializers.CharField(source='get_estado_display', read_only=True)
     items_web = ItemSolicitudWebSerializer(many=True, read_only=True)
@@ -123,9 +123,9 @@ class SolicitudPublicidadWebSerializer(serializers.ModelSerializer):
         )
 
 class SolicitudPublicidadWebCreateSerializer(serializers.ModelSerializer):
-    """Serializer para crear solicitudes desde el frontend"""
+    """serializer para crear solicitudes desde el frontend"""
     items_web = ItemSolicitudWebCreateSerializer(many=True)
-    # Alias de compatibilidad con clientes antiguos
+    #alias de compatibilidad con clientes antiguos
     items = ItemSolicitudWebCreateSerializer(many=True, write_only=True, required=False)
     
     class Meta:
@@ -137,11 +137,11 @@ class SolicitudPublicidadWebCreateSerializer(serializers.ModelSerializer):
         ]
     
     def validate(self, data):
-        """Validar que haya al menos un item"""
+        """validar que haya al menos un item"""
         if not data.get('items_web') and not data.get('items'):
             raise serializers.ValidationError("Debe seleccionar al menos una ubicación")
         
-        # Validar fechas
+        #validar fechas
         if data['fecha_fin_solicitada'] < data['fecha_inicio_solicitada']:
             raise serializers.ValidationError(
                 "La fecha de fin debe ser posterior a la fecha de inicio"
@@ -154,14 +154,14 @@ class SolicitudPublicidadWebCreateSerializer(serializers.ModelSerializer):
         if items_data is None:
             items_data = validated_data.pop('items', [])
         
-        # Asignar usuario autenticado
+        #asignar usuario autenticado
         validated_data['usuario'] = self.context['request'].user
         validated_data['estado'] = 'pendiente'
         
-        # Crear solicitud base
+        #crear solicitud base
         solicitud = SolicitudPublicidadWeb.objects.create(**validated_data)
         
-        # Crear items y calcular costo total estimado (autocompletar precio si falta)
+        #crear items y calcular costo total estimado (autocompletar precio si falta)
         costo_total = 0
         for item_data in items_data:
             precio = item_data.get('precio_acordado')
@@ -171,14 +171,14 @@ class SolicitudPublicidadWebCreateSerializer(serializers.ModelSerializer):
                 item_data['precio_acordado'] = precio
             costo_total += precio
             ItemSolicitudWeb.objects.create(solicitud=solicitud, **item_data)
-        # Persistir costo total estimado en la solicitud creada
+        #persistir costo total estimado en la solicitud creada
         solicitud.costo_total_estimado = costo_total
         solicitud.save(update_fields=['costo_total_estimado'])
         
         return solicitud
 
 class SolicitudPublicidadWebListSerializer(serializers.ModelSerializer):
-    """Serializer simplificado para listar solicitudes"""
+    """serializer simplificado para listar solicitudes"""
     estado_display = serializers.CharField(source='get_estado_display', read_only=True)
     items_count = serializers.SerializerMethodField()
     

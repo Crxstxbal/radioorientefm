@@ -7,5 +7,5 @@ class ArticulosConfig(AppConfig):
     verbose_name = 'Artículos'
 
     def ready(self):
-        """Importar señales cuando la aplicación esté lista"""
+        """importar señales cuando la aplicación esté lista"""
         import apps.articulos.signals  # noqa
