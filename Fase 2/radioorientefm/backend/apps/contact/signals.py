@@ -26,7 +26,7 @@ def enviar_email_bienvenida(sender, instance, created, **kwargs):
 
         #renderizar el template html
         html_message = render_to_string('emails/bienvenida_suscripcion.html', context)
-  #versión texto plano como fallback
+        plain_message = strip_tags(html_message)  #versión texto plano como fallback
 
         #preparar el asunto
         subject = f'¡Bienvenido a Radio Oriente! 🎉'
@@ -35,7 +35,7 @@ def enviar_email_bienvenida(sender, instance, created, **kwargs):
         #crear email con soporte html
         email = EmailMultiAlternatives(
             subject=subject,
-  #versión texto plano
+            body=plain_message,  #versión texto plano
             from_email=from_email,
             to=[instance.email]
         )

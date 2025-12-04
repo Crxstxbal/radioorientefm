@@ -1,21 +1,50 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
+import logging
 from .models import Articulo
 from apps.contact.models import Suscripcion
+
+logger = logging.getLogger(__name__)
+
+
+@receiver(pre_save, sender=Articulo)
+def guardar_estado_anterior(sender, instance, **kwargs):
+    """guarda el estado anterior de publicado para detectar cambios"""
+    if instance.pk:
+        try:
+            old_instance = Articulo.objects.get(pk=instance.pk)
+            instance._publicado_anterior = old_instance.publicado
+        except Articulo.DoesNotExist:
+            instance._publicado_anterior = False
+    else:
+        instance._publicado_anterior = False
 
 
 @receiver(post_save, sender=Articulo)
 def enviar_newsletter_articulo(sender, instance, created, **kwargs):
-    """envía un email html a todos los suscriptores activos cuando se publica un nuevo artículo. solo se envía si el artículo es nuevo y está publicado"""
-    #solo enviar si
-    #1. es un artículo nuevo (created=true)
-    #2. el artículo está publicado (publicado=true)
-    if not created or not instance.publicado:
+    """envía un email html a todos los suscriptores activos cuando se publica un artículo.
+    se envía si:
+    - es un artículo nuevo y está publicado, o
+    - es un artículo existente que acaba de cambiar a publicado
+    """
+    #verificar si debemos enviar el newsletter
+    publicado_anterior = getattr(instance, '_publicado_anterior', False)
+    
+    #enviar si: (es nuevo Y publicado) O (cambió de no publicado a publicado)
+    debe_enviar = (
+        (created and instance.publicado) or 
+        (not created and not publicado_anterior and instance.publicado)
+    )
+    
+    if not debe_enviar:
+        logger.info(f"No se envía newsletter para '{instance.titulo}': created={created}, publicado={instance.publicado}, publicado_anterior={publicado_anterior}")
         return
+    
+    logger.info(f"Iniciando envío de newsletter para artículo: {instance.titulo}")
 
     #obtener todos los suscriptores activos
     suscriptores = Suscripcion.objects.filter(activa=True)
@@ -47,7 +76,7 @@ def enviar_newsletter_articulo(sender, instance, created, **kwargs):
             #preparar el contexto para cada suscriptor
             context = {
                 'articulo': instance,
-  #url completa de la imagen
+                'imagen_articulo': imagen_url,  #url completa de la imagen
                 'site_url': settings.FRONTEND_URL or 'http://localhost:3000',
                 'radio_name': 'Radio Oriente',
                 'nombre': suscripcion.nombre,
@@ -56,12 +85,12 @@ def enviar_newsletter_articulo(sender, instance, created, **kwargs):
 
             #renderizar el template html
             html_message = render_to_string('emails/nuevo_articulo.html', context)
-  #versión texto plano como fallback
+            plain_message = strip_tags(html_message)  #versión texto plano como fallback
 
             #crear email con soporte html
             email = EmailMultiAlternatives(
                 subject=subject,
-  #versión texto plano
+                body=plain_message,  #versión texto plano
                 from_email=from_email,
                 to=[suscripcion.email]
             )
