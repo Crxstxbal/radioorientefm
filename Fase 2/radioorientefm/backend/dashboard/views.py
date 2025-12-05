@@ -3496,7 +3496,7 @@ def api_get_calendar_events(request):
         events_result = service.events().list(
             calendarId=CALENDAR_ID, 
             timeMin=now,
-            maxResults=50,
+            maxResults=500,
             singleEvents=True,
             orderBy='startTime'
         ).execute()
