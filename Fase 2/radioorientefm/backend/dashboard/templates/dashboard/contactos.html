@@ -537,7 +537,7 @@
         </div>
     </div>
 
-    <!-- Gestión de estados (compartida con bandas emergentes) -->
+    <!-- Gestión de estados de contactos -->
     <div class="row mb-3">
         <div class="col-12">
             <div class="card">
@@ -545,7 +545,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
                             <i class="fas fa-tasks me-2"></i>
-                            Gestión de estados
+                            Gestión de estados de contactos
                         </h5>
                         <i class="fas fa-chevron-down"></i>
                     </div>
@@ -554,20 +554,14 @@
                     <div class="card-body">
                         <form id="form-agregar-estado" method="post" action="{% url 'agregar_estado' %}" class="row g-3 mb-4">
                             {% csrf_token %}
-                            <div class="col-md-4">
+                            <input type="hidden" name="tipo_entidad" value="contacto">
+                            <div class="col-md-5">
                                 <label class="form-label">Nombre del Estado</label>
                                 <input type="text" class="form-control" name="nombre" placeholder="Ej: En Proceso..." required>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-5">
                                 <label class="form-label">Descripción</label>
                                 <input type="text" class="form-control" name="descripcion" placeholder="Breve descripción...">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Tipo</label>
-                                <select class="form-select" name="tipo_entidad" required>
-                                    <option value="banda">Banda</option>
-                                    <option value="contacto">Contacto</option>
-                                </select>
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <button type="submit" class="btn btn-primary w-100">
@@ -582,7 +576,6 @@
                                     <tr>
                                         <th>Estado</th>
                                         <th>Descripción</th>
-                                        <th>Tipo</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -591,19 +584,18 @@
                                     <tr id="estado-row-{{ estado.id }}">
                                         <td><strong>{{ estado.nombre }}</strong></td>
                                         <td>{{ estado.descripcion|default:"Sin descripción" }}</td>
-                                        <td>{{ estado.get_tipo_entidad_display }}</td>
                                         <td>
                                             <button type="button"
                                                     class="btn btn-sm btn-outline-danger"
                                                     onclick="deleteItem('{% url 'eliminar_estado' estado.id %}', '{{ estado.nombre|escapejs }}')"
-                                                    {% if estado.contactos.exists or estado.bandas.exists %}disabled title="No se puede eliminar porque tiene elementos asociados"{% endif %}>
+                                                    {% if estado.contactos.exists %}disabled title="No se puede eliminar porque tiene contactos asociados"{% endif %}>
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
                                     </tr>
                                     {% empty %}
                                     <tr id="no-estados-row">
-                                        <td colspan="4" class="text-center text-muted">No hay estados registrados.</td>
+                                        <td colspan="3" class="text-center text-muted">No hay estados registrados.</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

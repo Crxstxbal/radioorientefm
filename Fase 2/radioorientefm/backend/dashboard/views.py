@@ -2020,19 +2020,23 @@ def api_ver_campania(request, campania_id: int):
 @require_http_methods(["POST"])
 def api_publicidad_solicitar(request):
     """crea una solicitud de publicidad web. requiere autenticacion. espera json con: nombre, email, telefono, preferencia_contacto, ubicacion_id, url_destino, fecha_inicio, fecha_fin, mensaje (opcional)"""
-    #resolver usuario autenticado (sesión o token)
-    auth_user = request.user if request.user.is_authenticated else None
-    if not auth_user:
-        try:
-            auth_header = request.META.get('HTTP_AUTHORIZATION', '')
-            if isinstance(auth_header, str) and auth_header.startswith('Token '):
-                token_key = auth_header.split(' ', 1)[1].strip()
-                token_obj = Token.objects.select_related('user').get(key=token_key)
-                auth_user = token_obj.user
-        except Token.DoesNotExist:
-            auth_user = None
-        except Exception:
-            auth_user = None
+    #resolver usuario autenticado: PRIORIDAD al token sobre la sesión
+    #esto evita que si el admin está logueado en el dashboard, se use su sesión en lugar del token del usuario del frontend
+    auth_user = None
+    try:
+        auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+        if isinstance(auth_header, str) and auth_header.startswith('Token '):
+            token_key = auth_header.split(' ', 1)[1].strip()
+            token_obj = Token.objects.select_related('user').get(key=token_key)
+            auth_user = token_obj.user
+    except Token.DoesNotExist:
+        pass
+    except Exception:
+        pass
+    
+    #si no hay token, usar la sesión como fallback
+    if not auth_user and request.user.is_authenticated:
+        auth_user = request.user
 
     #verificar autenticacion primero
     if not auth_user:
@@ -3195,11 +3199,11 @@ def dashboard_contactos(request):
     page_obj = paginator.get_page(page_number)
 
     #obtener estados y tipos de asunto disponibles
-    estados_disponibles = Estado.objects.all().order_by('nombre')
+    estados_disponibles = Estado.objects.filter(tipo_entidad='contacto').order_by('nombre')
     tipos_asunto = TipoAsunto.objects.all().order_by('nombre')
 
     # estados para la sección "Gestión de estados" (contactos y bandas)
-    estados = Estado.objects.all().order_by('tipo_entidad', 'nombre')
+    estados = Estado.objects.filter(tipo_entidad='contacto').order_by('nombre')
 
     context = {
         'contactos': page_obj,

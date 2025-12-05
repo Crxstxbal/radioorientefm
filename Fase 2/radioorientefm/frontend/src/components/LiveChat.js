@@ -116,45 +116,45 @@ const LiveChat = () => {
       };
       const wsUrl = toWs(rawBase);
       
-      console.log('🔌 Conectando WebSocket a:', wsUrl);
+      console.log('Conectando WebSocket a:', wsUrl);
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('✅ WebSocket conectado');
+        console.log('WebSocket conectado');
       };
 
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log('📨 Mensaje WebSocket recibido:', data);
+          console.log('Mensaje WebSocket recibido:', data);
           
           if (data && data.type === 'presence' && typeof data.users_online === 'number') {
-            console.log('👥 Actualizando usuarios conectados:', data.users_online);
+            console.log('Actualizando usuarios conectados:', data.users_online);
             setOnlineUsers(data.users_online);
           }
         } catch (error) {
-          console.error('❌ Error parseando mensaje WS:', error);
+          console.error('Error parseando mensaje WS:', error);
         }
       };
 
       ws.onclose = (event) => {
-        console.log('🔌 WebSocket cerrado:', event.code, event.reason);
+        console.log('WebSocket cerrado:', event.code, event.reason);
         wsRef.current = null;
       };
 
       ws.onerror = (error) => {
-        console.error('❌ Error WebSocket:', error);
+        console.error('Error WebSocket:', error);
       };
 
       return () => {
         try { 
-          console.log('🔌 Cerrando WebSocket');
+          console.log('Cerrando WebSocket');
           ws.close(); 
         } catch (_) {}
       };
     } catch (error) {
-      console.error('❌ Error creando WebSocket:', error);
+      console.error('Error creando WebSocket:', error);
     }
   }, []);
 

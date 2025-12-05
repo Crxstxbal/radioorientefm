@@ -393,9 +393,17 @@ document.addEventListener('DOMContentLoaded', function() {
     cargarUbicacionesCampanias();
 
     // Configurar el botón de confirmar eliminación del modal global
+    // Sobrescribir el comportamiento por defecto de base.html para campañas y solicitudes
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     if (confirmDeleteBtn) {
-        confirmDeleteBtn.addEventListener('click', async function() {
+        // Remover listeners anteriores clonando el botón
+        const newBtn = confirmDeleteBtn.cloneNode(true);
+        confirmDeleteBtn.parentNode.replaceChild(newBtn, confirmDeleteBtn);
+        
+        newBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
             if (campaniaIdPendiente !== null) {
                 await eliminarCampania(campaniaIdPendiente);
                 campaniaIdPendiente = null;
